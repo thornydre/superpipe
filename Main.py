@@ -484,189 +484,192 @@ class SuperPipe(Frame):
             self.assetListCommand(None)
 
     def shotlistCommand(self, e):
-        selected_line = self.shot_list.curselection()[0]
-        selected_shot = self.shot_list.get(selected_line)
-        self.var_shot_nb_label.set(selected_shot.replace("s", "SEQUENCE ").replace("p", " SHOT "))
+        if self.shot_list.size() != 0:
+            selected_line = self.shot_list.curselection()[0]
+            selected_shot = self.shot_list.get(selected_line)
+            self.var_shot_nb_label.set(selected_shot.replace("s", "SEQUENCE ").replace("p", " SHOT "))
 
-        if selected_line == 0 and selected_line == self.shot_list.size() - 1:
-            self.up_button.grid_forget()
-            self.down_button.grid_forget()
-        elif selected_line == 0:
-            self.up_button.grid_forget()
-            self.down_button.grid(self.down_button.pi)
-        elif selected_line == self.shot_list.size() - 1:
-            self.down_button.grid_forget()
-            self.up_button.grid(self.up_button.pi)
-        else:
-            self.down_button.grid(self.down_button.pi)
-            self.up_button.grid(self.up_button.pi)
-
-        self.main_area_shot.grid(self.main_area_shot.pi)
-        self.main_area_asset.grid_forget()
-        self.main_area_preview.grid_forget()
-
-        self.asset_list.selection_remove(self.asset_list.focus())
-
-        self.delete_shot_button.grid(self.delete_shot_button.pi)
-
-        self.current_project.setSelection(shot_name = selected_shot)
-        shot = self.current_project.getSelection()
-
-        self.updateVersionListView(shot = shot)
-        self.version_list.select_set(0)
-
-        if shot.isSet():
-            self.set_shot_button.grid_forget()
-            self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
-
-            pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
-
-            selected_line = self.version_list.curselection()[0]
-            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
-
-            if path.isfile(pict_path):
-                pict = PhotoImage(file = pict_path)
-
-                self.shot_gifdict[pict_path] = pict
-
-                self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
-                self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
-
+            if selected_line == 0 and selected_line == self.shot_list.size() - 1:
+                self.up_button.grid_forget()
+                self.down_button.grid_forget()
+            elif selected_line == 0:
+                self.up_button.grid_forget()
+                self.down_button.grid(self.down_button.pi)
+            elif selected_line == self.shot_list.size() - 1:
+                self.down_button.grid_forget()
+                self.up_button.grid(self.up_button.pi)
             else:
-                self.shot_pict_caneva.grid_forget()
+                self.down_button.grid(self.down_button.pi)
+                self.up_button.grid(self.up_button.pi)
 
-        else:
-            self.set_shot_button.grid(self.set_shot_button.pi)
-            self.open_shot_layout_button.grid_forget()
+            self.main_area_shot.grid(self.main_area_shot.pi)
+            self.main_area_asset.grid_forget()
+            self.main_area_preview.grid_forget()
 
-            self.shot_pict_caneva.grid_forget()
+            self.asset_list.selection_remove(self.asset_list.focus())
 
-            self.var_selection_path_label.set("")
+            self.delete_shot_button.grid(self.delete_shot_button.pi)
 
-        prev_pict_path = ""
+            self.current_project.setSelection(shot_name = selected_shot)
+            shot = self.current_project.getSelection()
 
-        prev_shot_nb = shot.getShotNb() - 1
-
-        if prev_shot_nb > 0:
-            for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-                if shot_dir != "backup":
-                    if int(shot_dir[-2:]) == prev_shot_nb:
-                        all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
-
-                        all_picts_path_array = []
-
-                        for f in listdir(all_picts_path):
-                            if "small.gif" not in f:
-                                all_picts_path_array.append(all_picts_path + f)
-
-                        if all_picts_path_array:
-                            prev_pict_path = max(all_picts_path_array, key = path.getmtime)
-
-        if path.isfile(prev_pict_path):
-            pict = PhotoImage(file = prev_pict_path)
-
-            self.shot_prev_gifdict[prev_pict_path] = pict
-
-            self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
-            self.shot_prev_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-            self.shot_prev_pict_caneva.config(height = pict.height(), width = pict.width())
-        else:
-            self.shot_prev_pict_caneva.grid_forget()
-
-    def assetListCommand(self, e):
-        self.main_area_asset.grid(self.main_area_asset.pi)
-        self.main_area_shot.grid_forget()
-        self.main_area_preview.grid_forget()
-
-        self.shot_list.selection_clear(0, END)
-
-        if self.asset_list.focus() not in ["character", "fx", "props", "set"]:
-            selected_asset = self.asset_list.focus()
-
-            self.current_project.setSelection(asset_name = selected_asset, asset_cat = self.asset_list.parent(selected_asset))
-            asset = self.current_project.getSelection()
-
-            self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
-            self.delete_asset_button.grid(self.delete_asset_button.pi)
-            self.rename_asset_button.grid(self.rename_asset_button.pi)
-
-            self.updateVersionListView(asset = asset)
+            self.updateVersionListView(shot = shot)
             self.version_list.select_set(0)
 
-            if asset:
-                if asset.isSet():
-                    self.set_asset_button.grid_forget()
-                    self.open_asset_button.grid(self.open_asset_button.pi)
+            if shot.isSet():
+                self.set_shot_button.grid_forget()
+                self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
 
-                    selected_line = self.version_list.curselection()[0]
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
-                    pict_path = asset.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
+                selected_line = self.version_list.curselection()[0]
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
-                    if path.isfile(pict_path):
-                        pict = PhotoImage(file = pict_path)
+                if path.isfile(pict_path):
+                    pict = PhotoImage(file = pict_path)
 
-                        self.asset_gifdict[pict_path] = pict
+                    self.shot_gifdict[pict_path] = pict
 
-                        self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
-                        self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                        self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
-                    else:
-                        self.asset_pict_caneva.grid_forget()
-                        
+                    self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
+                    self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                    self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+
                 else:
-                    self.set_asset_button.grid(self.set_asset_button.pi)
-                    self.open_asset_button.grid_forget()
-                    self.var_selection_path_label.set("")
-                    self.asset_pict_caneva.grid_forget()
+                    self.shot_pict_caneva.grid_forget()
 
-        else:
-            self.var_asset_label.set("NO ASSET SELECTED")
-            self.var_selection_path_label.set("")
-            self.delete_asset_button.grid_forget()
-            self.rename_asset_button.grid_forget()
-            self.set_asset_button.grid_forget()
-            self.open_asset_button.grid_forget()
-            self.version_list.delete(0, END)
-            self.asset_pict_caneva.grid_forget()
-
-    def versionslistCommand(self, e):
-        self.open_asset_button.grid(self.open_asset_button.pi)
-
-        selected_line = self.version_list.curselection()[0]
-        selected_asset_version = self.version_list.get(selected_line)
-
-        if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version):
-            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version)
-        else:
-            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_asset_version)
-
-        pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_asset_version.strip(".ma") + ".gif"
-
-        if self.current_project.getSelectionType() == "shot":
-            if path.isfile(pict_path):
-                pict = PhotoImage(file = pict_path)
-
-                self.shot_gifdict[pict_path] = pict
-
-                self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
-                self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
             else:
+                self.set_shot_button.grid(self.set_shot_button.pi)
+                self.open_shot_layout_button.grid_forget()
+
                 self.shot_pict_caneva.grid_forget()
 
-        elif self.current_project.getSelectionType() == "asset":
-            if path.isfile(pict_path):
-                pict = PhotoImage(file = pict_path)
+                self.var_selection_path_label.set("")
 
-                self.asset_gifdict[pict_path] = pict
+            prev_pict_path = ""
 
-                self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
-                self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+            prev_shot_nb = shot.getShotNb() - 1
+
+            if prev_shot_nb > 0:
+                for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
+                    if shot_dir != "backup":
+                        if int(shot_dir[-2:]) == prev_shot_nb:
+                            all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
+
+                            all_picts_path_array = []
+
+                            for f in listdir(all_picts_path):
+                                if "small.gif" not in f:
+                                    all_picts_path_array.append(all_picts_path + f)
+
+                            if all_picts_path_array:
+                                prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+
+            if path.isfile(prev_pict_path):
+                pict = PhotoImage(file = prev_pict_path)
+
+                self.shot_prev_gifdict[prev_pict_path] = pict
+
+                self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
+                self.shot_prev_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                self.shot_prev_pict_caneva.config(height = pict.height(), width = pict.width())
             else:
+                self.shot_prev_pict_caneva.grid_forget()
+
+    def assetListCommand(self, e):
+        if self.asset_list.focus():
+            self.main_area_asset.grid(self.main_area_asset.pi)
+            self.main_area_shot.grid_forget()
+            self.main_area_preview.grid_forget()
+
+            self.shot_list.selection_clear(0, END)
+
+            if self.asset_list.focus() not in ["character", "fx", "props", "set"]:
+                selected_asset = self.asset_list.focus()
+
+                self.current_project.setSelection(asset_name = selected_asset, asset_cat = self.asset_list.parent(selected_asset))
+                asset = self.current_project.getSelection()
+
+                self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
+                self.delete_asset_button.grid(self.delete_asset_button.pi)
+                self.rename_asset_button.grid(self.rename_asset_button.pi)
+
+                self.updateVersionListView(asset = asset)
+                self.version_list.select_set(0)
+
+                if asset:
+                    if asset.isSet():
+                        self.set_asset_button.grid_forget()
+                        self.open_asset_button.grid(self.open_asset_button.pi)
+
+                        selected_line = self.version_list.curselection()[0]
+                        self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+
+                        pict_path = asset.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
+
+                        if path.isfile(pict_path):
+                            pict = PhotoImage(file = pict_path)
+
+                            self.asset_gifdict[pict_path] = pict
+
+                            self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
+                            self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                            self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                        else:
+                            self.asset_pict_caneva.grid_forget()
+                            
+                    else:
+                        self.set_asset_button.grid(self.set_asset_button.pi)
+                        self.open_asset_button.grid_forget()
+                        self.var_selection_path_label.set("")
+                        self.asset_pict_caneva.grid_forget()
+
+            else:
+                self.var_asset_label.set("NO ASSET SELECTED")
+                self.var_selection_path_label.set("")
+                self.delete_asset_button.grid_forget()
+                self.rename_asset_button.grid_forget()
+                self.set_asset_button.grid_forget()
+                self.open_asset_button.grid_forget()
+                self.version_list.delete(0, END)
                 self.asset_pict_caneva.grid_forget()
+
+    def versionslistCommand(self, e):
+        if self.version_list.size() != 0:
+            self.open_asset_button.grid(self.open_asset_button.pi)
+
+            selected_line = self.version_list.curselection()[0]
+            selected_asset_version = self.version_list.get(selected_line)
+
+            if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version):
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version)
+            else:
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_asset_version)
+
+            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_asset_version.strip(".ma") + ".gif"
+
+            if self.current_project.getSelectionType() == "shot":
+                if path.isfile(pict_path):
+                    pict = PhotoImage(file = pict_path)
+
+                    self.shot_gifdict[pict_path] = pict
+
+                    self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
+                    self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                    self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+                else:
+                    self.shot_pict_caneva.grid_forget()
+
+            elif self.current_project.getSelectionType() == "asset":
+                if path.isfile(pict_path):
+                    pict = PhotoImage(file = pict_path)
+
+                    self.asset_gifdict[pict_path] = pict
+
+                    self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
+                    self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                    self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                else:
+                    self.asset_pict_caneva.grid_forget()
 
     def openShotCommand(self):
         selected_line = self.version_list.curselection()[0]
