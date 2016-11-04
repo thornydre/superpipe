@@ -26,8 +26,8 @@ class SuperPipe(Frame):
         self.current_project = None
         self.current_sequence = 1
 
-        self.maya_path = Resources.readLine("save/options.supi", 1)
-        self.nuke_path = Resources.readLine("save/options.supi", 2)
+        self.maya_path = Resources.readLine("save/options.spi", 1)
+        self.nuke_path = Resources.readLine("save/options.spi", 2)
 
         self.initUI()
 
@@ -70,6 +70,7 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
+        ## // SIDE BAR \\ ##
         left_side_bar = Frame(self.parent, bg = "#666666")
         left_side_bar.grid(row = 0, column = 0, sticky = N)
 
@@ -89,7 +90,7 @@ class SuperPipe(Frame):
         self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.addShotCommand)
         self.add_shot_button.grid(row = 0, column = 1)
 
-        ## ASSETS ##
+        ## ASSETS LIST ##
         asset_label = Label(left_side_bar, text = "Assets", bg = "#666666", font = "Helvetica 10 bold")
         asset_label.grid(row = 1, column = 0, columnspan = 2)
 
@@ -102,7 +103,7 @@ class SuperPipe(Frame):
         self.asset_list.grid(row = 2, column = 0, columnspan = 2, sticky = N + S + W + E)
         self.asset_list.bind("<ButtonRelease-1>", self.assetListCommand)
 
-        ## SHOTS ##
+        ## SHOTS LIST ##
         shot_label = Label(left_side_bar, text = "Shots", bg = "#666666", font = "Helvetica 10 bold")
         shot_label.grid(row = 3, column = 0, columnspan = 2)
 
@@ -120,22 +121,24 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        ## SHOTS ##
+        ## // SHOTS MAIN FRAME \\ ##
         self.main_area_shot = Frame(self.parent, bg = "#666666", bd = 0)
         self.main_area_shot.grid(row = 0, column = 2, sticky = N + S + W + E)
         self.main_area_shot.pi = self.main_area_shot.grid_info()
 
         self.main_area_shot.columnconfigure(0, pad = 10, minsize = 40)
         self.main_area_shot.columnconfigure(1, pad = 10)
-        self.main_area_shot.columnconfigure(2, pad = 10)
+        self.main_area_shot.columnconfigure(2, pad = 10, minsize = 50)
         self.main_area_shot.columnconfigure(3, pad = 10)
         self.main_area_shot.columnconfigure(4, pad = 10, weight = 2)
         self.main_area_shot.columnconfigure(5, pad = 10)
 
         self.main_area_shot.rowconfigure(0, pad = 20, minsize = 75)
-        self.main_area_shot.rowconfigure(1, pad = 5, minsize = 30)
-        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 410)
+        self.main_area_shot.rowconfigure(1, pad = 5, minsize = 75)
+        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 50)
+        self.main_area_shot.rowconfigure(3, pad = 5, minsize = 410)
 
+        ## SHOT INFOS ##
         self.up_down_shot = Frame(self.main_area_shot, bg = "#666666", bd = 0)
         self.up_down_shot.grid(row = 0, column = 0, sticky = N + S, pady = 10)
         self.up_down_shot.pi = self.up_down_shot.grid_info()
@@ -162,12 +165,13 @@ class SuperPipe(Frame):
         shot_nb_label = Label(self.main_area_shot, textvariable = self.var_shot_nb_label, bg = "#666666", height = 1, anchor = NW, font = "Helvetica 11 bold")
         shot_nb_label.grid(row = 0, column = 1)
 
-        self.delete_shot_button = Button(self.main_area_shot, text = "Delete shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.deleteShotCommand)
+        self.delete_shot_button_img = PhotoImage(file = "img/red_cross.gif")
+        self.delete_shot_button = Button(self.main_area_shot, image = self.delete_shot_button_img, bg = "#666666", activebackground = "#666666", cursor = "hand2", fg = "#FFFFFF", bd = 0, command = self.deleteShotCommand)
         self.delete_shot_button.grid(row = 0, column = 2)
         self.delete_shot_button.pi = self.delete_shot_button.grid_info()
         self.delete_shot_button.grid_forget()
 
-        self.set_shot_button = Button(self.main_area_shot, text = "Set", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setShotCommand)
+        self.set_shot_button = Button(self.main_area_shot, text = "Set shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setShotCommand)
         self.set_shot_button.grid(row = 0, column = 3)
         self.set_shot_button.pi = self.set_shot_button.grid_info()
         self.set_shot_button.grid_forget()
@@ -178,19 +182,55 @@ class SuperPipe(Frame):
 
         self.var_check_show_last = IntVar()
         shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
-        shot_show_last_only_button.grid(row = 0, column = 5)
+        shot_show_last_only_button.grid(row = 0, column = 5, sticky = E)
 
-        self.open_shot_layout_button = Button(self.main_area_shot, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.openShotCommand)
-        self.open_shot_layout_button.grid(row = 1, column = 0, columnspan = 2)
+        ## SHOT STATE ##
+        self.shot_state_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.shot_state_line.columnconfigure(0, pad = 10)
+        self.shot_state_line.columnconfigure(1, pad = 10)
+        self.shot_state_line.columnconfigure(2, pad = 10)
+
+        self.priority_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_label.grid(row = 0, column = 0, sticky = E)
+        self.priority_label.pi = self.priority_label.grid_info()
+        self.priority_label.grid_forget()
+
+        self.var_shot_priority = StringVar(self.shot_state_line)
+        self.var_shot_priority.set("Low")
+
+        self.priority_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
+        self.priority_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
+        self.priority_menu.grid(row = 0, column = 2, sticky = W)
+        self.priority_menu.pi = self.priority_menu.grid_info()
+        self.priority_menu.grid_forget()
+
+        self.var_shot_done = IntVar()
+        self.done_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = "#666666", activebackground = "#666666", command = self.toggleShotDone)
+        self.done_button.grid(row = 0, column = 3)
+        self.done_button.pi = self.done_button.grid_info()
+        self.done_button.grid_forget()
+
+        ## SHOT ACTIONS ##
+        self.shot_actions_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_actions_line.grid(row = 2, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.shot_actions_line.columnconfigure(0, pad = 10)
+        self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
+        self.shot_actions_line.columnconfigure(2, pad = 10)
+
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
         self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
         self.open_shot_layout_button.grid_forget()
 
         ## PICTURES ##
         pictures_shot = Frame(self.main_area_shot, bg = "#555555", bd = 0)
-        pictures_shot.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        pictures_shot.grid(row = 3, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
 
-        pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
-        pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
+        pictures_shot.columnconfigure(0, weight = 2, minsize = 550)
+        pictures_shot.columnconfigure(1, weight = 2, minsize = 550)
 
         prev_pict_label = Label(pictures_shot, text = "Previous shot", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
         prev_pict_label.grid(row = 0, column = 0, pady = 10)
@@ -212,7 +252,7 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        ## ASSETS ##
+        ## // ASSETS MAIN FRAME \\ ##
         self.main_area_asset = Frame(self.parent, bg = "#666666", bd = 0, width = 1000, height = 300)
         self.main_area_asset.grid(row = 0, column = 2, sticky = N + S + W + E)
         self.main_area_asset.pi = self.main_area_asset.grid_info()
@@ -234,7 +274,8 @@ class SuperPipe(Frame):
         shot_nb_label = Label(self.main_area_asset, textvariable = self.var_asset_label, bg = "#666666", height = 1, anchor = NW, font = "Helvetica 11 bold")
         shot_nb_label.grid(row = 0, column = 0)
 
-        self.delete_asset_button = Button(self.main_area_asset, text = "Delete asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.deleteAssetCommand)
+        self.delete_asset_button_img = PhotoImage(file = "img/red_cross.gif")
+        self.delete_asset_button = Button(self.main_area_asset, image = self.delete_asset_button_img, bg = "#666666", activebackground = "#666666", fg = "#FFFFFF", cursor = "hand2", bd = 0, command = self.deleteAssetCommand)
         self.delete_asset_button.grid(row = 0, column = 1)
         self.delete_asset_button.pi = self.delete_asset_button.grid_info()
         self.delete_asset_button.grid_forget()
@@ -244,7 +285,7 @@ class SuperPipe(Frame):
         self.rename_asset_button.pi = self.rename_asset_button.grid_info()
         self.rename_asset_button.grid_forget()
 
-        self.set_asset_button = Button(self.main_area_asset, text = "Set", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setAssetCommand)
+        self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setAssetCommand)
         self.set_asset_button.grid(row = 0, column = 3)
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
@@ -330,7 +371,7 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        project_directory = Resources.readLine("save/options.supi", 3)
+        project_directory = Resources.readLine("save/options.spi", 3)
 
         if project_directory:
             if path.isdir(project_directory):
@@ -359,7 +400,7 @@ class SuperPipe(Frame):
             self.current_project = Project(directory["dir"])
             self.current_sequence = self.current_project.getCurrentSequence()
 
-            Resources.writeAtLine("save/options.supi", directory["dir"], 3)
+            Resources.writeAtLine("save/options.spi", directory["dir"], 3)
 
             self.add_shot_button.config(state = NORMAL)
             self.add_asset_button.config(state = NORMAL)
@@ -376,7 +417,7 @@ class SuperPipe(Frame):
         if directory:
             self.current_project = Project(directory)
 
-            Resources.writeAtLine("save/options.supi", directory, 3)
+            Resources.writeAtLine("save/options.spi", directory, 3)
 
             self.current_sequence = self.current_project.getCurrentSequence()
 
@@ -397,6 +438,7 @@ class SuperPipe(Frame):
 
         self.set_shot_button.grid_forget()
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+        self.done_button.grid(self.done_button.pi)
 
         self.updateVersionListView(shot = shot)
         self.version_list.select_set(0)
@@ -516,9 +558,16 @@ class SuperPipe(Frame):
             self.updateVersionListView(shot = shot)
             self.version_list.select_set(0)
 
+            self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 1)))
+            self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 2))
+
+            self.priority_label.grid(self.priority_label.pi)
+            self.priority_menu.grid(self.priority_menu.pi)
+
             if shot.isSet():
                 self.set_shot_button.grid_forget()
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+                self.done_button.grid(self.done_button.pi)
 
                 pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
@@ -540,6 +589,7 @@ class SuperPipe(Frame):
             else:
                 self.set_shot_button.grid(self.set_shot_button.pi)
                 self.open_shot_layout_button.grid_forget()
+                self.done_button.grid_forget()
 
                 self.shot_pict_caneva.grid_forget()
 
@@ -733,6 +783,13 @@ class SuperPipe(Frame):
         for shot in shots:
             self.shot_list.insert(shot[0], shot[1])
 
+            cur_shot = Shot(self.current_project.getDirectory(), shot[1])
+
+            if cur_shot.isDone():
+                self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
+            elif cur_shot.getPriority() == "Urgent":
+                self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
+            
     def updateAssetListView(self):
         for child in self.asset_list.get_children("character"):
             self.asset_list.delete(child)
@@ -770,7 +827,7 @@ class SuperPipe(Frame):
         self.current_project.moveShotUp(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] + 1
-        self.shot_list.selection_clear(0, END)
+        self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
         self.shotlistCommand(None)
@@ -779,7 +836,7 @@ class SuperPipe(Frame):
         self.current_project.moveShotDown(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] - 1
-        self.shot_list.selection_clear(0, END)
+        self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
         self.shotlistCommand(None)
@@ -793,11 +850,28 @@ class SuperPipe(Frame):
 
         self.version_list.select_set(0)
 
+    def toggleShotDone(self):
+        selected_line = self.shot_list.curselection()[0]
+        self.current_project.getSelection().updateShotState(self.var_shot_priority.get(), self.var_shot_done.get())
+        self.updateShotListView()
+        self.shot_list.select_set(selected_line)
+
+    def priorityShotCommand(self, priority):
+        selected_line = self.shot_list.curselection()[0]
+        self.current_project.getSelection().updateShotState(priority, self.var_shot_done.get())
+        self.updateShotListView()
+        self.shot_list.select_set(selected_line)
+
     def shotsPreviewCommand(self):
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
 
         self.main_area_preview.grid(self.main_area_preview.pi)
+
+        self.asset_list.selection_remove(self.asset_list.focus())
+        self.shot_list.selection_clear(0, END)
+
+        self.version_list.delete(0, END)
 
         all_shots_preview = []
 
@@ -861,8 +935,8 @@ class SuperPipe(Frame):
             self.maya_path = preferences["maya_path"]
             self.nuke_path = preferences["nuke_path"]
 
-            Resources.writeAtLine("save/options.supi", preferences["maya_path"], 1)
-            Resources.writeAtLine("save/options.supi", preferences["nuke_path"], 2)
+            Resources.writeAtLine("save/options.spi", preferences["maya_path"], 1)
+            Resources.writeAtLine("save/options.spi", preferences["nuke_path"], 2)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog("About", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")

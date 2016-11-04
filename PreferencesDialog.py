@@ -33,7 +33,7 @@ class PreferencesDialog(object):
         label.grid(row = 0, column = 0, columnspan = 4)
 
         self.maya_var_text = StringVar()
-        self.maya_var_text.set(Resources.readLine("save/options.supi", 1))
+        self.maya_var_text.set(Resources.readLine("save/options.spi", 1))
 
         self.maya_path_entry = Entry(top_frame, textvariable = self.maya_var_text, state = DISABLED, width = 75)
         self.maya_path_entry.grid(row = 1, column = 0, columnspan = 3)
@@ -47,7 +47,7 @@ class PreferencesDialog(object):
         label.grid(row = 2, column = 0, columnspan = 4)
 
         self.nuke_var_text = StringVar()
-        self.nuke_var_text.set(Resources.readLine("save/options.supi", 1))
+        self.nuke_var_text.set(Resources.readLine("save/options.spi", 1))
 
         self.nuke_path_entry = Entry(top_frame, textvariable = self.nuke_var_text, state = DISABLED, width = 75)
         self.nuke_path_entry.grid(row = 3, column = 0, columnspan = 3)

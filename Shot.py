@@ -14,6 +14,8 @@ class Shot:
         self.shot_name = shot_name
         self.shot_nb, self.sequence = Resources.makeShotNbs(self.shot_name)
         self.directory = directory + "/05_shot/" + self.shot_name
+        self.done = 0
+        self.priority = "Low"
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -31,6 +33,9 @@ class Shot:
             
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
+            with open(self.directory + "/data/shot_data.spi", "w") as f:
+                f.write(str(self.done) + "\n" + self.priority)
+            f.close()
             
             makedirs(self.directory + "/images")
             makedirs(self.directory + "/images/screenshots")
@@ -65,6 +70,21 @@ class Shot:
 
             copyfile("src/workspace.mel", self.directory + "/workspace.mel")
 
+        else:
+            if not path.isfile(self.directory + "/data/shot_data.spi"):
+                with open(self.directory + "/data/shot_data.spi", "w") as f:
+                    f.write(str(self.done) + "\n" + self.priority)
+                f.close()
+
+            shot_infos = []
+            with open(self.directory + "/data/shot_data.spi", "r") as f:
+                for l in f:
+                    shot_infos.append(l.strip("\n"))
+            f.close()
+
+            self.done = int(shot_infos[0])
+            self.priority = shot_infos[1]
+
     def getShotNb(self):
         return self.shot_nb
 
@@ -76,6 +96,15 @@ class Shot:
 
     def getSequence(self):
         return self.sequence
+
+    def getPriority(self):
+        return self.priority
+
+    def isDone(self):
+        if self.done == 1:
+            return True
+        else:
+            return False
 
     def setShot(self):
         copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
@@ -115,7 +144,7 @@ class Shot:
 
             for f in listdir(new_dir + "/scenes/"):
                 if self.shot_name in f:
-                    rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f.replace(self.shot_name, new_name))
+                    rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f .replace(self.shot_name, new_name))
 
             for f in listdir(new_dir + "/scenes/edits/"):
                 if self.shot_name in f:
@@ -128,5 +157,11 @@ class Shot:
             for f in listdir(new_dir + "/images/screenshots/"):
                 if self.shot_name in f:
                     rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
-        else:
-            print("va te faire foutre !")
+
+    def updateShotState(self, priority, done):
+        self.priority = priority
+        self.done = done
+
+        with open(self.directory + "/data/shot_data.spi", "w") as f:
+            f.write(str(self.done) + "\n" + str(self.priority))
+        f.close()
