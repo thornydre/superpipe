@@ -11,10 +11,10 @@ import time
 class Asset:
     def __init__(self, directory = None, asset_name = None, category = None):
         self.asset_name = asset_name
-
         self.category = category
-
         self.directory = directory + "/04_asset/" + self.category + "/" + self.asset_name
+        self.done = 0
+        self.priority = "Low"
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -32,6 +32,9 @@ class Asset:
             
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
+            with open(self.directory + "/data/asset_data.spi", "w") as f:
+                f.write(str(self.done) + "\n" + self.priority)
+            f.close()
             
             makedirs(self.directory + "/images")
             makedirs(self.directory + "/images/screenshots")
@@ -66,6 +69,21 @@ class Asset:
 
             copyfile("src/workspace.mel", self.directory + "/workspace.mel")
 
+        else:
+            if not path.isfile(self.directory + "/data/asset_data.spi"):
+                with open(self.directory + "/data/asset_data.spi", "w") as f:
+                    f.write(str(self.done) + "\n" + self.priority)
+                f.close()
+
+            asset_infos = []
+            with open(self.directory + "/data/asset_data.spi", "r") as f:
+                for l in f:
+                    asset_infos.append(l.strip("\n"))
+            f.close()
+
+            self.done = int(asset_infos[0])
+            self.priority = asset_infos[1]
+
     def getAssetName(self):
         return self.asset_name
 
@@ -74,6 +92,15 @@ class Asset:
 
     def getCategory(self):
         return self.category
+
+    def getPriority(self):
+        return self.priority
+
+    def isDone(self):
+        if self.done == 1:
+            return True
+        else:
+            return False
 
     def setAsset(self):
         copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_v01.ma")
@@ -128,3 +155,11 @@ class Asset:
 
         else:
             return False
+
+    def updateAssetState(self, priority, done):
+        self.priority = priority
+        self.done = done
+
+        with open(self.directory + "/data/asset_data.spi", "w") as f:
+            f.write(str(self.done) + "\n" + str(self.priority))
+        f.close()

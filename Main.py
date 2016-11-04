@@ -95,7 +95,7 @@ class SuperPipe(Frame):
         asset_label.grid(row = 1, column = 0, columnspan = 2)
 
         self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
-        ttk.Style().configure("Treeview", background = "#777777", fieldbackground = "#777777")
+        ttk.Style().configure("Treeview", background = "#777777")
         self.asset_list.insert("", 1, "character", text = "CHARACTER")
         self.asset_list.insert("", 3, "fx", text = "FX")
         self.asset_list.insert("", 4, "props", text = "PROPS")
@@ -192,25 +192,25 @@ class SuperPipe(Frame):
         self.shot_state_line.columnconfigure(1, pad = 10)
         self.shot_state_line.columnconfigure(2, pad = 10)
 
-        self.priority_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
-        self.priority_label.grid(row = 0, column = 0, sticky = E)
-        self.priority_label.pi = self.priority_label.grid_info()
-        self.priority_label.grid_forget()
+        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
+        self.priority_shot_label.pi = self.priority_shot_label.grid_info()
+        self.priority_shot_label.grid_forget()
 
         self.var_shot_priority = StringVar(self.shot_state_line)
         self.var_shot_priority.set("Low")
 
-        self.priority_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
-        self.priority_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
-        self.priority_menu.grid(row = 0, column = 2, sticky = W)
-        self.priority_menu.pi = self.priority_menu.grid_info()
-        self.priority_menu.grid_forget()
+        self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
+        self.priority_shot_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
+        self.priority_shot_menu.grid(row = 0, column = 2, sticky = W)
+        self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
+        self.priority_shot_menu.grid_forget()
 
         self.var_shot_done = IntVar()
-        self.done_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = "#666666", activebackground = "#666666", command = self.toggleShotDone)
-        self.done_button.grid(row = 0, column = 3)
-        self.done_button.pi = self.done_button.grid_info()
-        self.done_button.grid_forget()
+        self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = "#666666", activebackground = "#666666", command = self.toggleShotDone)
+        self.done_shot_button.grid(row = 0, column = 3)
+        self.done_shot_button.pi = self.done_shot_button.grid_info()
+        self.done_shot_button.grid_forget()
 
         ## SHOT ACTIONS ##
         self.shot_actions_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
@@ -266,8 +266,9 @@ class SuperPipe(Frame):
         self.main_area_asset.columnconfigure(5, pad = 10)
 
         self.main_area_asset.rowconfigure(0, pad = 20, minsize = 75)
-        self.main_area_asset.rowconfigure(1, pad = 5, minsize = 30)
-        self.main_area_asset.rowconfigure(2, pad = 5, minsize = 410)
+        self.main_area_asset.rowconfigure(1, pad = 5, minsize = 75)
+        self.main_area_asset.rowconfigure(2, pad = 5, minsize = 30)
+        self.main_area_asset.rowconfigure(3, pad = 5, minsize = 410)
 
         self.var_asset_label = StringVar()
         self.var_asset_label.set("NO ASSET SELECTED")
@@ -296,14 +297,50 @@ class SuperPipe(Frame):
         asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
         asset_show_last_only_button.grid(row = 0, column = 5)
 
-        self.open_asset_button = Button(self.main_area_asset, text = "Open asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.openAssetCommand)
-        self.open_asset_button.grid(row = 1, column = 0)
+        ## ASSET STATE ##
+        self.asset_state_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
+        self.asset_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.asset_state_line.columnconfigure(0, pad = 10)
+        self.asset_state_line.columnconfigure(1, pad = 10)
+        self.asset_state_line.columnconfigure(2, pad = 10)
+
+        self.priority_asset_label = Label(self.asset_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_asset_label.grid(row = 0, column = 0, sticky = E)
+        self.priority_asset_label.pi = self.priority_asset_label.grid_info()
+        self.priority_asset_label.grid_forget()
+
+        self.var_asset_priority = StringVar(self.asset_state_line)
+        self.var_asset_priority.set("Low")
+
+        self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
+        self.priority_asset_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
+        self.priority_asset_menu.grid(row = 0, column = 2, sticky = W)
+        self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
+        self.priority_asset_menu.grid_forget()
+
+        self.var_asset_done = IntVar()
+        self.done_asset_button = Checkbutton(self.asset_state_line, text = "Shot done", variable = self.var_asset_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetDone)
+        self.done_asset_button.grid(row = 0, column = 3)
+        self.done_asset_button.pi = self.done_asset_button.grid_info()
+        self.done_asset_button.grid_forget()
+
+        ## ASSET ACTIONS ##
+        self.asset_actions_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
+        self.asset_actions_line.grid(row = 2, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.asset_actions_line.columnconfigure(0, pad = 10)
+        self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
+        self.asset_actions_line.columnconfigure(2, pad = 10)
+
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openAssetCommand)
+        self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
 
         ## PICTURES ##
         pictures_asset = Frame(self.main_area_asset, bg = "#555555", bd = 0)
-        pictures_asset.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        pictures_asset.grid(row = 3, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
 
         pictures_asset.columnconfigure(0, weight = 1)
 
@@ -438,7 +475,7 @@ class SuperPipe(Frame):
 
         self.set_shot_button.grid_forget()
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
-        self.done_button.grid(self.done_button.pi)
+        self.done_shot_button.grid(self.done_shot_button.pi)
 
         self.updateVersionListView(shot = shot)
         self.version_list.select_set(0)
@@ -456,6 +493,7 @@ class SuperPipe(Frame):
 
         self.set_asset_button.grid_forget()
         self.open_asset_button.grid(self.open_asset_button.pi)
+        self.done_asset_button.grid(self.done_asset_button.pi)
 
         self.updateVersionListView(asset = asset)
         self.version_list.select_set(0)
@@ -561,13 +599,13 @@ class SuperPipe(Frame):
             self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 1)))
             self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 2))
 
-            self.priority_label.grid(self.priority_label.pi)
-            self.priority_menu.grid(self.priority_menu.pi)
+            self.priority_shot_label.grid(self.priority_shot_label.pi)
+            self.priority_shot_menu.grid(self.priority_shot_menu.pi)
 
             if shot.isSet():
                 self.set_shot_button.grid_forget()
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
-                self.done_button.grid(self.done_button.pi)
+                self.done_shot_button.grid(self.done_shot_button.pi)
 
                 pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
@@ -589,7 +627,7 @@ class SuperPipe(Frame):
             else:
                 self.set_shot_button.grid(self.set_shot_button.pi)
                 self.open_shot_layout_button.grid_forget()
-                self.done_button.grid_forget()
+                self.done_shot_button.grid_forget()
 
                 self.shot_pict_caneva.grid_forget()
 
@@ -643,8 +681,14 @@ class SuperPipe(Frame):
                 self.delete_asset_button.grid(self.delete_asset_button.pi)
                 self.rename_asset_button.grid(self.rename_asset_button.pi)
 
+                self.priority_asset_label.grid(self.priority_asset_label.pi)
+                self.priority_asset_menu.grid(self.priority_asset_menu.pi)
+
                 self.updateVersionListView(asset = asset)
                 self.version_list.select_set(0)
+
+                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 1)))
+                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 2))
 
                 if asset:
                     if asset.isSet():
@@ -653,6 +697,8 @@ class SuperPipe(Frame):
 
                         selected_line = self.version_list.curselection()[0]
                         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+
+                        self.done_asset_button.grid(self.done_asset_button.pi)
 
                         pict_path = asset.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
@@ -672,6 +718,7 @@ class SuperPipe(Frame):
                         self.open_asset_button.grid_forget()
                         self.var_selection_path_label.set("")
                         self.asset_pict_caneva.grid_forget()
+                        self.done_asset_button.grid_forget()
 
             else:
                 self.var_asset_label.set("NO ASSET SELECTED")
@@ -682,6 +729,9 @@ class SuperPipe(Frame):
                 self.open_asset_button.grid_forget()
                 self.version_list.delete(0, END)
                 self.asset_pict_caneva.grid_forget()
+                self.priority_asset_label.grid_forget()
+                self.priority_asset_menu.grid_forget()
+                self.done_asset_button.grid_forget()
 
     def versionslistCommand(self, e):
         if self.version_list.size() != 0:
@@ -856,11 +906,17 @@ class SuperPipe(Frame):
         self.updateShotListView()
         self.shot_list.select_set(selected_line)
 
+    def toggleAssetDone(self):
+        self.current_project.getSelection().updateAssetState(self.var_asset_priority.get(), self.var_asset_done.get())
+
     def priorityShotCommand(self, priority):
         selected_line = self.shot_list.curselection()[0]
         self.current_project.getSelection().updateShotState(priority, self.var_shot_done.get())
         self.updateShotListView()
         self.shot_list.select_set(selected_line)
+
+    def priorityAssetCommand(self, priority):
+        self.current_project.getSelection().updateAssetState(priority, self.var_asset_done.get())
 
     def shotsPreviewCommand(self):
         self.main_area_shot.grid_forget()
