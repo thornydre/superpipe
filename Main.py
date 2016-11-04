@@ -96,6 +96,8 @@ class SuperPipe(Frame):
 
         self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = "#777777")
+        self.asset_list.tag_configure("done", background = "#89C17F")
+        self.asset_list.tag_configure("urgent", background = "#E55252")
         self.asset_list.insert("", 1, "character", text = "CHARACTER")
         self.asset_list.insert("", 3, "fx", text = "FX")
         self.asset_list.insert("", 4, "props", text = "PROPS")
@@ -854,7 +856,14 @@ class SuperPipe(Frame):
 
         for asset in assets:
             if asset[0] != "backup":
-                self.asset_list.insert(asset[1], END, asset[0], text = asset[0])
+                cur_asset = Asset(self.current_project.getDirectory(), asset[0], asset[1])
+
+                if cur_asset.isDone():
+                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("done"))
+                elif cur_asset.getPriority() == "Urgent":
+                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("urgent"))
+                else:
+                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0])
 
     def updateVersionListView(self, shot = None, asset = None):
         self.version_list.delete(0, END)
@@ -901,22 +910,32 @@ class SuperPipe(Frame):
         self.version_list.select_set(0)
 
     def toggleShotDone(self):
-        selected_line = self.shot_list.curselection()[0]
+        selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().updateShotState(self.var_shot_priority.get(), self.var_shot_done.get())
         self.updateShotListView()
-        self.shot_list.select_set(selected_line)
+        self.shot_list.select_set(selected_shot)
 
     def toggleAssetDone(self):
+        selected_asset = self.asset_list.focus()
         self.current_project.getSelection().updateAssetState(self.var_asset_priority.get(), self.var_asset_done.get())
+        self.updateAssetListView()
+        self.asset_list.selection_set(selected_asset)
+        self.asset_list.focus_set()
+        self.asset_list.focus(selected_asset)
 
     def priorityShotCommand(self, priority):
-        selected_line = self.shot_list.curselection()[0]
+        selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().updateShotState(priority, self.var_shot_done.get())
         self.updateShotListView()
-        self.shot_list.select_set(selected_line)
+        self.shot_list.select_set(selected_shot)
 
     def priorityAssetCommand(self, priority):
+        selected_asset = self.asset_list.focus()
         self.current_project.getSelection().updateAssetState(priority, self.var_asset_done.get())
+        self.updateAssetListView()
+        self.asset_list.selection_set(selected_asset)
+        self.asset_list.focus_set()
+        self.asset_list.focus(selected_asset)
 
     def shotsPreviewCommand(self):
         self.main_area_shot.grid_forget()
