@@ -8,6 +8,7 @@ from Resources import *
 from tkinter import *
 from tkinter import filedialog, ttk
 from os import path
+from urllib.parse import urlsplit
 
 import NewShotDialog
 import NewAssetDialog
@@ -16,6 +17,7 @@ import PreferencesDialog
 import YesNoDialog
 import OkDialog
 import subprocess
+import webbrowser
 
 class SuperPipe(Frame):
     def __init__(self, parent):
@@ -115,6 +117,10 @@ class SuperPipe(Frame):
 
         self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.grid(row = 5, column = 0, columnspan = 2)
+
+
+        self.custom_button = Button(left_side_bar, text = "Custom link", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button.grid(row = 6, column = 0, columnspan = 2)
 
         ###############################################################################################################
 
@@ -293,8 +299,8 @@ class SuperPipe(Frame):
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
 
-        shot_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = "#666666", height = 1, anchor = NW)
-        shot_path_label.grid(row = 0, column = 4)
+        asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = "#666666", height = 1, anchor = NW)
+        asset_path_label.grid(row = 0, column = 4)
 
         asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
         asset_show_last_only_button.grid(row = 0, column = 5)
@@ -335,7 +341,7 @@ class SuperPipe(Frame):
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_asset_button = Button(self.asset_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openAssetCommand)
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
@@ -516,9 +522,9 @@ class SuperPipe(Frame):
 
             self.updateShotListView()
 
-            self.shot_list.select_set(selected_line)
+            self.clearMainFrame("shot")
 
-            self.shotlistCommand(None)
+            self.updateVersionListView()
 
     def deleteAssetCommand(self):
         selected_asset = self.asset_list.focus()
@@ -532,6 +538,10 @@ class SuperPipe(Frame):
             self.current_project.removeAsset(selected_asset, self.asset_list.parent(selected_asset))
 
             self.updateAssetListView()
+
+            self.clearMainFrame("asset")
+
+            self.updateVersionListView()
 
     def addShotCommand(self):
         NewShotDialog.root = self.parent
@@ -981,6 +991,38 @@ class SuperPipe(Frame):
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
 
     ###############################################################################################################
+
+    def customButtonCommand(self):
+        base_url = "www.google.fr"
+        
+        # url = urlsplit(base_url)
+        # url.geturl()
+
+        webbrowser.open(base_url)
+
+    def clearMainFrame(self, type):
+        if type == "shot":
+            self.var_shot_nb_label.set("NO SHOT SELECTED")
+            self.up_down_shot.grid_forget()
+            self.delete_shot_button.grid_forget()
+            self.set_shot_button.grid_forget()
+            self.var_selection_path_label.set("")
+            self.shot_pict_caneva.grid_forget()
+            self.open_shot_layout_button.grid_forget()
+            self.priority_shot_menu.grid_forget()
+            self.priority_shot_label.grid_forget()
+            self.done_shot_button.grid_forget()
+        elif type == "asset":
+            self.var_asset_label.set("NO ASSET SELECTED")
+            self.delete_asset_button.grid_forget()
+            self.rename_asset_button.grid_forget()
+            self.set_asset_button.grid_forget()
+            self.var_selection_path_label.set("")
+            self.asset_pict_caneva.grid_forget()
+            self.open_asset_button.grid_forget()
+            self.priority_asset_menu.grid_forget()
+            self.priority_asset_label.grid_forget()
+            self.done_asset_button.grid_forget()
 
     def cleanBackupsCommand(self):
         yesno = {"result" : ""}
