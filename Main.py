@@ -272,9 +272,9 @@ class SuperPipe(Frame):
         self.main_area_asset.pi = self.main_area_asset.grid_info()
         self.main_area_asset.grid_forget()
 
-        self.main_area_asset.columnconfigure(0, pad = 10)
-        self.main_area_asset.columnconfigure(1, pad = 10, minsize = 50)
-        self.main_area_asset.columnconfigure(2, pad = 10)
+        self.main_area_asset.columnconfigure(0, pad = 10, minsize = 40)
+        self.main_area_asset.columnconfigure(1, pad = 10)
+        self.main_area_asset.columnconfigure(2, pad = 10, minsize = 50)
         self.main_area_asset.columnconfigure(3, pad = 10)
         self.main_area_asset.columnconfigure(4, pad = 10, weight = 2)
         self.main_area_asset.columnconfigure(5, pad = 10)

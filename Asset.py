@@ -127,7 +127,7 @@ class Asset:
                 if asset_file[-3:] == ".ma":
                     versions_list.append(asset_file)
 
-        return versions_list
+        return sorted(versions_list, reverse = True)
 
     def renameAsset(self, new_name):
         new_dir = path.dirname(self.directory) + "/" + new_name
