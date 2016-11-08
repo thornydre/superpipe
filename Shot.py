@@ -34,7 +34,7 @@ class Shot:
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
             with open(self.directory + "/data/shot_data.spi", "w") as f:
-                f.write(str(self.done) + "\n" + self.priority)
+                f.write(str(self.done) + "\n" + self.priority + "\n")
             f.close()
             
             makedirs(self.directory + "/images")

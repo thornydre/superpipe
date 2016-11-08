@@ -23,7 +23,7 @@ class OkDialog(object):
         ok_button["command"] = self.top.destroy
         ok_button.pack(padx = 4, pady = 4)
 
-        self.top.bind("<Return>", self.top.destroy)
+        self.top.bind("<Return>", lambda event: self.top.destroy())
         self.top.bind("<Escape>", lambda event: self.top.destroy())
 
         self.top.update_idletasks()

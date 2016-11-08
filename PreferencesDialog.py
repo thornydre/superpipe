@@ -32,10 +32,10 @@ class PreferencesDialog(object):
         label = Label(top_frame, text = "Path to Maya", bg = "#666666")
         label.grid(row = 0, column = 0, columnspan = 4)
 
-        self.maya_var_text = StringVar()
-        self.maya_var_text.set(Resources.readLine("save/options.spi", 1))
+        self.var_maya_text = StringVar()
+        self.var_maya_text.set(Resources.readLine("save/options.spi", 1))
 
-        self.maya_path_entry = Entry(top_frame, textvariable = self.maya_var_text, state = DISABLED, width = 75)
+        self.maya_path_entry = Entry(top_frame, textvariable = self.var_maya_text, state = DISABLED, width = 75)
         self.maya_path_entry.grid(row = 1, column = 0, columnspan = 3)
 
         maya_path_button = Button(top_frame, text ="Browse", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
@@ -82,7 +82,7 @@ class PreferencesDialog(object):
         maya_path = filedialog.askopenfilename(title = "Select Maya.exe",  filetypes = [("Maya","*maya*.exe")])
 
         if maya_path:
-            self.maya_var_text.set(maya_path)
+            self.var_maya_text.set(maya_path)
 
         self.top.focus()
 

@@ -49,6 +49,7 @@ class NewAssetDialog(object):
 
         self.name_entry = Entry(top_frame)
         self.name_entry.grid(row = 3, column = 1, sticky = W)
+        self.name_entry.focus_set()
 
         submit_button = Button(top_frame, text = "Create asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1)
         submit_button["command"] = lambda: self.submit(dict_key)

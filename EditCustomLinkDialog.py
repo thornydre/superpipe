@@ -5,9 +5,9 @@ from Main import *
 from tkinter import *
 from Resources import *
 
-class RenameAssetDialog(object):
+class EditCustomLinkDialog(object):
     root = None
-    def __init__(self, dict_key = None):
+    def __init__(self, project_options_path, dict_key = None):
         self.top = Toplevel(self.root)
         self.top.title("Super Pipe || Rename asset")
         self.top["bg"] = "#666666"
@@ -23,14 +23,17 @@ class RenameAssetDialog(object):
         top_frame.rowconfigure(0, pad = 5)
         top_frame.rowconfigure(1, pad = 5)
 
-        name_label = Label(top_frame, text = "Asset new name : ", bg = "#666666", fg = "#FFFFFF")
+        name_label = Label(top_frame, text = "Custom link : ", bg = "#666666", fg = "#FFFFFF")
         name_label.grid(row = 0, column = 0, sticky = E)
 
-        self.name_entry = Entry(top_frame)
-        self.name_entry.grid(row = 0, column = 1, sticky = W)
-        self.name_entry.focus_set()
+        self.var_custom_link = StringVar()
+        self.var_custom_link.set(Resources.readLine(project_options_path, 1))
 
-        submit_button = Button(top_frame, text = "Rename asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1)
+        self.link_entry = Entry(top_frame, textvariable = self.var_custom_link, width = 75)
+        self.link_entry.grid(row = 0, column = 1, sticky = W)
+        self.link_entry.focus_set()
+
+        submit_button = Button(top_frame, text = "Submit", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1)
         submit_button["command"] = lambda: self.submit(dict_key)
         submit_button.grid(row = 1, column = 0, sticky = W)
 
@@ -54,9 +57,8 @@ class RenameAssetDialog(object):
         self.top.focus()
 
     def submit(self, dict_key):
-        name = self.name_entry.get()
-        name = Resources.normString(name)
-        if name:
+        link = self.link_entry.get()
+        if link:
             d, key = dict_key
-            d[key] = name
+            d[key] = link
             self.top.destroy()

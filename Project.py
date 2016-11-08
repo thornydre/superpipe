@@ -66,6 +66,10 @@ class Project:
 
             makedirs(self.directory + "/10_print")
 
+            with open(self.directory + "/project_option.spi", "w") as f:
+                f.write("www.google.fr\n")
+            f.close()
+
         elif path.isdir(self.directory + "/05_shot"):
             self.updateShotList()
             self.updateAssetList()
@@ -181,8 +185,18 @@ class Project:
         #     rmtree(self.directory + "05_shot/s00p00")
 
     def createAsset(self, asset_name, category):
-        asset = Asset(self.directory, asset_name, category)
-        self.asset_list.append((asset_name, category))
+        if path.isdir(self.directory + "/04_asset/character/" + asset_name):
+            return False
+        elif path.isdir(self.directory + "/04_asset/FX/" + asset_name):
+            return False
+        elif path.isdir(self.directory + "/04_asset/props/" + asset_name):
+            return False
+        elif path.isdir(self.directory + "/04_asset/set/" + asset_name):
+            return False
+        else:
+            asset = Asset(self.directory, asset_name, category)
+            self.asset_list.append((asset_name, category))
+            return True
 
     def removeAsset(self, asset_name, category):
         asset = Asset(self.directory, asset_name, category)

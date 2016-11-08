@@ -7,13 +7,14 @@ from Project import *
 from Resources import *
 from tkinter import *
 from tkinter import filedialog, ttk
-from os import path
+from os import path, makedirs
 from urllib.parse import urlsplit
 
 import NewShotDialog
 import NewAssetDialog
 import RenameAssetDialog
 import PreferencesDialog
+import EditCustomLinkDialog
 import YesNoDialog
 import OkDialog
 import subprocess
@@ -27,6 +28,11 @@ class SuperPipe(Frame):
 
         self.current_project = None
         self.current_sequence = 1
+
+        if not path.isfile("save/options.spi"):
+            with open("save/options.spi", "w") as f:
+                f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\n\n")
+            f.close()
 
         self.maya_path = Resources.readLine("save/options.spi", 1)
         self.nuke_path = Resources.readLine("save/options.spi", 2)
@@ -53,11 +59,12 @@ class SuperPipe(Frame):
         menu_edit.add_command(label = "Clean backups", command = self.cleanBackupsCommand)
         menu_edit.add_command(label = "Clean student versions", command = self.cleanStudentCommand)
         menu_edit.add_separator()
+        menu_edit.add_command(label = "Edit custom link", command = self.editCustomLinkCommand)
         menu_edit.add_command(label = "Preferences", command = self.preferencesCommand)
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
 
         menu_help = Menu(menu_bar, tearoff = 0)
-        menu_help.add_command(label = "About", command = self.about)
+        menu_help.add_command(label = "Credits", command = self.about)
         menu_bar.add_cascade(label = "Help", menu = menu_help)
 
         self.parent.config(menu = menu_bar)
@@ -117,7 +124,6 @@ class SuperPipe(Frame):
 
         self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.grid(row = 5, column = 0, columnspan = 2)
-
 
         self.custom_button = Button(left_side_bar, text = "Custom link", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.customButtonCommand)
         self.custom_button.grid(row = 6, column = 0, columnspan = 2)
@@ -468,6 +474,7 @@ class SuperPipe(Frame):
 
             self.add_shot_button.config(state = NORMAL)
             self.add_asset_button.config(state = NORMAL)
+            self.shots_preview_button.config(state = NORMAL)
 
             self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
@@ -567,13 +574,18 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"]:
-            self.current_project.createAsset(asset["name"], Resources.getCategoryName(asset["cat"]))
-            self.updateAssetListView()
+            if self.current_project.createAsset(asset["name"], Resources.getCategoryName(asset["cat"])):
+                self.updateAssetListView()
 
-            self.asset_list.selection_set(asset["name"])
-            self.asset_list.focus_set()
-            self.asset_list.focus(asset["name"])
-            self.assetListCommand(None)
+                self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
+
+                self.asset_list.selection_set(asset["name"])
+                self.asset_list.focus_set()
+                self.asset_list.focus(asset["name"])
+                self.assetListCommand(None)
+            else:
+                dialog = lambda: OkDialog.OkDialog("Asset already exists", "The asset \"" + asset["name"] + "\" already exists")
+                self.wait_window(dialog().top)
 
     def shotlistCommand(self, e):
         if self.shot_list.size() != 0:
@@ -992,8 +1004,22 @@ class SuperPipe(Frame):
 
     ###############################################################################################################
 
+    def editCustomLinkCommand(self):
+        if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
+            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
+                f.write("www.google.fr\n")
+            f.close()
+
+        link = {"link" : None}
+
+        dialog = lambda: EditCustomLinkDialog.EditCustomLinkDialog(self.current_project.getDirectory() + "/project_option.spi", (link, "link"))
+        self.wait_window(dialog().top)
+
+        if link["link"]:
+            Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", link["link"], 1)
+
     def customButtonCommand(self):
-        base_url = "www.google.fr"
+        base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
         
         # url = urlsplit(base_url)
         # url.geturl()
@@ -1056,7 +1082,7 @@ class SuperPipe(Frame):
             Resources.writeAtLine("save/options.spi", preferences["nuke_path"], 2)
 
     def about(self):
-        dialog = lambda: OkDialog.OkDialog("About", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")
+        dialog = lambda: OkDialog.OkDialog("Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")
         self.wait_window(dialog().top)
 
     def refresh(self, e):
