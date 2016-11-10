@@ -48,4 +48,5 @@ Temporary Items
 
 *.spi
 *.pyc
+*.pyw
 test.py
