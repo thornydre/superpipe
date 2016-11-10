@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 
 from Main import *
-from os import makedirs, path, listdir, rename
+from os import makedirs, path, listdir, rename, remove
 from tkinter import *
 from shutil import copyfile, copytree, rmtree
 from Resources import *
@@ -16,6 +16,7 @@ class Shot:
         self.directory = directory + "/05_shot/" + self.shot_name
         self.done = 0
         self.priority = "Low"
+        self.step = "Layout"
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -34,8 +35,10 @@ class Shot:
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
             with open(self.directory + "/data/shot_data.spi", "w") as f:
-                f.write(str(self.done) + "\n" + self.priority + "\n")
+                f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n")
             f.close()
+
+            open(self.directory + "/data/versions_data.spi", "a").close()
             
             makedirs(self.directory + "/images")
             makedirs(self.directory + "/images/screenshots")
@@ -73,7 +76,7 @@ class Shot:
         else:
             if not path.isfile(self.directory + "/data/shot_data.spi"):
                 with open(self.directory + "/data/shot_data.spi", "w") as f:
-                    f.write(str(self.done) + "\n" + self.priority)
+                    f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n")
                 f.close()
 
             shot_infos = []
@@ -84,6 +87,7 @@ class Shot:
 
             self.done = int(shot_infos[0])
             self.priority = shot_infos[1]
+            self.step = shot_infos[2]
 
     def getShotNb(self):
         return self.shot_nb
@@ -100,6 +104,26 @@ class Shot:
     def getPriority(self):
         return self.priority
 
+    def getStep(self):
+        return self.step
+
+    def getComment(self, version_file):
+        with open(self.directory + "/data/versions_data.spi", "r") as f:
+            all_comments = f.read()
+        f.close()
+
+        comment_list = all_comments.split("\n---\n")
+
+        i = 1
+
+        for comment in comment_list:
+            if comment == version_file:
+                return comment_list[i]
+
+            i += 1
+
+        return ""
+
     def isDone(self):
         if self.done == 1:
             return True
@@ -108,9 +132,9 @@ class Shot:
 
     def setShot(self):
         copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
-        copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
-        copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
-        copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
+        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
+        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
+        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
 
     def isSet(self):
         for shot_file in listdir(self.directory + "/scenes/"):
@@ -126,8 +150,9 @@ class Shot:
     def getVersionsList(self, last_only):
         versions_list = []
         for shot_file in listdir(self.directory + "/scenes/"):
-            if shot_file[-3:] == ".ma":
-                versions_list.append(shot_file)
+            if not "reference" in shot_file:
+                if shot_file[-3:] == ".ma":
+                    versions_list.append(shot_file)
 
         if not last_only:
             for shot_file in listdir(self.directory + "/scenes/edits/"):
@@ -158,10 +183,70 @@ class Shot:
                 if self.shot_name in f:
                     rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
 
-    def updateShotState(self, priority, done):
-        self.priority = priority
+    def setDone(self, done):
         self.done = done
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", str(self.done), 1)
 
-        with open(self.directory + "/data/shot_data.spi", "w") as f:
-            f.write(str(self.done) + "\n" + str(self.priority))
-        f.close()
+    def setPriority(self, priority):
+        self.priority = priority
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", self.priority, 2)
+
+    def upgrade(self):
+        version = 0
+        version_str = ""
+
+        for file in listdir(self.directory + "/images/screenshots/"):
+            if self.step.lower() in file:
+                if not "small" in file:
+                    tmp_version_str = file.strip(".gif")[-2:]
+                    if int(tmp_version_str) > version:
+                        version = int(tmp_version_str)
+                        version_str = tmp_version_str
+
+        if self.step == "Layout":
+            self.step = "Blocking"
+        elif self.step == "Blocking":
+            self.step = "Splining"
+        elif self.step == "Splining":
+            self.step = "Rendering"
+
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", self.step, 3)
+
+        for file in listdir(self.directory + "/scenes/"):
+            if file[:6] == self.shot_name:
+                file_to_upgrade = file
+
+        if self.step == "Blocking":
+            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.gif")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01_small.gif")
+        elif self.step == "Splining":
+            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.gif")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.gif")
+        elif self.step == "Rendering":
+            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.gif")
+            copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.gif")
+
+    def downgrade(self):
+        for file in listdir(self.directory + "/scenes/"):
+            if self.step.lower() in file:
+                rename(self.directory +"/scenes/" + file, self.directory +"/scenes/backup/" + file + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+
+        for file in listdir(self.directory + "/scenes/edits/"):
+            if self.step.lower() in file:
+                rename(self.directory +"/scenes/edits/" + file, self.directory +"/scenes/backup/" + file + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+
+        for file in listdir(self.directory + "/images/screenshots/"):
+            if self.step.lower() in file:
+                remove(self.directory + "/images/screenshots/" + file)
+
+        if self.step == "Blocking":
+            self.step = "Layout"
+        elif self.step == "Splining":
+            self.step = "Blocking"
+        elif self.step == "Rendering":
+            self.step = "Splining"
+
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", self.step, 3)

@@ -35,6 +35,8 @@ class Asset:
             with open(self.directory + "/data/asset_data.spi", "w") as f:
                 f.write(str(self.done) + "\n" + self.priority)
             f.close()
+
+            open(self.directory + "/data/versions_data.spi", "a").close()
             
             makedirs(self.directory + "/images")
             makedirs(self.directory + "/images/screenshots")
@@ -119,8 +121,9 @@ class Asset:
     def getVersionsList(self, last_only):
         versions_list = []
         for asset_file in listdir(self.directory + "/scenes/"):
-            if asset_file[-3:] == ".ma":
-                versions_list.append(asset_file)
+            if not "reference" in asset_file:
+                if asset_file[-3:] == ".ma":
+                    versions_list.append(asset_file)
 
         if not last_only:
             for asset_file in listdir(self.directory + "/scenes/edits/"):
@@ -156,10 +159,10 @@ class Asset:
         else:
             return False
 
-    def updateAssetState(self, priority, done):
-        self.priority = priority
+    def setDone(self, done):
         self.done = done
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", str(self.done), 1)
 
-        with open(self.directory + "/data/asset_data.spi", "w") as f:
-            f.write(str(self.done) + "\n" + str(self.priority))
-        f.close()
+    def setPriority(self, priority):
+        self.priority = priority
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", self.priority, 2)

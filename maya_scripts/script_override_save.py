@@ -1,5 +1,6 @@
 import maya.cmds as cmds
-from os import path, listdir, mkdir
+from os import path, listdir, mkdir, remove
+from shutil import copyfile
 
 current_file_ext = cmds.file(query = True, expandName = True)
 current_file = current_file_ext.strip(".ma")
@@ -25,3 +26,13 @@ cmds.setAttr("defaultRenderGlobals.imageFormat", frm)
 ## SAVE ##
 cmds.file(rename = current_file_ext)
 cmds.file(save = True, type = "mayaAscii")
+
+## CREATE REFERENCE ##
+if "edits" in directory:
+	if path.isfile(directory + "/../reference_" + file_name + ".ma"):
+		remove(directory + "/../reference_" + file_name + ".ma")
+	copyfile(directory + "/" + file_name + ".ma", directory + "/../reference_" + file_name.split("_")[0] + ".ma")
+else:
+	if path.isfile(directory + "/reference_" + file_name + ".ma"):
+		remove(directory + "/reference_" + file_name + ".ma")
+	copyfile(directory + "/" + file_name + ".ma", directory + "/reference_" + file_name.split("_")[0] + ".ma")

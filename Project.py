@@ -81,7 +81,7 @@ class Project:
                 self.current_sequence = shot.getSequence()
 
         else:
-            dialog = lambda: OkDialog.OkDialog("Set project", "'" + directory + "' is not a project folder")
+            dialog = lambda: OkDialog.OkDialog("Set project", "\"" + directory + "\" is not a project folder")
             self.wait_window(dialog().top)
 
     def getShotList(self):

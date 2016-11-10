@@ -107,6 +107,8 @@ class SuperPipe(Frame):
         ttk.Style().configure("Treeview", background = "#777777")
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
+        self.asset_list.tag_configure("high", background = "#EFB462")
+        self.asset_list.tag_configure("medium", background = "#F4E255")
         self.asset_list.insert("", 1, "character", text = "CHARACTER")
         self.asset_list.insert("", 3, "fx", text = "FX")
         self.asset_list.insert("", 4, "props", text = "PROPS")
@@ -202,11 +204,12 @@ class SuperPipe(Frame):
         self.shot_state_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
         self.shot_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
-        self.shot_state_line.columnconfigure(0, pad = 10)
-        self.shot_state_line.columnconfigure(1, pad = 10)
-        self.shot_state_line.columnconfigure(2, pad = 10)
+        self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
+        self.shot_state_line.columnconfigure(1, pad = 10, minsize = 100)
+        self.shot_state_line.columnconfigure(2, pad = 20)
+        self.shot_state_line.columnconfigure(7, pad = 20)
 
-        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold", stat = DISABLED)
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
         self.priority_shot_label.pi = self.priority_shot_label.grid_info()
         self.priority_shot_label.grid_forget()
@@ -216,13 +219,43 @@ class SuperPipe(Frame):
 
         self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
         self.priority_shot_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
-        self.priority_shot_menu.grid(row = 0, column = 2, sticky = W)
+        self.priority_shot_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
 
+        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
+        self.downgrade_shot_button.grid(row = 0, column = 2)
+        self.downgrade_shot_button.pi = self.downgrade_shot_button.grid_info()
+        self.downgrade_shot_button.grid_forget()
+
+        self.layout_label = Label(self.shot_state_line, text = "Layout", bg = "#66CEFF", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
+        self.layout_label.grid(row = 0, column = 3)
+        self.layout_label.pi = self.layout_label.grid_info()
+        self.layout_label.grid_forget()
+        
+        self.blocking_label = Label(self.shot_state_line, text = "Blocking", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
+        self.blocking_label.grid(row = 0, column = 4)
+        self.blocking_label.pi = self.blocking_label.grid_info()
+        self.blocking_label.grid_forget()
+        
+        self.splining_label = Label(self.shot_state_line, text = "Splining", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
+        self.splining_label.grid(row = 0, column = 5)
+        self.splining_label.pi = self.splining_label.grid_info()
+        self.splining_label.grid_forget()
+
+        self.rendering_label = Label(self.shot_state_line, text = "Rendering", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
+        self.rendering_label.grid(row = 0, column = 6)
+        self.rendering_label.pi = self.rendering_label.grid_info()
+        self.rendering_label.grid_forget()
+
+        self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
+        self.upgrade_shot_button.grid(row = 0, column = 7)
+        self.upgrade_shot_button.pi = self.upgrade_shot_button.grid_info()
+        self.upgrade_shot_button.grid_forget()
+
         self.var_shot_done = IntVar()
         self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = "#666666", activebackground = "#666666", command = self.toggleShotDone)
-        self.done_shot_button.grid(row = 0, column = 3)
+        self.done_shot_button.grid(row = 0, column = 8)
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
@@ -263,6 +296,18 @@ class SuperPipe(Frame):
         self.shot_pict_caneva.pi = self.shot_pict_caneva.grid_info()
         self.shot_pict_caneva.grid_forget()
         self.shot_gifdict = {}
+
+        ## VERSION MANAGEMENT ##
+        self.shot_version_management_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.shot_version_management_line.columnconfigure(0, pad = 10)
+        self.shot_version_management_line.columnconfigure(1, pad = 10, weight = 1)
+        self.shot_version_management_line.columnconfigure(2, pad = 10)
+
+        self.var_shot_version_comment_label = StringVar()
+        self.shot_version_comment_label = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment_label, bg = "#666666", pady = 5, padx = 15, width = 750)
+        self.shot_version_comment_label.grid(row = 0, column = 1, sticky = N)
 
         ###############################################################################################################
 
@@ -418,7 +463,7 @@ class SuperPipe(Frame):
 
         self.version_list = Listbox(right_side_bar, bg = "#777777", selectbackground = "#555555", bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
         self.version_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
-        self.version_list.bind("<<ListboxSelect>>", self.versionslistCommand)
+        self.version_list.bind("<<ListboxSelect>>", self.versionlistCommand)
 
         ###############################################################################################################
 
@@ -490,6 +535,15 @@ class SuperPipe(Frame):
 
         self.set_shot_button.grid_forget()
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+
+        self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
+
+        self.layout_label.grid(self.layout_label.pi)
+        self.blocking_label.grid(self.blocking_label.pi)
+        self.splining_label.grid(self.splining_label.pi)
+        self.rendering_label.grid(self.rendering_label.pi)
+
+        self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
         self.done_shot_button.grid(self.done_shot_button.pi)
 
         self.updateVersionListView(shot = shot)
@@ -498,7 +552,7 @@ class SuperPipe(Frame):
         selected_line = self.version_list.curselection()[0]
         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
-        self.versionslistCommand(None)
+        self.versionlistCommand(None)
 
     def setAssetCommand(self):
         selected_asset = self.asset_list.focus()
@@ -513,7 +567,7 @@ class SuperPipe(Frame):
         self.updateVersionListView(asset = asset)
         self.version_list.select_set(0)
 
-        self.versionslistCommand(None)
+        self.versionlistCommand(None)
 
     def deleteShotCommand(self):
         selected_line = self.shot_list.curselection()[0]
@@ -629,7 +683,41 @@ class SuperPipe(Frame):
             if shot.isSet():
                 self.set_shot_button.grid_forget()
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+
+                self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
+
+                self.layout_label.grid(self.layout_label.pi)
+                self.blocking_label.grid(self.blocking_label.pi)
+                self.splining_label.grid(self.splining_label.pi)
+                self.rendering_label.grid(self.rendering_label.pi)
+
+                self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
                 self.done_shot_button.grid(self.done_shot_button.pi)
+
+                if shot.getStep() == "Layout":
+                    self.blocking_label.config(bg = "#999999")
+                    self.splining_label.config(bg = "#999999")
+                    self.rendering_label.config(bg = "#999999")
+                    self.upgrade_shot_button.config(state = NORMAL)
+                    self.downgrade_shot_button.config(state = DISABLED)
+                elif shot.getStep() == "Blocking":
+                    self.blocking_label.config(bg = "#66CEFF")
+                    self.splining_label.config(bg = "#999999")
+                    self.rendering_label.config(bg = "#999999")
+                    self.upgrade_shot_button.config(state = NORMAL)
+                    self.downgrade_shot_button.config(state = NORMAL)
+                elif shot.getStep() == "Splining":
+                    self.blocking_label.config(bg = "#66CEFF")
+                    self.splining_label.config(bg = "#66CEFF")
+                    self.rendering_label.config(bg = "#999999")
+                    self.upgrade_shot_button.config(state = NORMAL)
+                    self.downgrade_shot_button.config(state = NORMAL)
+                elif shot.getStep() == "Rendering":
+                    self.blocking_label.config(bg = "#66CEFF")
+                    self.splining_label.config(bg = "#66CEFF")
+                    self.rendering_label.config(bg = "#66CEFF")
+                    self.upgrade_shot_button.config(state = DISABLED)
+                    self.downgrade_shot_button.config(state = NORMAL)
 
                 pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
@@ -651,6 +739,15 @@ class SuperPipe(Frame):
             else:
                 self.set_shot_button.grid(self.set_shot_button.pi)
                 self.open_shot_layout_button.grid_forget()
+
+                self.downgrade_shot_button.grid_forget()
+
+                self.layout_label.grid_forget()
+                self.blocking_label.grid_forget()
+                self.splining_label.grid_forget()
+                self.rendering_label.grid_forget()
+
+                self.upgrade_shot_button.grid_forget()
                 self.done_shot_button.grid_forget()
 
                 self.shot_pict_caneva.grid_forget()
@@ -757,7 +854,7 @@ class SuperPipe(Frame):
                 self.priority_asset_menu.grid_forget()
                 self.done_asset_button.grid_forget()
 
-    def versionslistCommand(self, e):
+    def versionlistCommand(self, e):
         if self.version_list.size() != 0:
             self.open_asset_button.grid(self.open_asset_button.pi)
 
@@ -772,6 +869,8 @@ class SuperPipe(Frame):
             pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_asset_version.strip(".ma") + ".gif"
 
             if self.current_project.getSelectionType() == "shot":
+                self.var_shot_version_comment_label.set(self.current_project.getSelection().getComment(selected_asset_version))
+
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
 
@@ -863,6 +962,10 @@ class SuperPipe(Frame):
                 self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
             elif cur_shot.getPriority() == "Urgent":
                 self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
+            elif cur_shot.getPriority() == "High":
+                self.shot_list.itemconfig(shot[0] - 1, bg = "#EFB462", selectbackground = "#997646")
+            elif cur_shot.getPriority() == "Medium":
+                self.shot_list.itemconfig(shot[0] - 1, bg = "#F4E255", selectbackground = "#9B9145")
             
     def updateAssetListView(self):
         for child in self.asset_list.get_children("character"):
@@ -884,6 +987,10 @@ class SuperPipe(Frame):
                     self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("done"))
                 elif cur_asset.getPriority() == "Urgent":
                     self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("urgent"))
+                elif cur_asset.getPriority() == "High":
+                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("high"))
+                elif cur_asset.getPriority() == "Medium":
+                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("medium"))
                 else:
                     self.asset_list.insert(asset[1], END, asset[0], text = asset[0])
 
@@ -933,13 +1040,13 @@ class SuperPipe(Frame):
 
     def toggleShotDone(self):
         selected_shot = self.shot_list.curselection()[0]
-        self.current_project.getSelection().updateShotState(self.var_shot_priority.get(), self.var_shot_done.get())
+        self.current_project.getSelection().setDone(self.var_shot_done.get())
         self.updateShotListView()
         self.shot_list.select_set(selected_shot)
 
     def toggleAssetDone(self):
         selected_asset = self.asset_list.focus()
-        self.current_project.getSelection().updateAssetState(self.var_asset_priority.get(), self.var_asset_done.get())
+        self.current_project.getSelection().setDone(self.var_shot_done.get())
         self.updateAssetListView()
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
@@ -947,13 +1054,13 @@ class SuperPipe(Frame):
 
     def priorityShotCommand(self, priority):
         selected_shot = self.shot_list.curselection()[0]
-        self.current_project.getSelection().updateShotState(priority, self.var_shot_done.get())
+        self.current_project.getSelection().setPriority(priority)
         self.updateShotListView()
         self.shot_list.select_set(selected_shot)
 
     def priorityAssetCommand(self, priority):
         selected_asset = self.asset_list.focus()
-        self.current_project.getSelection().updateAssetState(priority, self.var_asset_done.get())
+        self.current_project.getSelection().setPriority(priority)
         self.updateAssetListView()
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
@@ -1002,6 +1109,34 @@ class SuperPipe(Frame):
             shot_preview_caneva.grid(row = int((nb - 1)/5), column = (nb - 1) % 5, pady = 20)
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
 
+    def upgradeShotCommand(self):
+        selected_shot = self.shot_list.curselection()[0]
+        self.current_project.getSelection().upgrade()
+
+        if self.current_project.getSelection().getStep() == "Layout":
+            self.downgrade_shot_button.config(state = DISABLED)
+        elif self.current_project.getSelection().getStep() == "Rendering":
+            self.upgrade_shot_button.config(state = DISABLED)
+
+        self.shotlistCommand(None)
+
+    def downgradeShotCommand(self):
+        yesno = {"result" : ""}
+
+        dialog = lambda: YesNoDialog.YesNoDialog("Downgrade shot", "Are you sure you want to downgrade the shot \"" + self.current_project.getSelection().getShotName() + "\" ?", (yesno, "result"))
+        self.wait_window(dialog().top)
+
+        if yesno["result"] == "yes":
+            selected_shot = self.shot_list.curselection()[0]
+            self.current_project.getSelection().downgrade()
+
+            if self.current_project.getSelection().getStep() == "Layout":
+                self.downgrade_shot_button.config(state = DISABLED)
+            elif self.current_project.getSelection().getStep() == "Rendering":
+                self.upgrade_shot_button.config(state = DISABLED)
+
+            self.shotlistCommand(None)
+
     ###############################################################################################################
 
     def editCustomLinkCommand(self):
@@ -1020,9 +1155,6 @@ class SuperPipe(Frame):
 
     def customButtonCommand(self):
         base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
-        
-        # url = urlsplit(base_url)
-        # url.geturl()
 
         webbrowser.open(base_url)
 
@@ -1037,6 +1169,12 @@ class SuperPipe(Frame):
             self.open_shot_layout_button.grid_forget()
             self.priority_shot_menu.grid_forget()
             self.priority_shot_label.grid_forget()
+            self.downgrade_shot_button.grid_forget()
+            self.layout_label.grid_forget()
+            self.blocking_label.grid_forget()
+            self.splining_label.grid_forget()
+            self.rendering_label.grid_forget()
+            self.upgrade_shot_button.grid_forget()
             self.done_shot_button.grid_forget()
         elif type == "asset":
             self.var_asset_label.set("NO ASSET SELECTED")
@@ -1086,7 +1224,16 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
     def refresh(self, e):
-        self.versionslistCommand(None)
+        selected_version = self.version_list.curselection()[0]
+
+        if self.current_project.getSelectionType() == "shot":
+            self.updateVersionListView(shot = self.current_project.getSelection())
+        elif self.current_project.getSelectionType() == "asset":
+            self.updateVersionListView(assset = self.current_project.getSelection())
+
+        self.version_list.select_set(selected_version)
+
+        self.versionlistCommand(None)
 
     def scrollCommand(self, e):
         self.preview_canva_scroll.configure(scrollregion = self.preview_canva_scroll.bbox("all"), width = 2000, height = self.parent.winfo_height())
