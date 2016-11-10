@@ -209,7 +209,7 @@ class SuperPipe(Frame):
         self.shot_state_line.columnconfigure(2, pad = 20)
         self.shot_state_line.columnconfigure(7, pad = 20)
 
-        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold", stat = DISABLED)
+        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
         self.priority_shot_label.pi = self.priority_shot_label.grid_info()
         self.priority_shot_label.grid_forget()
@@ -306,8 +306,8 @@ class SuperPipe(Frame):
         self.shot_version_management_line.columnconfigure(2, pad = 10)
 
         self.var_shot_version_comment_label = StringVar()
-        self.shot_version_comment_label = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment_label, bg = "#666666", pady = 5, padx = 15, width = 750)
-        self.shot_version_comment_label.grid(row = 0, column = 1, sticky = N)
+        shot_version_comment_label = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment_label, bg = "#666666", pady = 5, padx = 15, width = 750)
+        shot_version_comment_label.grid(row = 0, column = 1, sticky = N)
 
         ###############################################################################################################
 
@@ -406,11 +406,23 @@ class SuperPipe(Frame):
         prev_pict_label = Label(pictures_asset, text = "This asset", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
         prev_pict_label.grid(row = 0, column = 0, pady = 10)
 
-        self.asset_pict_caneva = Canvas(pictures_asset, bg = "#555555")
+        self.asset_pict_caneva = Canvas(pictures_asset, bg = "#555555", bd = 0, highlightthickness = 0)
         self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
         self.asset_pict_caneva.pi = self.asset_pict_caneva.grid_info()
         self.asset_pict_caneva.grid_forget()
         self.asset_gifdict = {}
+
+        ## VERSION MANAGEMENT ##
+        self.asset_version_management_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
+        self.asset_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.asset_version_management_line.columnconfigure(0, pad = 10)
+        self.asset_version_management_line.columnconfigure(1, pad = 10, weight = 1)
+        self.asset_version_management_line.columnconfigure(2, pad = 10)
+
+        self.var_asset_version_comment_label = StringVar()
+        asset_version_comment_label = Message(self.asset_version_management_line, textvariable = self.var_asset_version_comment_label, bg = "#666666", pady = 5, padx = 15, width = 750)
+        asset_version_comment_label.grid(row = 0, column = 1, sticky = N)
 
         ###############################################################################################################
 
@@ -859,17 +871,17 @@ class SuperPipe(Frame):
             self.open_asset_button.grid(self.open_asset_button.pi)
 
             selected_line = self.version_list.curselection()[0]
-            selected_asset_version = self.version_list.get(selected_line)
+            selected_version = self.version_list.get(selected_line)
 
-            if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version):
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version)
+            if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
             else:
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_asset_version)
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version)
 
-            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_asset_version.strip(".ma") + ".gif"
+            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_version.strip(".ma") + ".gif"
 
             if self.current_project.getSelectionType() == "shot":
-                self.var_shot_version_comment_label.set(self.current_project.getSelection().getComment(selected_asset_version))
+                self.var_shot_version_comment_label.set(self.current_project.getSelection().getComment(selected_version))
 
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
@@ -883,6 +895,8 @@ class SuperPipe(Frame):
                     self.shot_pict_caneva.grid_forget()
 
             elif self.current_project.getSelectionType() == "asset":
+                self.var_asset_version_comment_label.set(self.current_project.getSelection().getComment(selected_version))
+
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
 
@@ -1154,6 +1168,11 @@ class SuperPipe(Frame):
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", link["link"], 1)
 
     def customButtonCommand(self):
+        if not path.isdir(self.current_project.getDirectory() + "/project_option.spi"):
+            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
+                f.write("www.google.fr\n")
+            f.close()
+
         base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
 
         webbrowser.open(base_url)
@@ -1229,7 +1248,7 @@ class SuperPipe(Frame):
         if self.current_project.getSelectionType() == "shot":
             self.updateVersionListView(shot = self.current_project.getSelection())
         elif self.current_project.getSelectionType() == "asset":
-            self.updateVersionListView(assset = self.current_project.getSelection())
+            self.updateVersionListView(asset = self.current_project.getSelection())
 
         self.version_list.select_set(selected_version)
 

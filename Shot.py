@@ -74,6 +74,9 @@ class Shot:
             copyfile("src/workspace.mel", self.directory + "/workspace.mel")
 
         else:
+            if not path.isfile(self.directory + "/data/versions_data.spi"):
+                open(self.directory + "/data/versions_data.spi", "a").close()
+
             if not path.isfile(self.directory + "/data/shot_data.spi"):
                 with open(self.directory + "/data/shot_data.spi", "w") as f:
                     f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n")
@@ -108,19 +111,22 @@ class Shot:
         return self.step
 
     def getComment(self, version_file):
-        with open(self.directory + "/data/versions_data.spi", "r") as f:
-            all_comments = f.read()
-        f.close()
+        if not path.isfile(self.directory + "/data/versions_data.spi"):
+                open(self.directory + "/data/versions_data.spi", "a").close()
+        else:
+            with open(self.directory + "/data/versions_data.spi", "r") as f:
+                all_comments = f.read()
+            f.close()
 
-        comment_list = all_comments.split("\n---\n")
+            comment_list = all_comments.split("\n---\n")
 
-        i = 1
+            i = 1
 
-        for comment in comment_list:
-            if comment == version_file:
-                return comment_list[i]
+            for comment in comment_list:
+                if comment == version_file:
+                    return comment_list[i]
 
-            i += 1
+                i += 1
 
         return ""
 
