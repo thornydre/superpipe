@@ -119,7 +119,7 @@ class Asset:
 
                 i += 1
 
-        return ""
+        return "No comment"
 
     def isDone(self):
         if self.done == 1:

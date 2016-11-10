@@ -151,8 +151,8 @@ class SuperPipe(Frame):
 
         self.main_area_shot.rowconfigure(0, pad = 20, minsize = 75)
         self.main_area_shot.rowconfigure(1, pad = 5, minsize = 75)
-        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 50)
-        self.main_area_shot.rowconfigure(3, pad = 5, minsize = 410)
+        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 410)
+        self.main_area_shot.rowconfigure(3, pad = 5, minsize = 50)
 
         ## SHOT INFOS ##
         self.up_down_shot = Frame(self.main_area_shot, bg = "#666666", bd = 0)
@@ -209,7 +209,7 @@ class SuperPipe(Frame):
         self.shot_state_line.columnconfigure(2, pad = 20)
         self.shot_state_line.columnconfigure(7, pad = 20)
 
-        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold", stat = DISABLED)
+        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
         self.priority_shot_label.pi = self.priority_shot_label.grid_info()
         self.priority_shot_label.grid_forget()
@@ -218,7 +218,7 @@ class SuperPipe(Frame):
         self.var_shot_priority.set("Low")
 
         self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
-        self.priority_shot_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
+        self.priority_shot_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 10)
         self.priority_shot_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
@@ -259,22 +259,9 @@ class SuperPipe(Frame):
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
-        ## SHOT ACTIONS ##
-        self.shot_actions_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
-        self.shot_actions_line.grid(row = 2, column = 0, columnspan = 6, sticky = W + E, pady = 10)
-
-        self.shot_actions_line.columnconfigure(0, pad = 10)
-        self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
-        self.shot_actions_line.columnconfigure(2, pad = 10)
-
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openShotCommand)
-        self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
-        self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
-        self.open_shot_layout_button.grid_forget()
-
         ## PICTURES ##
         pictures_shot = Frame(self.main_area_shot, bg = "#555555", bd = 0)
-        pictures_shot.grid(row = 3, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        pictures_shot.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
 
         pictures_shot.columnconfigure(0, weight = 2, minsize = 550)
         pictures_shot.columnconfigure(1, weight = 2, minsize = 550)
@@ -297,17 +284,34 @@ class SuperPipe(Frame):
         self.shot_pict_caneva.grid_forget()
         self.shot_gifdict = {}
 
-        ## VERSION MANAGEMENT ##
-        self.shot_version_management_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        ## SHOT VERSION ACTIONS ##
+        self.shot_actions_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_actions_line.grid(row = 3, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+
+        self.shot_actions_line.columnconfigure(0, pad = 10)
+        self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
+        self.shot_actions_line.columnconfigure(2, pad = 10)
+
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
+        self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
+        self.open_shot_layout_button.grid_forget()
+
+        ## SHOT VERSION INFOS ##
+        self.shot_version_management_line = Frame(self.main_area_shot, bg = "#555555", bd = 0)
         self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
         self.shot_version_management_line.columnconfigure(0, pad = 10)
         self.shot_version_management_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_version_management_line.columnconfigure(2, pad = 10)
 
-        self.var_shot_version_comment_label = StringVar()
-        self.shot_version_comment_label = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment_label, bg = "#666666", pady = 5, padx = 15, width = 750)
-        self.shot_version_comment_label.grid(row = 0, column = 1, sticky = N)
+        shot_version_comment_label = Label(self.shot_version_management_line, text = "Version comment :", bg = "#555555", height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
+        shot_version_comment_label.grid(row = 0, column = 1)
+
+        self.var_shot_version_comment = StringVar()
+        self.var_shot_version_comment.set("No comment")
+        shot_version_comment = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment, bg = "#555555", pady = 10, width = 750)
+        shot_version_comment.grid(row = 1, column = 1, sticky = N)
 
         ###############################################################################################################
 
@@ -326,8 +330,8 @@ class SuperPipe(Frame):
 
         self.main_area_asset.rowconfigure(0, pad = 20, minsize = 75)
         self.main_area_asset.rowconfigure(1, pad = 5, minsize = 75)
-        self.main_area_asset.rowconfigure(2, pad = 5, minsize = 30)
-        self.main_area_asset.rowconfigure(3, pad = 5, minsize = 410)
+        self.main_area_asset.rowconfigure(2, pad = 5, minsize = 410)
+        self.main_area_asset.rowconfigure(3, pad = 5, minsize = 30)
 
         self.var_asset_label = StringVar()
         self.var_asset_label.set("NO ASSET SELECTED")
@@ -373,7 +377,7 @@ class SuperPipe(Frame):
         self.var_asset_priority.set("Low")
 
         self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
-        self.priority_asset_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 8)
+        self.priority_asset_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 10)
         self.priority_asset_menu.grid(row = 0, column = 2, sticky = W)
         self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
         self.priority_asset_menu.grid_forget()
@@ -384,9 +388,24 @@ class SuperPipe(Frame):
         self.done_asset_button.pi = self.done_asset_button.grid_info()
         self.done_asset_button.grid_forget()
 
-        ## ASSET ACTIONS ##
+        ## PICTURES ##
+        pictures_asset = Frame(self.main_area_asset, bg = "#555555", bd = 0)
+        pictures_asset.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+
+        pictures_asset.columnconfigure(0, weight = 1)
+
+        prev_pict_label = Label(pictures_asset, text = "This asset", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
+        prev_pict_label.grid(row = 0, column = 0, pady = 10)
+
+        self.asset_pict_caneva = Canvas(pictures_asset, bg = "#555555", bd = 0, highlightthickness = 0)
+        self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
+        self.asset_pict_caneva.pi = self.asset_pict_caneva.grid_info()
+        self.asset_pict_caneva.grid_forget()
+        self.asset_gifdict = {}
+
+        ## ASSET VERSION ACTIONS ##
         self.asset_actions_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
-        self.asset_actions_line.grid(row = 2, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.asset_actions_line.grid(row = 3, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
         self.asset_actions_line.columnconfigure(0, pad = 10)
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
@@ -397,20 +416,21 @@ class SuperPipe(Frame):
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
 
-        ## PICTURES ##
-        pictures_asset = Frame(self.main_area_asset, bg = "#555555", bd = 0)
-        pictures_asset.grid(row = 3, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        ## ASSET VERSION INFOS ##
+        self.asset_version_management_line = Frame(self.main_area_asset, bg = "#555555", bd = 0)
+        self.asset_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
-        pictures_asset.columnconfigure(0, weight = 1)
+        self.asset_version_management_line.columnconfigure(0, pad = 10)
+        self.asset_version_management_line.columnconfigure(1, pad = 10, weight = 1)
+        self.asset_version_management_line.columnconfigure(2, pad = 10)
 
-        prev_pict_label = Label(pictures_asset, text = "This asset", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
-        prev_pict_label.grid(row = 0, column = 0, pady = 10)
+        shot_version_comment_label = Label(self.asset_version_management_line, text = "Version comment :", bg = "#555555", height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
+        shot_version_comment_label.grid(row = 0, column = 1)
 
-        self.asset_pict_caneva = Canvas(pictures_asset, bg = "#555555")
-        self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
-        self.asset_pict_caneva.pi = self.asset_pict_caneva.grid_info()
-        self.asset_pict_caneva.grid_forget()
-        self.asset_gifdict = {}
+        self.var_asset_version_comment_label = StringVar()
+        self.var_asset_version_comment_label.set("No comment")
+        asset_version_comment_label = Message(self.asset_version_management_line, textvariable = self.var_asset_version_comment_label, bg = "#555555", pady = 10, width = 750)
+        asset_version_comment_label.grid(row = 1, column = 1, sticky = N)
 
         ###############################################################################################################
 
@@ -859,17 +879,17 @@ class SuperPipe(Frame):
             self.open_asset_button.grid(self.open_asset_button.pi)
 
             selected_line = self.version_list.curselection()[0]
-            selected_asset_version = self.version_list.get(selected_line)
+            selected_version = self.version_list.get(selected_line)
 
-            if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version):
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_asset_version)
+            if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
             else:
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_asset_version)
+                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version)
 
-            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_asset_version.strip(".ma") + ".gif"
+            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_version.strip(".ma") + ".gif"
 
             if self.current_project.getSelectionType() == "shot":
-                self.var_shot_version_comment_label.set(self.current_project.getSelection().getComment(selected_asset_version))
+                self.var_shot_version_comment.set(self.current_project.getSelection().getComment(selected_version))
 
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
@@ -883,6 +903,8 @@ class SuperPipe(Frame):
                     self.shot_pict_caneva.grid_forget()
 
             elif self.current_project.getSelectionType() == "asset":
+                self.var_asset_version_comment_label.set(self.current_project.getSelection().getComment(selected_version))
+
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
 
@@ -1154,7 +1176,14 @@ class SuperPipe(Frame):
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", link["link"], 1)
 
     def customButtonCommand(self):
+        if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
+            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
+                f.write("www.google.fr\n")
+            f.close()
+
         base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
+
+        print(base_url)
 
         webbrowser.open(base_url)
 
@@ -1229,7 +1258,7 @@ class SuperPipe(Frame):
         if self.current_project.getSelectionType() == "shot":
             self.updateVersionListView(shot = self.current_project.getSelection())
         elif self.current_project.getSelectionType() == "asset":
-            self.updateVersionListView(assset = self.current_project.getSelection())
+            self.updateVersionListView(asset = self.current_project.getSelection())
 
         self.version_list.select_set(selected_version)
 

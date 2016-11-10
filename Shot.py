@@ -128,7 +128,7 @@ class Shot:
 
                 i += 1
 
-        return ""
+        return "No comment"
 
     def isDone(self):
         if self.done == 1:
@@ -138,9 +138,6 @@ class Shot:
 
     def setShot(self):
         copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
-        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
-        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
-        # copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
 
     def isSet(self):
         for shot_file in listdir(self.directory + "/scenes/"):

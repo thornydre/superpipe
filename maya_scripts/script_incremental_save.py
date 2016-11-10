@@ -5,8 +5,9 @@ from shutil import copyfile
 window = cmds.window(title = "SupeRig", iconName = "SupeRig", widthHeight = (200, 400), sizeable = False, resizeToFitChildren = True)
 cmds.columnLayout(adjustableColumn = True)
 
-cmds.scrollField("comment_textfield", wordWrap = True)
-cmds.button("start_button", label = "Submit", command = "submitCommand()")
+cmds.scrollField("comment_textfield", wordWrap = True, enterCommand = ("submitCommand()"))
+cmds.button("submit_button", label = "Submit", command = ("submitCommand()"))
+cmds.button("cancel_button", label = "Cancel", command = ("cmds.deleteUI(\'" + window + "\', window = True)"))
 cmds.showWindow(window)
 
 def submitCommand():
