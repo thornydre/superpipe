@@ -6,9 +6,10 @@ from tkinter import *
 from Resources import *
 
 class EditCustomLinkDialog(object):
-    root = None
-    def __init__(self, project_options_path, dict_key = None):
+    def __init__(self, parent, project_options_path, dict_key = None):
+        self.root = parent
         self.top = Toplevel(self.root)
+        self.top.transient(self.root)
         self.top.title("Super Pipe || Rename asset")
         self.top["bg"] = "#666666"
 

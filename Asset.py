@@ -13,8 +13,11 @@ class Asset:
         self.asset_name = asset_name
         self.category = category
         self.directory = directory + "/04_asset/" + self.category + "/" + self.asset_name
-        self.done = 0
         self.priority = "Low"
+        self.modeling_done = 0
+        self.rig_done = 0
+        self.lookdev_done = 0
+        self.done = 0
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -33,7 +36,7 @@ class Asset:
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
             with open(self.directory + "/data/asset_data.spi", "w") as f:
-                f.write(str(self.done) + "\n" + self.priority)
+                f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done))
             f.close()
 
             open(self.directory + "/data/versions_data.spi", "a").close()
@@ -80,14 +83,11 @@ class Asset:
                     f.write(str(self.done) + "\n" + self.priority)
                 f.close()
 
-            asset_infos = []
-            with open(self.directory + "/data/asset_data.spi", "r") as f:
-                for l in f:
-                    asset_infos.append(l.strip("\n"))
-            f.close()
-
-            self.done = int(asset_infos[0])
-            self.priority = asset_infos[1]
+            self.priority = Resources.readLine(self.directory + "/data/asset_data.spi", 1)
+            self.modeling_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 2))
+            self.rig_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 3))
+            self.lookdev_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 4))
+            self.done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 5))
 
     def getAssetName(self):
         return self.asset_name
@@ -182,10 +182,22 @@ class Asset:
         else:
             return False
 
-    def setDone(self, done):
-        self.done = done
-        Resources.writeAtLine(self.directory + "/data/shot_data.spi", str(self.done), 1)
-
     def setPriority(self, priority):
         self.priority = priority
-        Resources.writeAtLine(self.directory + "/data/shot_data.spi", self.priority, 2)
+        Resources.writeAtLine(self.directory + "/data/asset_data.spi", self.priority, 1)
+
+    def setModelingDone(self, modeling_done):
+        self.modeling_done = modeling_done
+        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.modeling_done), 2)
+
+    def setRigDone(self, rig_done):
+        self.rig_done = rig_done
+        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.rig_done), 3)
+
+    def setLookdevDone(self, lookdev_done):
+        self.lookdev_done = lookdev_done
+        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.lookdev_done), 4)
+
+    def setDone(self, done):
+        self.done = done
+        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.done), 5)

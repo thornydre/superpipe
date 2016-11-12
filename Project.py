@@ -21,6 +21,7 @@ class Project:
         self.selected_shot = None
         self.selected_asset = None
         self.directory = directory
+        self.valid = True
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -81,8 +82,7 @@ class Project:
                 self.current_sequence = shot.getSequence()
 
         else:
-            dialog = lambda: OkDialog.OkDialog("Set project", "\"" + directory + "\" is not a project folder")
-            self.wait_window(dialog().top)
+            self.valid = False
 
     def getShotList(self):
         return self.shot_list
@@ -120,6 +120,9 @@ class Project:
 
     def getShot(self, shot_name):
         return Shot(self.directory, shot_name)
+
+    def isValid(self):
+        return self.valid
 
     def createShot(self, sequence):
         shot_nb = len(self.shot_list) + 1

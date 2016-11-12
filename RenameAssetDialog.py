@@ -6,10 +6,11 @@ from tkinter import *
 from Resources import *
 
 class RenameAssetDialog(object):
-    root = None
-    def __init__(self, dict_key = None):
+    def __init__(self, parent, dict_key = None):
+        self.root = parent
         self.top = Toplevel(self.root)
-        self.top.title("Super Pipe || Rename asset")
+        self.top.transient(self.root)
+        self.top.title("Rename asset")
         self.top["bg"] = "#666666"
 
         self.top.resizable(width = False, height = False)

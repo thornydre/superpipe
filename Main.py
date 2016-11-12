@@ -223,7 +223,7 @@ class SuperPipe(Frame):
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
 
-        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
+        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
         self.downgrade_shot_button.grid(row = 0, column = 2)
         self.downgrade_shot_button.pi = self.downgrade_shot_button.grid_info()
         self.downgrade_shot_button.grid_forget()
@@ -325,47 +325,48 @@ class SuperPipe(Frame):
         self.main_area_asset.columnconfigure(1, pad = 10)
         self.main_area_asset.columnconfigure(2, pad = 10, minsize = 50)
         self.main_area_asset.columnconfigure(3, pad = 10)
-        self.main_area_asset.columnconfigure(4, pad = 10, weight = 2)
-        self.main_area_asset.columnconfigure(5, pad = 10)
+        self.main_area_asset.columnconfigure(4, pad = 10)
+        self.main_area_asset.columnconfigure(5, pad = 10, weight = 2)
+        self.main_area_asset.columnconfigure(6, pad = 10)
 
         self.main_area_asset.rowconfigure(0, pad = 20, minsize = 75)
         self.main_area_asset.rowconfigure(1, pad = 5, minsize = 75)
         self.main_area_asset.rowconfigure(2, pad = 5, minsize = 410)
-        self.main_area_asset.rowconfigure(3, pad = 5, minsize = 30)
+        self.main_area_asset.rowconfigure(3, pad = 5, minsize = 50)
 
         self.var_asset_label = StringVar()
         self.var_asset_label.set("NO ASSET SELECTED")
         shot_nb_label = Label(self.main_area_asset, textvariable = self.var_asset_label, bg = "#666666", height = 1, anchor = NW, font = "Helvetica 11 bold")
-        shot_nb_label.grid(row = 0, column = 0)
+        shot_nb_label.grid(row = 0, column = 1)
 
         self.delete_asset_button_img = PhotoImage(file = "img/red_cross.gif")
         self.delete_asset_button = Button(self.main_area_asset, image = self.delete_asset_button_img, bg = "#666666", activebackground = "#666666", fg = "#FFFFFF", cursor = "hand2", bd = 0, command = self.deleteAssetCommand)
-        self.delete_asset_button.grid(row = 0, column = 1)
+        self.delete_asset_button.grid(row = 0, column = 2)
         self.delete_asset_button.pi = self.delete_asset_button.grid_info()
         self.delete_asset_button.grid_forget()
 
         self.rename_asset_button = Button(self.main_area_asset, text = "Rename asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.renameAssetCommand)
-        self.rename_asset_button.grid(row = 0, column = 2)
+        self.rename_asset_button.grid(row = 0, column = 3)
         self.rename_asset_button.pi = self.rename_asset_button.grid_info()
         self.rename_asset_button.grid_forget()
 
         self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setAssetCommand)
-        self.set_asset_button.grid(row = 0, column = 3)
+        self.set_asset_button.grid(row = 0, column = 4)
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
 
         asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = "#666666", height = 1, anchor = NW)
-        asset_path_label.grid(row = 0, column = 4)
+        asset_path_label.grid(row = 0, column = 5)
 
         asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
-        asset_show_last_only_button.grid(row = 0, column = 5)
+        asset_show_last_only_button.grid(row = 0, column = 6)
 
         ## ASSET STATE ##
         self.asset_state_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
-        self.asset_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.asset_state_line.grid(row = 1, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
-        self.asset_state_line.columnconfigure(0, pad = 10)
-        self.asset_state_line.columnconfigure(1, pad = 10)
+        self.asset_state_line.columnconfigure(0, pad = 10, minsize = 75)
+        self.asset_state_line.columnconfigure(1, pad = 10, minsize = 100)
         self.asset_state_line.columnconfigure(2, pad = 10)
 
         self.priority_asset_label = Label(self.asset_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
@@ -378,19 +379,37 @@ class SuperPipe(Frame):
 
         self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
         self.priority_asset_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 10)
-        self.priority_asset_menu.grid(row = 0, column = 2, sticky = W)
+        self.priority_asset_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
         self.priority_asset_menu.grid_forget()
 
+        self.var_asset_modeling_done = IntVar()
+        self.modeling_done_asset_button = Checkbutton(self.asset_state_line, text = "Modeling done", variable = self.var_asset_modeling_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetModelingDone)
+        self.modeling_done_asset_button.grid(row = 0, column = 2)
+        self.modeling_done_asset_button.pi = self.modeling_done_asset_button.grid_info()
+        self.modeling_done_asset_button.grid_forget()
+
+        self.var_asset_rig_done = IntVar()
+        self.rig_done_asset_button = Checkbutton(self.asset_state_line, text = "Rig done", variable = self.var_asset_rig_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetRigDone)
+        self.rig_done_asset_button.grid(row = 0, column = 3)
+        self.rig_done_asset_button.pi = self.rig_done_asset_button.grid_info()
+        self.rig_done_asset_button.grid_forget()
+
+        self.var_asset_lookdev_done = IntVar()
+        self.lookdev_done_asset_button = Checkbutton(self.asset_state_line, text = "Lookdev done", variable = self.var_asset_lookdev_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetLookdevDone)
+        self.lookdev_done_asset_button.grid(row = 0, column = 4)
+        self.lookdev_done_asset_button.pi = self.lookdev_done_asset_button.grid_info()
+        self.lookdev_done_asset_button.grid_forget()
+
         self.var_asset_done = IntVar()
         self.done_asset_button = Checkbutton(self.asset_state_line, text = "Asset done", variable = self.var_asset_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetDone)
-        self.done_asset_button.grid(row = 0, column = 3)
+        self.done_asset_button.grid(row = 0, column = 5)
         self.done_asset_button.pi = self.done_asset_button.grid_info()
         self.done_asset_button.grid_forget()
 
         ## PICTURES ##
         pictures_asset = Frame(self.main_area_asset, bg = "#555555", bd = 0)
-        pictures_asset.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        pictures_asset.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
         pictures_asset.columnconfigure(0, weight = 1)
 
@@ -405,7 +424,7 @@ class SuperPipe(Frame):
 
         ## ASSET VERSION ACTIONS ##
         self.asset_actions_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
-        self.asset_actions_line.grid(row = 3, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.asset_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.asset_actions_line.columnconfigure(0, pad = 10)
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
@@ -418,7 +437,7 @@ class SuperPipe(Frame):
 
         ## ASSET VERSION INFOS ##
         self.asset_version_management_line = Frame(self.main_area_asset, bg = "#555555", bd = 0)
-        self.asset_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.asset_version_management_line.grid(row = 4, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.asset_version_management_line.columnconfigure(0, pad = 10)
         self.asset_version_management_line.columnconfigure(1, pad = 10, weight = 1)
@@ -503,13 +522,11 @@ class SuperPipe(Frame):
                 self.updateAssetListView()
 
     def newProjectCommand(self):
-        NewProjectDialog.root = self.parent
-
         self.current_sequence = 1
 
         directory = {"dir":""}
 
-        dialog = lambda: NewProjectDialog.NewProjectDialog((directory, "dir"))
+        dialog = lambda: NewProjectDialog.NewProjectDialog(self.parent, (directory, "dir"))
         self.wait_window(dialog().top)
 
         if directory["dir"]:
@@ -533,18 +550,22 @@ class SuperPipe(Frame):
         if directory:
             self.current_project = Project(directory)
 
-            Resources.writeAtLine("save/options.spi", directory, 3)
+            if self.current_project.isValid():
+                Resources.writeAtLine("save/options.spi", directory, 3)
 
-            self.current_sequence = self.current_project.getCurrentSequence()
+                self.current_sequence = self.current_project.getCurrentSequence()
 
-            self.add_shot_button.config(state = NORMAL)
-            self.add_asset_button.config(state = NORMAL)
-            self.shots_preview_button.config(state = NORMAL)
+                self.add_shot_button.config(state = NORMAL)
+                self.add_asset_button.config(state = NORMAL)
+                self.shots_preview_button.config(state = NORMAL)
 
-            self.parent.title("Super Pipe || " + self.current_project.getDirectory())
+                self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
-            self.updateShotListView()
-            self.updateAssetListView()
+                self.updateShotListView()
+                self.updateAssetListView()
+            else:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Set project", "\"" + directory + "\" is not a project folder")
+                self.wait_window(dialog().top)
 
     def setShotCommand(self):
         selected_line = self.shot_list.curselection()[0]
@@ -582,6 +603,9 @@ class SuperPipe(Frame):
 
         self.set_asset_button.grid_forget()
         self.open_asset_button.grid(self.open_asset_button.pi)
+        self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
+        self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
+        self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
         self.done_asset_button.grid(self.done_asset_button.pi)
 
         self.updateVersionListView(asset = asset)
@@ -595,7 +619,7 @@ class SuperPipe(Frame):
 
         yesno = {"result" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog("Delete shot", "Delete shot \"" + selected_shot + "\" ?", (yesno, "result"))
+        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Delete shot", "Delete shot \"" + selected_shot + "\" ?", (yesno, "result"))
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
@@ -612,7 +636,7 @@ class SuperPipe(Frame):
 
         yesno = {"result" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog("Delete asset", "Delete asset \"" + selected_asset + "\" from \"" + self.asset_list.parent(selected_asset).upper() + "\" category ?", (yesno, "result"))
+        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Delete asset", "Delete asset \"" + selected_asset + "\" from \"" + self.asset_list.parent(selected_asset).upper() + "\" category ?", (yesno, "result"))
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
@@ -625,11 +649,9 @@ class SuperPipe(Frame):
             self.updateVersionListView()
 
     def addShotCommand(self):
-        NewShotDialog.root = self.parent
-
         sequence = {"seq": -1}
 
-        dialog = lambda: NewShotDialog.NewShotDialog((sequence, "seq"))
+        dialog = lambda: NewShotDialog.NewShotDialog(self.parent, (sequence, "seq"))
         self.wait_window(dialog().top)
 
         if sequence["seq"] >= 0:
@@ -640,11 +662,9 @@ class SuperPipe(Frame):
             self.shotlistCommand(None)
 
     def addAssetCommand(self):
-        NewAssetDialog.root = self.parent
-
         asset = {"cat": None, "name" : None}
 
-        dialog = lambda: NewAssetDialog.NewAssetDialog((asset, "cat", "name"))
+        dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, (asset, "cat", "name"))
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"]:
@@ -658,7 +678,7 @@ class SuperPipe(Frame):
                 self.asset_list.focus(asset["name"])
                 self.assetListCommand(None)
             else:
-                dialog = lambda: OkDialog.OkDialog("Asset already exists", "The asset \"" + asset["name"] + "\" already exists")
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Asset already exists", "The asset \"" + asset["name"] + "\" already exists")
                 self.wait_window(dialog().top)
 
     def shotlistCommand(self, e):
@@ -828,8 +848,11 @@ class SuperPipe(Frame):
                 self.updateVersionListView(asset = asset)
                 self.version_list.select_set(0)
 
-                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 1)))
-                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 2))
+                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 1))
+                self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 2)))
+                self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 3)))
+                self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 4)))
+                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 5)))
 
                 if asset:
                     if asset.isSet():
@@ -839,6 +862,9 @@ class SuperPipe(Frame):
                         selected_line = self.version_list.curselection()[0]
                         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
+                        self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
+                        self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
+                        self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
                         self.done_asset_button.grid(self.done_asset_button.pi)
 
                         pict_path = asset.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
@@ -859,6 +885,9 @@ class SuperPipe(Frame):
                         self.open_asset_button.grid_forget()
                         self.var_selection_path_label.set("")
                         self.asset_pict_caneva.grid_forget()
+                        self.modeling_done_asset_button.grid_forget()
+                        self.rig_done_asset_button.grid_forget()
+                        self.lookdev_done_asset_button.grid_forget()
                         self.done_asset_button.grid_forget()
 
             else:
@@ -872,6 +901,9 @@ class SuperPipe(Frame):
                 self.asset_pict_caneva.grid_forget()
                 self.priority_asset_label.grid_forget()
                 self.priority_asset_menu.grid_forget()
+                self.modeling_done_asset_button.grid_forget()
+                self.rig_done_asset_button.grid_forget()
+                self.lookdev_done_asset_button.grid_forget()
                 self.done_asset_button.grid_forget()
 
     def versionlistCommand(self, e):
@@ -930,7 +962,7 @@ class SuperPipe(Frame):
 
             subprocess.Popen("%s %s" % (self.maya_path, maya_file))
         else:
-            dialog = lambda: OkDialog.OkDialog("Maya path", "Check Maya path in Edit > Preferences")
+            dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
             self.wait_window(dialog().top)
 
     def openAssetCommand(self):
@@ -947,13 +979,13 @@ class SuperPipe(Frame):
 
             subprocess.Popen("%s %s" % (self.maya_path, maya_file))
         else:
-            dialog = lambda: OkDialog.OkDialog("Maya path", "Check Maya path in Edit > Preferences")
+            dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
             self.wait_window(dialog().top)
 
     def renameAssetCommand(self):
         asset_name = {"name" : None}
 
-        dialog = lambda: RenameAssetDialog.RenameAssetDialog((asset_name, "name"))
+        dialog = lambda: RenameAssetDialog.RenameAssetDialog(self.parent, (asset_name, "name"))
         self.wait_window(dialog().top)
 
         if asset_name["name"]:
@@ -967,7 +999,7 @@ class SuperPipe(Frame):
                 self.asset_list.focus(asset_name["name"])
                 self.assetListCommand(None)
             else:
-                dialog = lambda: OkDialog.OkDialog("Error", "The asset \"" + asset_name["name"] + "\" already exists !")
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
                 self.wait_window(dialog().top)
 
     def updateShotListView(self):
@@ -1066,9 +1098,33 @@ class SuperPipe(Frame):
         self.updateShotListView()
         self.shot_list.select_set(selected_shot)
 
+    def toggleAssetModelingDone(self):
+        selected_asset = self.asset_list.focus()
+        self.current_project.getSelection().setModelingDone(self.var_asset_modeling_done.get())
+        self.updateAssetListView()
+        self.asset_list.selection_set(selected_asset)
+        self.asset_list.focus_set()
+        self.asset_list.focus(selected_asset)
+
+    def toggleAssetRigDone(self):
+        selected_asset = self.asset_list.focus()
+        self.current_project.getSelection().setRigDone(self.var_asset_rig_done.get())
+        self.updateAssetListView()
+        self.asset_list.selection_set(selected_asset)
+        self.asset_list.focus_set()
+        self.asset_list.focus(selected_asset)
+
+    def toggleAssetLookdevDone(self):
+        selected_asset = self.asset_list.focus()
+        self.current_project.getSelection().setLookdevDone(self.var_asset_lookdev_done.get())
+        self.updateAssetListView()
+        self.asset_list.selection_set(selected_asset)
+        self.asset_list.focus_set()
+        self.asset_list.focus(selected_asset)
+
     def toggleAssetDone(self):
         selected_asset = self.asset_list.focus()
-        self.current_project.getSelection().setDone(self.var_shot_done.get())
+        self.current_project.getSelection().setDone(self.var_asset_done.get())
         self.updateAssetListView()
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
@@ -1145,7 +1201,7 @@ class SuperPipe(Frame):
     def downgradeShotCommand(self):
         yesno = {"result" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog("Downgrade shot", "Are you sure you want to downgrade the shot \"" + self.current_project.getSelection().getShotName() + "\" ?", (yesno, "result"))
+        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Downgrade shot", "Are you sure you want to downgrade the shot \"" + self.current_project.getSelection().getShotName() + "\" ?", (yesno, "result"))
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
@@ -1169,7 +1225,7 @@ class SuperPipe(Frame):
 
         link = {"link" : None}
 
-        dialog = lambda: EditCustomLinkDialog.EditCustomLinkDialog(self.current_project.getDirectory() + "/project_option.spi", (link, "link"))
+        dialog = lambda: EditCustomLinkDialog.EditCustomLinkDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (link, "link"))
         self.wait_window(dialog().top)
 
         if link["link"]:
@@ -1215,12 +1271,15 @@ class SuperPipe(Frame):
             self.open_asset_button.grid_forget()
             self.priority_asset_menu.grid_forget()
             self.priority_asset_label.grid_forget()
+            self.modeling_done_asset_button.grid_forget()
+            self.rig_done_asset_button.grid_forget()
+            self.lookdev_done_asset_button.grid_forget()
             self.done_asset_button.grid_forget()
 
     def cleanBackupsCommand(self):
         yesno = {"result" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog("Clean backups", "Clean all the backups ?", (yesno, "result"))
+        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Clean backups", "Clean all the backups ?", (yesno, "result"))
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
@@ -1229,7 +1288,7 @@ class SuperPipe(Frame):
     def cleanStudentCommand(self):
         yesno = {"result" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog("Clean student versions", "Make all your files easy to save again ?", (yesno, "result"))
+        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Clean student versions", "Make all your files easy to save again ?", (yesno, "result"))
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
@@ -1238,7 +1297,7 @@ class SuperPipe(Frame):
     def preferencesCommand(self):
         preferences = {"maya_path" : "", "nuke_path" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog((preferences, "maya_path", "nuke_path"))
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, (preferences, "maya_path", "nuke_path"))
         self.wait_window(dialog().top)
 
         if preferences["maya_path"] and preferences["nuke_path"]:
@@ -1249,7 +1308,7 @@ class SuperPipe(Frame):
             Resources.writeAtLine("save/options.spi", preferences["nuke_path"], 2)
 
     def about(self):
-        dialog = lambda: OkDialog.OkDialog("Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")
+        dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")
         self.wait_window(dialog().top)
 
     def refresh(self, e):

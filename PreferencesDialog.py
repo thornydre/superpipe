@@ -6,10 +6,11 @@ from tkinter import *
 from Resources import *
 
 class PreferencesDialog(object):
-    root = None
-    def __init__(self, dict_key = None):
+    def __init__(self, parent, dict_key = None):
+        self.root = parent
         self.top = Toplevel(self.root)
-        self.top.title("Super Pipe || Preferences")
+        self.top.transient(self.root)
+        self.top.title("Preferences")
         self.top["bg"] = "#666666"
 
         self.top.resizable(width = False, height = False)

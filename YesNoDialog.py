@@ -5,9 +5,10 @@ from Main import *
 from tkinter import *
 
 class YesNoDialog(object):
-    root = None
-    def __init__(self, window_name, question, dict_key):
+    def __init__(self, parent, window_name, question, dict_key):
+        self.root = parent
         self.top = Toplevel(self.root)
+        self.top.transient(self.root)
         self.top.title(window_name)
         self.top["bg"] = "#666666"
 

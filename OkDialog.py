@@ -5,9 +5,10 @@ from Main import *
 from tkinter import *
 
 class OkDialog(object):
-    root = None
-    def __init__(self, window_name, message):
+    def __init__(self, parent, window_name, message):
+        self.root = parent
         self.top = Toplevel(self.root)
+        self.top.transient(self.root)
         self.top.title(window_name)
         self.top["bg"] = "#666666"
 

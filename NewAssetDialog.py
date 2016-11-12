@@ -6,9 +6,10 @@ from tkinter import *
 from Resources import *
 
 class NewAssetDialog(object):
-    root = None
-    def __init__(self, dict_key = None):
+    def __init__(self, parent, dict_key = None):
+        self.root = parent
         self.top = Toplevel(self.root)
+        self.top.transient(self.root)
         self.top.title("Super Pipe || Add asset")
         self.top["bg"] = "#666666"
 
