@@ -120,6 +120,7 @@ class SuperPipe(Frame):
 
         self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
+        ttk.Style().configure("Treeview.tree", background = self.list_color)
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
         self.asset_list.tag_configure("high", background = "#EFB462")
@@ -233,7 +234,7 @@ class SuperPipe(Frame):
         self.var_shot_priority.set("Low")
 
         self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
-        self.priority_shot_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10)
+        self.priority_shot_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10, highlightthickness = 0)
         self.priority_shot_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
@@ -393,7 +394,7 @@ class SuperPipe(Frame):
         self.var_asset_priority.set("Low")
 
         self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
-        self.priority_asset_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10)
+        self.priority_asset_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10, highlightthickness = 0)
         self.priority_asset_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
         self.priority_asset_menu.grid_forget()
