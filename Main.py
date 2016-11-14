@@ -22,7 +22,22 @@ import webbrowser
 
 class SuperPipe(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent, bg = "#666666")
+        ## THEME COLORS ##
+        self.main_color = "#2f3847"
+        self.second_color = "#1c222b"
+        self.list_color = "#434f63"
+        self.button_color1 = "#43A4E0"
+        self.button_color2 = "#585c63"
+        self.separator_color = "#07090A"
+        self.text_color = "#efefef"
+
+        # self.main_color = "#666666"
+        # self.second_color = "#555555"
+        # self.list_color = "#777777"
+        # self.button_color2 = "#888888"
+        # self.separator_color = "#333333"
+
+        Frame.__init__(self, parent, bg = self.main_color)
 
         self.parent = parent
 
@@ -40,7 +55,7 @@ class SuperPipe(Frame):
         self.initUI()
 
     def initUI(self):
-        self.parent["bg"] = "#666666"
+        self.parent["bg"] = self.main_color
         self.parent.title("Super Pipe")
         self.grid(sticky = N + S + E + W)
 
@@ -80,7 +95,7 @@ class SuperPipe(Frame):
         ###############################################################################################################
 
         ## // SIDE BAR \\ ##
-        left_side_bar = Frame(self.parent, bg = "#666666")
+        left_side_bar = Frame(self.parent, bg = self.main_color)
         left_side_bar.grid(row = 0, column = 0, sticky = N)
 
         left_side_bar.columnconfigure(0, pad = 0)
@@ -93,18 +108,18 @@ class SuperPipe(Frame):
         left_side_bar.rowconfigure(4, pad = 5)
         left_side_bar.rowconfigure(5, pad = 20)
 
-        self.add_asset_button = Button(left_side_bar, text = "Add asset", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.addAssetCommand)
+        self.add_asset_button = Button(left_side_bar, text = "Add asset", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addAssetCommand)
         self.add_asset_button.grid(row = 0, column = 0)
 
-        self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.addShotCommand)
+        self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addShotCommand)
         self.add_shot_button.grid(row = 0, column = 1)
 
         ## ASSETS LIST ##
-        asset_label = Label(left_side_bar, text = "Assets", bg = "#666666", font = "Helvetica 10 bold")
+        asset_label = Label(left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         asset_label.grid(row = 1, column = 0, columnspan = 2)
 
         self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
-        ttk.Style().configure("Treeview", background = "#777777")
+        ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
         self.asset_list.tag_configure("high", background = "#EFB462")
@@ -117,28 +132,28 @@ class SuperPipe(Frame):
         self.asset_list.bind("<ButtonRelease-1>", self.assetListCommand)
 
         ## SHOTS LIST ##
-        shot_label = Label(left_side_bar, text = "Shots", bg = "#666666", font = "Helvetica 10 bold")
+        shot_label = Label(left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         shot_label.grid(row = 3, column = 0, columnspan = 2)
 
-        self.shot_list = Listbox(left_side_bar, bg = "#777777", selectbackground = "#555555", bd = 0, highlightthickness = 0, width = 30, height = 40, exportselection = False)
+        self.shot_list = Listbox(left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, height = 40, exportselection = False)
         self.shot_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
         self.shot_list.bind("<<ListboxSelect>>", self.shotlistCommand)
 
-        self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
+        self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.grid(row = 5, column = 0, columnspan = 2)
 
-        self.custom_button = Button(left_side_bar, text = "Custom link", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button = Button(left_side_bar, text = "Custom link", bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
         self.custom_button.grid(row = 6, column = 0, columnspan = 2)
 
         ###############################################################################################################
 
-        separator = Frame(self.parent, bg = "#333333", bd = 0, width = 5, height = 10)
+        separator = Frame(self.parent, bg = self.separator_color, bd = 0, width = 5, height = 10)
         separator.grid(row = 0, column = 1, sticky = N + S + W + E)
 
         ###############################################################################################################
 
         ## // SHOTS MAIN FRAME \\ ##
-        self.main_area_shot = Frame(self.parent, bg = "#666666", bd = 0)
+        self.main_area_shot = Frame(self.parent, bg = self.main_color, bd = 0)
         self.main_area_shot.grid(row = 0, column = 2, sticky = N + S + W + E)
         self.main_area_shot.pi = self.main_area_shot.grid_info()
 
@@ -155,7 +170,7 @@ class SuperPipe(Frame):
         self.main_area_shot.rowconfigure(3, pad = 5, minsize = 50)
 
         ## SHOT INFOS ##
-        self.up_down_shot = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.up_down_shot = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
         self.up_down_shot.grid(row = 0, column = 0, sticky = N + S, pady = 10)
         self.up_down_shot.pi = self.up_down_shot.grid_info()
 
@@ -165,43 +180,43 @@ class SuperPipe(Frame):
         self.up_down_shot.rowconfigure(1, pad = 0, weight = 1)
 
         self.up_button_img = PhotoImage(file = "img/arrow_up.gif")
-        self.up_button = Button(self.up_down_shot, image = self.up_button_img, compound = "left", bg = "#888888", fg = "#FFFFFF", bd = 0, command = self.moveShotDownCommand)
+        self.up_button = Button(self.up_down_shot, image = self.up_button_img, compound = "left", bg = self.button_color2, fg = self.text_color, bd = 0, command = self.moveShotDownCommand)
         self.up_button.grid(row = 0, column = 0, sticky = N)
         self.up_button.pi = self.up_button.grid_info()
         self.up_button.grid_forget()
 
         self.down_button_img = PhotoImage(file = "img/arrow_down.gif")
-        self.down_button = Button(self.up_down_shot, image = self.down_button_img, compound = "left", bg = "#888888", fg = "#FFFFFF", bd = 0, command = self.moveShotUpCommand)
+        self.down_button = Button(self.up_down_shot, image = self.down_button_img, compound = "left", bg = self.button_color2, fg = self.text_color, bd = 0, command = self.moveShotUpCommand)
         self.down_button.grid(row = 1, column = 0, sticky = S)
         self.down_button.pi = self.down_button.grid_info()
         self.down_button.grid_forget()
 
         self.var_shot_nb_label = StringVar()
         self.var_shot_nb_label.set("NO SHOT SELECTED")
-        shot_nb_label = Label(self.main_area_shot, textvariable = self.var_shot_nb_label, bg = "#666666", height = 1, anchor = NW, font = "Helvetica 11 bold")
+        shot_nb_label = Label(self.main_area_shot, textvariable = self.var_shot_nb_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 11 bold")
         shot_nb_label.grid(row = 0, column = 1)
 
         self.delete_shot_button_img = PhotoImage(file = "img/red_cross.gif")
-        self.delete_shot_button = Button(self.main_area_shot, image = self.delete_shot_button_img, bg = "#666666", activebackground = "#666666", cursor = "hand2", fg = "#FFFFFF", bd = 0, command = self.deleteShotCommand)
+        self.delete_shot_button = Button(self.main_area_shot, image = self.delete_shot_button_img, bg = self.main_color, activebackground = self.main_color, cursor = "hand2", fg = self.text_color, bd = 0, command = self.deleteShotCommand)
         self.delete_shot_button.grid(row = 0, column = 2)
         self.delete_shot_button.pi = self.delete_shot_button.grid_info()
         self.delete_shot_button.grid_forget()
 
-        self.set_shot_button = Button(self.main_area_shot, text = "Set shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setShotCommand)
+        self.set_shot_button = Button(self.main_area_shot, text = "Set shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setShotCommand)
         self.set_shot_button.grid(row = 0, column = 3)
         self.set_shot_button.pi = self.set_shot_button.grid_info()
         self.set_shot_button.grid_forget()
 
         self.var_selection_path_label = StringVar()
-        shot_path_label = Label(self.main_area_shot, textvariable = self.var_selection_path_label, bg = "#666666", height = 1, anchor = NW)
+        shot_path_label = Label(self.main_area_shot, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
         shot_path_label.grid(row = 0, column = 4)
 
         self.var_check_show_last = IntVar()
-        shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
+        shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         shot_show_last_only_button.grid(row = 0, column = 5, sticky = E)
 
         ## SHOT STATE ##
-        self.shot_state_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_state_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
         self.shot_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
         self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
@@ -209,7 +224,7 @@ class SuperPipe(Frame):
         self.shot_state_line.columnconfigure(2, pad = 20)
         self.shot_state_line.columnconfigure(7, pad = 20)
 
-        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
         self.priority_shot_label.pi = self.priority_shot_label.grid_info()
         self.priority_shot_label.grid_forget()
@@ -218,12 +233,12 @@ class SuperPipe(Frame):
         self.var_shot_priority.set("Low")
 
         self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
-        self.priority_shot_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 10)
+        self.priority_shot_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10)
         self.priority_shot_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
 
-        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", state = DISABLED, bg = "#888888", fg = "#FFFFFF", bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
+        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
         self.downgrade_shot_button.grid(row = 0, column = 2)
         self.downgrade_shot_button.pi = self.downgrade_shot_button.grid_info()
         self.downgrade_shot_button.grid_forget()
@@ -248,75 +263,75 @@ class SuperPipe(Frame):
         self.rendering_label.pi = self.rendering_label.grid_info()
         self.rendering_label.grid_forget()
 
-        self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
+        self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
         self.upgrade_shot_button.grid(row = 0, column = 7)
         self.upgrade_shot_button.pi = self.upgrade_shot_button.grid_info()
         self.upgrade_shot_button.grid_forget()
 
         self.var_shot_done = IntVar()
-        self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = "#666666", activebackground = "#666666", command = self.toggleShotDone)
+        self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDone)
         self.done_shot_button.grid(row = 0, column = 8)
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
         ## PICTURES ##
-        pictures_shot = Frame(self.main_area_shot, bg = "#555555", bd = 0)
+        pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
         pictures_shot.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
 
         pictures_shot.columnconfigure(0, weight = 2, minsize = 550)
         pictures_shot.columnconfigure(1, weight = 2, minsize = 550)
 
-        prev_pict_label = Label(pictures_shot, text = "Previous shot", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
+        prev_pict_label = Label(pictures_shot, text = "Previous shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
         prev_pict_label.grid(row = 0, column = 0, pady = 10)
 
-        self.shot_prev_pict_caneva = Canvas(pictures_shot, bg = "#555555", bd = 0, highlightthickness = 0)
+        self.shot_prev_pict_caneva = Canvas(pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.shot_prev_pict_caneva.grid(row = 1, column = 0, pady = 20)
         self.shot_prev_pict_caneva.pi = self.shot_prev_pict_caneva.grid_info()
         self.shot_prev_pict_caneva.grid_forget()
         self.shot_prev_gifdict = {}
 
-        shot_nb_label = Label(pictures_shot, text = "This shot", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
+        shot_nb_label = Label(pictures_shot, text = "This shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
         shot_nb_label.grid(row = 0, column = 1, pady = 10)
 
-        self.shot_pict_caneva = Canvas(pictures_shot, bg = "#555555", bd = 0, highlightthickness = 0)
+        self.shot_pict_caneva = Canvas(pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.shot_pict_caneva.grid(row = 1, column = 1, pady = 20)
         self.shot_pict_caneva.pi = self.shot_pict_caneva.grid_info()
         self.shot_pict_caneva.grid_forget()
         self.shot_gifdict = {}
 
         ## SHOT VERSION ACTIONS ##
-        self.shot_actions_line = Frame(self.main_area_shot, bg = "#666666", bd = 0)
+        self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
         self.shot_actions_line.grid(row = 3, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
         self.shot_actions_line.columnconfigure(0, pad = 10)
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
         self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
         self.open_shot_layout_button.grid_forget()
 
         ## SHOT VERSION INFOS ##
-        self.shot_version_management_line = Frame(self.main_area_shot, bg = "#555555", bd = 0)
+        self.shot_version_management_line = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
         self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
 
         self.shot_version_management_line.columnconfigure(0, pad = 10)
         self.shot_version_management_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_version_management_line.columnconfigure(2, pad = 10)
 
-        shot_version_comment_label = Label(self.shot_version_management_line, text = "Version comment :", bg = "#555555", height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
+        shot_version_comment_label = Label(self.shot_version_management_line, text = "Version comment :", bg = self.second_color, fg = self.text_color, height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
         shot_version_comment_label.grid(row = 0, column = 1)
 
         self.var_shot_version_comment = StringVar()
         self.var_shot_version_comment.set("No comment")
-        shot_version_comment = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment, bg = "#555555", pady = 10, width = 750)
+        shot_version_comment = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment, bg = self.second_color, fg = self.text_color, pady = 10, width = 750)
         shot_version_comment.grid(row = 1, column = 1, sticky = N)
 
         ###############################################################################################################
 
         ## // ASSETS MAIN FRAME \\ ##
-        self.main_area_asset = Frame(self.parent, bg = "#666666", bd = 0, width = 1000, height = 300)
+        self.main_area_asset = Frame(self.parent, bg = self.main_color, bd = 0, width = 1000, height = 300)
         self.main_area_asset.grid(row = 0, column = 2, sticky = N + S + W + E)
         self.main_area_asset.pi = self.main_area_asset.grid_info()
         self.main_area_asset.grid_forget()
@@ -336,40 +351,40 @@ class SuperPipe(Frame):
 
         self.var_asset_label = StringVar()
         self.var_asset_label.set("NO ASSET SELECTED")
-        shot_nb_label = Label(self.main_area_asset, textvariable = self.var_asset_label, bg = "#666666", height = 1, anchor = NW, font = "Helvetica 11 bold")
+        shot_nb_label = Label(self.main_area_asset, textvariable = self.var_asset_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 11 bold")
         shot_nb_label.grid(row = 0, column = 1)
 
         self.delete_asset_button_img = PhotoImage(file = "img/red_cross.gif")
-        self.delete_asset_button = Button(self.main_area_asset, image = self.delete_asset_button_img, bg = "#666666", activebackground = "#666666", fg = "#FFFFFF", cursor = "hand2", bd = 0, command = self.deleteAssetCommand)
+        self.delete_asset_button = Button(self.main_area_asset, image = self.delete_asset_button_img, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, cursor = "hand2", bd = 0, command = self.deleteAssetCommand)
         self.delete_asset_button.grid(row = 0, column = 2)
         self.delete_asset_button.pi = self.delete_asset_button.grid_info()
         self.delete_asset_button.grid_forget()
 
-        self.rename_asset_button = Button(self.main_area_asset, text = "Rename asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1, command = self.renameAssetCommand)
+        self.rename_asset_button = Button(self.main_area_asset, text = "Rename asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.renameAssetCommand)
         self.rename_asset_button.grid(row = 0, column = 3)
         self.rename_asset_button.pi = self.rename_asset_button.grid_info()
         self.rename_asset_button.grid_forget()
 
-        self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1, command = self.setAssetCommand)
+        self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setAssetCommand)
         self.set_asset_button.grid(row = 0, column = 4)
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
 
-        asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = "#666666", height = 1, anchor = NW)
+        asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
         asset_path_label.grid(row = 0, column = 5)
 
-        asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = "#666666", activebackground = "#666666", command = self.toggleLastVersions)
-        asset_show_last_only_button.grid(row = 0, column = 6)
+        asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
+        asset_show_last_only_button.grid(row = 0, column = 6, sticky = E)
 
         ## ASSET STATE ##
-        self.asset_state_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
+        self.asset_state_line = Frame(self.main_area_asset, bg = self.main_color, bd = 0)
         self.asset_state_line.grid(row = 1, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.asset_state_line.columnconfigure(0, pad = 10, minsize = 75)
         self.asset_state_line.columnconfigure(1, pad = 10, minsize = 100)
         self.asset_state_line.columnconfigure(2, pad = 10)
 
-        self.priority_asset_label = Label(self.asset_state_line, text = "Priority : ", bg = "#666666", height = 1, anchor = NW, font = "Helvetica 9 bold")
+        self.priority_asset_label = Label(self.asset_state_line, text = "Priority : ", bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_asset_label.grid(row = 0, column = 0, sticky = E)
         self.priority_asset_label.pi = self.priority_asset_label.grid_info()
         self.priority_asset_label.grid_forget()
@@ -378,90 +393,90 @@ class SuperPipe(Frame):
         self.var_asset_priority.set("Low")
 
         self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
-        self.priority_asset_menu.config(bg = "#888888", activebackground = "#888888", bd = 0, width = 10)
+        self.priority_asset_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10)
         self.priority_asset_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
         self.priority_asset_menu.grid_forget()
 
         self.var_asset_modeling_done = IntVar()
-        self.modeling_done_asset_button = Checkbutton(self.asset_state_line, text = "Modeling done", variable = self.var_asset_modeling_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetModelingDone)
+        self.modeling_done_asset_button = Checkbutton(self.asset_state_line, text = "Modeling done", variable = self.var_asset_modeling_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetModelingDone)
         self.modeling_done_asset_button.grid(row = 0, column = 2)
         self.modeling_done_asset_button.pi = self.modeling_done_asset_button.grid_info()
         self.modeling_done_asset_button.grid_forget()
 
         self.var_asset_rig_done = IntVar()
-        self.rig_done_asset_button = Checkbutton(self.asset_state_line, text = "Rig done", variable = self.var_asset_rig_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetRigDone)
+        self.rig_done_asset_button = Checkbutton(self.asset_state_line, text = "Rig done", variable = self.var_asset_rig_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetRigDone)
         self.rig_done_asset_button.grid(row = 0, column = 3)
         self.rig_done_asset_button.pi = self.rig_done_asset_button.grid_info()
         self.rig_done_asset_button.grid_forget()
 
         self.var_asset_lookdev_done = IntVar()
-        self.lookdev_done_asset_button = Checkbutton(self.asset_state_line, text = "Lookdev done", variable = self.var_asset_lookdev_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetLookdevDone)
+        self.lookdev_done_asset_button = Checkbutton(self.asset_state_line, text = "Lookdev done", variable = self.var_asset_lookdev_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetLookdevDone)
         self.lookdev_done_asset_button.grid(row = 0, column = 4)
         self.lookdev_done_asset_button.pi = self.lookdev_done_asset_button.grid_info()
         self.lookdev_done_asset_button.grid_forget()
 
         self.var_asset_done = IntVar()
-        self.done_asset_button = Checkbutton(self.asset_state_line, text = "Asset done", variable = self.var_asset_done, bg = "#666666", activebackground = "#666666", command = self.toggleAssetDone)
+        self.done_asset_button = Checkbutton(self.asset_state_line, text = "Asset done", variable = self.var_asset_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDone)
         self.done_asset_button.grid(row = 0, column = 5)
         self.done_asset_button.pi = self.done_asset_button.grid_info()
         self.done_asset_button.grid_forget()
 
         ## PICTURES ##
-        pictures_asset = Frame(self.main_area_asset, bg = "#555555", bd = 0)
+        pictures_asset = Frame(self.main_area_asset, bg = self.second_color, bd = 0)
         pictures_asset.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
         pictures_asset.columnconfigure(0, weight = 1)
 
-        prev_pict_label = Label(pictures_asset, text = "This asset", bg = "#555555", height = 1, anchor = N, font = "Helvetica 11")
+        prev_pict_label = Label(pictures_asset, text = "This asset", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
         prev_pict_label.grid(row = 0, column = 0, pady = 10)
 
-        self.asset_pict_caneva = Canvas(pictures_asset, bg = "#555555", bd = 0, highlightthickness = 0)
+        self.asset_pict_caneva = Canvas(pictures_asset, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
         self.asset_pict_caneva.pi = self.asset_pict_caneva.grid_info()
         self.asset_pict_caneva.grid_forget()
         self.asset_gifdict = {}
 
         ## ASSET VERSION ACTIONS ##
-        self.asset_actions_line = Frame(self.main_area_asset, bg = "#666666", bd = 0)
+        self.asset_actions_line = Frame(self.main_area_asset, bg = self.main_color, bd = 0)
         self.asset_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.asset_actions_line.columnconfigure(0, pad = 10)
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 13, height = 1, command = self.openAssetCommand)
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
 
         ## ASSET VERSION INFOS ##
-        self.asset_version_management_line = Frame(self.main_area_asset, bg = "#555555", bd = 0)
+        self.asset_version_management_line = Frame(self.main_area_asset, bg = self.second_color, bd = 0)
         self.asset_version_management_line.grid(row = 4, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.asset_version_management_line.columnconfigure(0, pad = 10)
         self.asset_version_management_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_version_management_line.columnconfigure(2, pad = 10)
 
-        shot_version_comment_label = Label(self.asset_version_management_line, text = "Version comment :", bg = "#555555", height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
+        shot_version_comment_label = Label(self.asset_version_management_line, text = "Version comment :", bg = self.second_color, fg = self.text_color, height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
         shot_version_comment_label.grid(row = 0, column = 1)
 
         self.var_asset_version_comment_label = StringVar()
         self.var_asset_version_comment_label.set("No comment")
-        asset_version_comment_label = Message(self.asset_version_management_line, textvariable = self.var_asset_version_comment_label, bg = "#555555", pady = 10, width = 750)
+        asset_version_comment_label = Message(self.asset_version_management_line, textvariable = self.var_asset_version_comment_label, bg = self.second_color, fg = self.text_color, pady = 10, width = 750)
         asset_version_comment_label.grid(row = 1, column = 1, sticky = N)
 
         ###############################################################################################################
 
         ## SHOTS PREVIEW ##
-        self.main_area_preview = Frame(self.parent, bg = "#666666", bd = 0, width = 100, height = 100)
+        self.main_area_preview = Frame(self.parent, bg = self.main_color, bd = 0, width = 100, height = 100)
         self.main_area_preview.grid(row = 0, column = 2, sticky = N + W + E)
         self.main_area_preview.pi = self.main_area_preview.grid_info()
         self.main_area_preview.grid_forget()
 
-        self.preview_canva_scroll = Canvas(self.main_area_preview, bg = "#666666", bd = 0, highlightthickness = 0, yscrollincrement = 20)
+        self.preview_canva_scroll = Canvas(self.main_area_preview, bg = self.main_color, bd = 0, highlightthickness = 0, yscrollincrement = 20)
 
-        self.shots_preview_list = Frame(self.preview_canva_scroll, bg = "#666666", bd = 0, width = 1000, height = 300)
+        self.shots_preview_list = Frame(self.preview_canva_scroll, bg = self.main_color, bd = 0, width = 1000, height = 300)
         self.shots_preview_list.grid()
 
         self.shots_preview_list.columnconfigure(0, pad = 25, weight = 1)
@@ -483,12 +498,12 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        separator = Frame(self.parent, bg = "#333333", bd = 0, width = 5, height = 10)
+        separator = Frame(self.parent, bg = self.separator_color, bd = 0, width = 5, height = 10)
         separator.grid(row = 0, column = 3, sticky = N + S + W + E)
 
         ###############################################################################################################
 
-        right_side_bar = Frame(self.parent, bg = "#666666")
+        right_side_bar = Frame(self.parent, bg = self.main_color)
         right_side_bar.grid(row = 0, column = 4, sticky = N)
 
         right_side_bar.columnconfigure(0, pad = 0)
@@ -497,10 +512,10 @@ class SuperPipe(Frame):
         right_side_bar.rowconfigure(1, pad = 5)
 
         ## VERSIONS ##
-        versions_label = Label(right_side_bar, text = "Versions", bg = "#666666", font = "Helvetica 10 bold")
+        versions_label = Label(right_side_bar, text = "Versions", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         versions_label.grid(row = 1, column = 0, columnspan = 2)
 
-        self.version_list = Listbox(right_side_bar, bg = "#777777", selectbackground = "#555555", bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
+        self.version_list = Listbox(right_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
         self.version_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
         self.version_list.bind("<<ListboxSelect>>", self.versionlistCommand)
 
@@ -1175,7 +1190,10 @@ class SuperPipe(Frame):
                     all_shots_preview.append([cur_shot.getShotNb(), "img/img_not_available.gif"])
 
         for nb, img in all_shots_preview:
-            shot_preview_caneva = Canvas(self.shots_preview_list, bg = "#555555", bd = 0, highlightthickness = 0)
+            # shot_peview_label = Label(self.shots_preview_list, text = nb, bg = self.main_color, fg = self.text_color)
+            # shot_peview_label.grid(row = int((nb - 1)/5), column = (nb - 1) % 5)
+
+            shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.second_color, bd = 0, highlightthickness = 0)
 
             pict = PhotoImage(file = img)
 

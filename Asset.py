@@ -18,7 +18,7 @@ class Asset:
         self.rig_done = 0
         self.lookdev_done = 0
         self.done = 0
-
+        
         if not path.isdir(self.directory):
             makedirs(self.directory)
 
@@ -80,7 +80,7 @@ class Asset:
 
             if not path.isfile(self.directory + "/data/asset_data.spi"):
                 with open(self.directory + "/data/asset_data.spi", "w") as f:
-                    f.write(str(self.done) + "\n" + self.priority)
+                    f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done))
                 f.close()
 
             self.priority = Resources.readLine(self.directory + "/data/asset_data.spi", 1)
