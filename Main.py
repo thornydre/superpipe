@@ -23,19 +23,14 @@ import webbrowser
 class SuperPipe(Frame):
     def __init__(self, parent):
         ## THEME COLORS ##
-        self.main_color = "#2f3847"
-        self.second_color = "#1c222b"
-        self.list_color = "#434f63"
-        self.button_color1 = "#43A4E0"
+        self.main_color = "#2d323a"
+        self.second_color = "#1f2328"
+        self.list_color = "#3c434f"
+        self.button_color1 = "#43a4e0"
+        self.over_button_color1 = "#337ab7"
         self.button_color2 = "#585c63"
-        self.separator_color = "#07090A"
+        self.separator_color = "#07090a"
         self.text_color = "#efefef"
-
-        # self.main_color = "#666666"
-        # self.second_color = "#555555"
-        # self.list_color = "#777777"
-        # self.button_color2 = "#888888"
-        # self.separator_color = "#333333"
 
         Frame.__init__(self, parent, bg = self.main_color)
 
@@ -120,7 +115,6 @@ class SuperPipe(Frame):
 
         self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
-        ttk.Style().configure("Treeview.tree", background = self.list_color)
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
         self.asset_list.tag_configure("high", background = "#EFB462")
@@ -308,7 +302,7 @@ class SuperPipe(Frame):
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
         self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
         self.open_shot_layout_button.grid_forget()
@@ -446,7 +440,7 @@ class SuperPipe(Frame):
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.openAssetCommand)
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()

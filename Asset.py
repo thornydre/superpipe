@@ -128,7 +128,9 @@ class Asset:
             return False
 
     def setAsset(self):
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_v01.ma")
+        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
+        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
+        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
 
     def isSet(self):
         for asset_file in listdir(self.directory + "/scenes/"):
