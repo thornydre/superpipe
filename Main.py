@@ -40,6 +40,7 @@ class SuperPipe(Frame):
         self.current_sequence = 1
 
         if not path.isfile("save/options.spi"):
+            makedirs("save")
             with open("save/options.spi", "w") as f:
                 f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\n\n")
             f.close()
