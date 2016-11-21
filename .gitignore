@@ -46,7 +46,7 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-*.spi
+options.spi
 *.pyc
 *.pyw
 test.py

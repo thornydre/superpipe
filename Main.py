@@ -6,7 +6,6 @@ from Shot import *
 from Project import *
 from Resources import *
 from tkinter import *
-from MaxLengthEntry import *
 from tkinter import filedialog, ttk
 from os import path, makedirs
 from urllib.parse import urlsplit
