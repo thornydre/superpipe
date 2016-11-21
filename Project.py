@@ -78,6 +78,10 @@ class Project:
             self.updateShotList()
             self.updateAssetList()
 
+
+            if not Resources.readLine(self.directory + "/project_option.spi", 2):
+                Resources.writeAtLine(self.directory + "/project_option.spi", "1920x1080", 2)
+
             res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
 
             self.res_x = res[0]

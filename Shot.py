@@ -83,6 +83,9 @@ class Shot:
                     f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n")
                 f.close()
 
+            if not Resources.readLine(self.directory + "/data/shot_data.spi", 4):
+                Resources.writeAtLine(self.directory + "/data/shot_data.spi", "200", 4)
+
             shot_infos = []
             with open(self.directory + "/data/shot_data.spi", "r") as f:
                 for l in f:
