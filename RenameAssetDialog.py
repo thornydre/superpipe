@@ -7,15 +7,23 @@ from Resources import *
 
 class RenameAssetDialog(object):
     def __init__(self, parent, dict_key = None):
+        ## THEME COLORS ##
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.button_color2 = Resources.readLine("save/themes.spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
+
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
         self.top.title("Rename asset")
-        self.top["bg"] = "#666666"
+        self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
 
-        top_frame = Frame(self.top, borderwidth = 0, bg = "#666666")
+        top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
         top_frame.columnconfigure(0, pad = 5)
@@ -24,20 +32,20 @@ class RenameAssetDialog(object):
         top_frame.rowconfigure(0, pad = 5)
         top_frame.rowconfigure(1, pad = 5)
 
-        name_label = Label(top_frame, text = "Asset new name : ", bg = "#666666", fg = "#FFFFFF")
+        name_label = Label(top_frame, text = "Asset new name : ", bg = self.main_color, fg = self.text_color, activeforeground = self.text_color)
         name_label.grid(row = 0, column = 0, sticky = E)
 
-        self.name_entry = Entry(top_frame)
+        self.name_entry = Entry(top_frame, relief = FLAT, bg = self.button_color2)
         self.name_entry.grid(row = 0, column = 1, sticky = W)
         self.name_entry.focus_set()
 
-        submit_button = Button(top_frame, text = "Rename asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1)
+        submit_button = Button(top_frame, text = "Rename asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
         submit_button["command"] = lambda: self.submit(dict_key)
         submit_button.grid(row = 1, column = 0, sticky = W)
 
         self.top.bind("<Return>", lambda event, a = dict_key:self.submit(a))
 
-        cancel_button = Button(top_frame, text = "Cancel", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
         cancel_button.grid(row = 1, column = 1, sticky = E)
 

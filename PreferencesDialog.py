@@ -7,15 +7,25 @@ from Resources import *
 
 class PreferencesDialog(object):
     def __init__(self, parent, dict_key = None):
+        ## THEME COLORS ##
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.button_color2 = Resources.readLine("save/themes.spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
+        self.disabled_button_color2 = Resources.readLine("save/themes.spi", 10)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
+        self.disabled_text_color = Resources.readLine("save/themes.spi", 11)
+
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
         self.top.title("Preferences")
-        self.top["bg"] = "#666666"
+        self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
 
-        top_frame = Frame(self.top, borderwidth = 0, bg = "#666666")
+        top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = False, padx = 10, pady = 10)
 
         top_frame.columnconfigure(0, pad = 5)
@@ -30,39 +40,39 @@ class PreferencesDialog(object):
         top_frame.rowconfigure(4, pad = 5)
 
         ## MAYA ##
-        label = Label(top_frame, text = "Path to Maya", bg = "#666666")
+        label = Label(top_frame, text = "Path to Maya", bg = self.main_color, fg = self.text_color)
         label.grid(row = 0, column = 0, columnspan = 4)
 
         self.var_maya_text = StringVar()
         self.var_maya_text.set(Resources.readLine("save/options.spi", 1))
 
-        self.maya_path_entry = Entry(top_frame, textvariable = self.var_maya_text, state = DISABLED, width = 75)
+        self.maya_path_entry = Entry(top_frame, textvariable = self.var_maya_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
         self.maya_path_entry.grid(row = 1, column = 0, columnspan = 3)
 
-        maya_path_button = Button(top_frame, text ="Browse", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        maya_path_button = Button(top_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         maya_path_button["command"] = lambda: self.mayaPathEntry()
         maya_path_button.grid(row = 1, column = 3, sticky = E)
 
         ## NUKE ##
-        label = Label(top_frame, text = "Path to Nuke", bg = "#666666")
+        label = Label(top_frame, text = "Path to Nuke", bg = self.main_color, fg = self.text_color)
         label.grid(row = 2, column = 0, columnspan = 4)
 
         self.nuke_var_text = StringVar()
         self.nuke_var_text.set(Resources.readLine("save/options.spi", 1))
 
-        self.nuke_path_entry = Entry(top_frame, textvariable = self.nuke_var_text, state = DISABLED, width = 75)
+        self.nuke_path_entry = Entry(top_frame, textvariable = self.nuke_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
         self.nuke_path_entry.grid(row = 3, column = 0, columnspan = 3)
 
-        nuke_path_button = Button(top_frame, text ="Browse", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        nuke_path_button = Button(top_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         nuke_path_button["command"] = lambda: self.nukePathEntry()
         nuke_path_button.grid(row = 3, column = 3, sticky = E)
 
         ## SAVE/CANCEL ##
-        save_button = Button(top_frame, text = "Save", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        save_button = Button(top_frame, text = "Save", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         save_button["command"] = lambda: self.saveEntry(dict_key)
         save_button.grid(row = 4, column = 0, sticky = W)
 
-        cancel_button = Button(top_frame, text = "Cancel", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
         cancel_button.grid(row = 4, column = 3, sticky = E)
 

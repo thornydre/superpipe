@@ -6,21 +6,27 @@ from tkinter import *
 
 class OkDialog(object):
     def __init__(self, parent, window_name, message):
+        ## THEME COLORS ##
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
+
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
         self.top.title(window_name)
-        self.top["bg"] = "#666666"
+        self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
 
-        top_frame = Frame(self.top, borderwidth = 0, bg = "#666666")
+        top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
-        label = Label(top_frame, text = message, bg = "#666666")
+        label = Label(top_frame, text = message, bg = self.main_color, fg = self.text_color)
         label.pack(padx = 4, pady = 4)
 
-        ok_button = Button(top_frame, text = "OK", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 10, height = 1)
+        ok_button = Button(top_frame, text = "OK", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 10, height = 1)
         ok_button["command"] = self.top.destroy
         ok_button.pack(padx = 4, pady = 4)
 

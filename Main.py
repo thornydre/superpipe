@@ -6,6 +6,7 @@ from Shot import *
 from Project import *
 from Resources import *
 from tkinter import *
+from MaxLengthEntry import *
 from tkinter import filedialog, ttk
 from os import path, makedirs
 from urllib.parse import urlsplit
@@ -13,6 +14,7 @@ from urllib.parse import urlsplit
 import NewShotDialog
 import NewAssetDialog
 import RenameAssetDialog
+import ProjectSettingsDialog
 import PreferencesDialog
 import EditCustomLinkDialog
 import YesNoDialog
@@ -23,14 +25,15 @@ import webbrowser
 class SuperPipe(Frame):
     def __init__(self, parent):
         ## THEME COLORS ##
-        self.main_color = "#2d323a"
-        self.second_color = "#1f2328"
-        self.list_color = "#3c434f"
-        self.button_color1 = "#43a4e0"
-        self.over_button_color1 = "#337ab7"
-        self.button_color2 = "#585c63"
-        self.separator_color = "#07090a"
-        self.text_color = "#efefef"
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.second_color = Resources.readLine("save/themes.spi", 2)
+        self.list_color = Resources.readLine("save/themes.spi", 3)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.button_color2 = Resources.readLine("save/themes.spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
+        self.separator_color = Resources.readLine("save/themes.spi", 8)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
 
         Frame.__init__(self, parent, bg = self.main_color)
 
@@ -70,6 +73,8 @@ class SuperPipe(Frame):
         menu_edit.add_command(label = "Clean backups", command = self.cleanBackupsCommand)
         menu_edit.add_command(label = "Clean student versions", command = self.cleanStudentCommand)
         menu_edit.add_separator()
+        menu_edit.add_command(label = "Project settings", command = self.projectSettingsCommand)
+        menu_edit.add_separator()
         menu_edit.add_command(label = "Edit custom link", command = self.editCustomLinkCommand)
         menu_edit.add_command(label = "Preferences", command = self.preferencesCommand)
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
@@ -104,17 +109,17 @@ class SuperPipe(Frame):
         left_side_bar.rowconfigure(4, pad = 5)
         left_side_bar.rowconfigure(5, pad = 20)
 
-        self.add_asset_button = Button(left_side_bar, text = "Add asset", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addAssetCommand)
+        self.add_asset_button = Button(left_side_bar, text = "Add asset", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addAssetCommand)
         self.add_asset_button.grid(row = 0, column = 0)
 
-        self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addShotCommand)
+        self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addShotCommand)
         self.add_shot_button.grid(row = 0, column = 1)
 
         ## ASSETS LIST ##
         asset_label = Label(left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         asset_label.grid(row = 1, column = 0, columnspan = 2)
 
-        self.asset_list = ttk.Treeview(left_side_bar, height = 8, show = "tree", selectmode = "browse")
+        self.asset_list = ttk.Treeview(left_side_bar, height = 16, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
@@ -131,14 +136,14 @@ class SuperPipe(Frame):
         shot_label = Label(left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         shot_label.grid(row = 3, column = 0, columnspan = 2)
 
-        self.shot_list = Listbox(left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, height = 40, exportselection = False)
+        self.shot_list = Listbox(left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, height = 31, exportselection = False)
         self.shot_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
         self.shot_list.bind("<<ListboxSelect>>", self.shotlistCommand)
 
-        self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
+        self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.grid(row = 5, column = 0, columnspan = 2)
 
-        self.custom_button = Button(left_side_bar, text = "Custom link", bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button = Button(left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
         self.custom_button.grid(row = 6, column = 0, columnspan = 2)
 
         ###############################################################################################################
@@ -157,8 +162,9 @@ class SuperPipe(Frame):
         self.main_area_shot.columnconfigure(1, pad = 10)
         self.main_area_shot.columnconfigure(2, pad = 10, minsize = 50)
         self.main_area_shot.columnconfigure(3, pad = 10)
-        self.main_area_shot.columnconfigure(4, pad = 10, weight = 2)
-        self.main_area_shot.columnconfigure(5, pad = 10)
+        self.main_area_shot.columnconfigure(4, pad = 10)
+        self.main_area_shot.columnconfigure(5, pad = 10, weight = 2)
+        self.main_area_shot.columnconfigure(6, pad = 10)
 
         self.main_area_shot.rowconfigure(0, pad = 20, minsize = 75)
         self.main_area_shot.rowconfigure(1, pad = 5, minsize = 75)
@@ -176,13 +182,13 @@ class SuperPipe(Frame):
         self.up_down_shot.rowconfigure(1, pad = 0, weight = 1)
 
         self.up_button_img = PhotoImage(file = "img/arrow_up.gif")
-        self.up_button = Button(self.up_down_shot, image = self.up_button_img, compound = "left", bg = self.button_color2, fg = self.text_color, bd = 0, command = self.moveShotDownCommand)
+        self.up_button = Button(self.up_down_shot, image = self.up_button_img, compound = "left", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, command = self.moveShotDownCommand)
         self.up_button.grid(row = 0, column = 0, sticky = N)
         self.up_button.pi = self.up_button.grid_info()
         self.up_button.grid_forget()
 
         self.down_button_img = PhotoImage(file = "img/arrow_down.gif")
-        self.down_button = Button(self.up_down_shot, image = self.down_button_img, compound = "left", bg = self.button_color2, fg = self.text_color, bd = 0, command = self.moveShotUpCommand)
+        self.down_button = Button(self.up_down_shot, image = self.down_button_img, compound = "left", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, command = self.moveShotUpCommand)
         self.down_button.grid(row = 1, column = 0, sticky = S)
         self.down_button.pi = self.down_button.grid_info()
         self.down_button.grid_forget()
@@ -198,22 +204,35 @@ class SuperPipe(Frame):
         self.delete_shot_button.pi = self.delete_shot_button.grid_info()
         self.delete_shot_button.grid_forget()
 
-        self.set_shot_button = Button(self.main_area_shot, text = "Set shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setShotCommand)
+        self.set_shot_button = Button(self.main_area_shot, text = "Set shot", bg = self.button_color1, activebackground = self.over_button_color1, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setShotCommand)
         self.set_shot_button.grid(row = 0, column = 3)
         self.set_shot_button.pi = self.set_shot_button.grid_info()
         self.set_shot_button.grid_forget()
 
+        self.var_frame_range = StringVar()
+
+        self.frame_range_entry = Entry(self.main_area_shot, textvariable = self.var_frame_range, relief = FLAT, bg = self.button_color2, bd = 5, width = 6, justify = CENTER)
+        # self.frame_range_entry = MaxLengthEntry(self.main_area_shot, maxlength = 6)
+        self.frame_range_entry.grid(row = 0, column = 3)
+        self.frame_range_entry.pi = self.frame_range_entry.grid_info()
+        self.frame_range_entry.grid_forget()
+
+        self.set_shot_frame_range_button = Button(self.main_area_shot, text = "Set frame range", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.setShotFrameRangeCommand)
+        self.set_shot_frame_range_button.grid(row = 0, column = 4)
+        self.set_shot_frame_range_button.pi = self.set_shot_frame_range_button.grid_info()
+        self.set_shot_frame_range_button.grid_forget()
+
         self.var_selection_path_label = StringVar()
         shot_path_label = Label(self.main_area_shot, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
-        shot_path_label.grid(row = 0, column = 4)
+        shot_path_label.grid(row = 0, column = 5)
 
         self.var_check_show_last = IntVar()
-        shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
-        shot_show_last_only_button.grid(row = 0, column = 5, sticky = E)
+        shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
+        shot_show_last_only_button.grid(row = 0, column = 6, sticky = E)
 
         ## SHOT STATE ##
         self.shot_state_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
-        self.shot_state_line.grid(row = 1, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.shot_state_line.grid(row = 1, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
         self.shot_state_line.columnconfigure(1, pad = 10, minsize = 100)
@@ -229,12 +248,12 @@ class SuperPipe(Frame):
         self.var_shot_priority.set("Low")
 
         self.priority_shot_menu = OptionMenu(self.shot_state_line, self.var_shot_priority, "Low", "Medium", "High", "Urgent", command = self.priorityShotCommand)
-        self.priority_shot_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10, highlightthickness = 0)
+        self.priority_shot_menu.config(bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, bd = 0, width = 10, highlightthickness = 0)
         self.priority_shot_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_shot_menu.pi = self.priority_shot_menu.grid_info()
         self.priority_shot_menu.grid_forget()
 
-        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", state = DISABLED, bg = self.button_color2, fg = self.text_color, bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
+        self.downgrade_shot_button = Button(self.shot_state_line, text = "Downgrade shot", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 14, height = 1, command = self.downgradeShotCommand)
         self.downgrade_shot_button.grid(row = 0, column = 2)
         self.downgrade_shot_button.pi = self.downgrade_shot_button.grid_info()
         self.downgrade_shot_button.grid_forget()
@@ -259,20 +278,20 @@ class SuperPipe(Frame):
         self.rendering_label.pi = self.rendering_label.grid_info()
         self.rendering_label.grid_forget()
 
-        self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = self.button_color2, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
+        self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
         self.upgrade_shot_button.grid(row = 0, column = 7)
         self.upgrade_shot_button.pi = self.upgrade_shot_button.grid_info()
         self.upgrade_shot_button.grid_forget()
 
         self.var_shot_done = IntVar()
-        self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDone)
+        self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDone)
         self.done_shot_button.grid(row = 0, column = 8)
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
         ## PICTURES ##
         pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
-        pictures_shot.grid(row = 2, column = 0, columnspan = 6, sticky = N + S + W + E, pady = 20)
+        pictures_shot.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
         pictures_shot.columnconfigure(0, weight = 2, minsize = 550)
         pictures_shot.columnconfigure(1, weight = 2, minsize = 550)
@@ -297,7 +316,7 @@ class SuperPipe(Frame):
 
         ## SHOT VERSION ACTIONS ##
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
-        self.shot_actions_line.grid(row = 3, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.shot_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_actions_line.columnconfigure(0, pad = 10)
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
@@ -310,7 +329,7 @@ class SuperPipe(Frame):
 
         ## SHOT VERSION INFOS ##
         self.shot_version_management_line = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
-        self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 6, sticky = W + E, pady = 10)
+        self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_version_management_line.columnconfigure(0, pad = 10)
         self.shot_version_management_line.columnconfigure(1, pad = 10, weight = 1)
@@ -356,12 +375,12 @@ class SuperPipe(Frame):
         self.delete_asset_button.pi = self.delete_asset_button.grid_info()
         self.delete_asset_button.grid_forget()
 
-        self.rename_asset_button = Button(self.main_area_asset, text = "Rename asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.renameAssetCommand)
+        self.rename_asset_button = Button(self.main_area_asset, text = "Rename asset", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.renameAssetCommand)
         self.rename_asset_button.grid(row = 0, column = 3)
         self.rename_asset_button.pi = self.rename_asset_button.grid_info()
         self.rename_asset_button.grid_forget()
 
-        self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = self.button_color2, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setAssetCommand)
+        self.set_asset_button = Button(self.main_area_asset, text = "Set asset", bg = self.button_color1, activebackground = self.over_button_color1, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.setAssetCommand)
         self.set_asset_button.grid(row = 0, column = 4)
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
@@ -369,7 +388,7 @@ class SuperPipe(Frame):
         asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
         asset_path_label.grid(row = 0, column = 5)
 
-        asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
+        asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         asset_show_last_only_button.grid(row = 0, column = 6, sticky = E)
 
         ## ASSET STATE ##
@@ -389,31 +408,31 @@ class SuperPipe(Frame):
         self.var_asset_priority.set("Low")
 
         self.priority_asset_menu = OptionMenu(self.asset_state_line, self.var_asset_priority, "Low", "Medium", "High", "Urgent", command = self.priorityAssetCommand)
-        self.priority_asset_menu.config(bg = self.button_color2, activebackground = self.button_color2, bd = 0, width = 10, highlightthickness = 0)
+        self.priority_asset_menu.config(bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, bd = 0, width = 10, highlightthickness = 0)
         self.priority_asset_menu.grid(row = 0, column = 1, sticky = W)
         self.priority_asset_menu.pi = self.priority_asset_menu.grid_info()
         self.priority_asset_menu.grid_forget()
 
         self.var_asset_modeling_done = IntVar()
-        self.modeling_done_asset_button = Checkbutton(self.asset_state_line, text = "Modeling done", variable = self.var_asset_modeling_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetModelingDone)
+        self.modeling_done_asset_button = Checkbutton(self.asset_state_line, text = "Modeling done", variable = self.var_asset_modeling_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetModelingDone)
         self.modeling_done_asset_button.grid(row = 0, column = 2)
         self.modeling_done_asset_button.pi = self.modeling_done_asset_button.grid_info()
         self.modeling_done_asset_button.grid_forget()
 
         self.var_asset_rig_done = IntVar()
-        self.rig_done_asset_button = Checkbutton(self.asset_state_line, text = "Rig done", variable = self.var_asset_rig_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetRigDone)
+        self.rig_done_asset_button = Checkbutton(self.asset_state_line, text = "Rig done", variable = self.var_asset_rig_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetRigDone)
         self.rig_done_asset_button.grid(row = 0, column = 3)
         self.rig_done_asset_button.pi = self.rig_done_asset_button.grid_info()
         self.rig_done_asset_button.grid_forget()
 
         self.var_asset_lookdev_done = IntVar()
-        self.lookdev_done_asset_button = Checkbutton(self.asset_state_line, text = "Lookdev done", variable = self.var_asset_lookdev_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetLookdevDone)
+        self.lookdev_done_asset_button = Checkbutton(self.asset_state_line, text = "Lookdev done", variable = self.var_asset_lookdev_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetLookdevDone)
         self.lookdev_done_asset_button.grid(row = 0, column = 4)
         self.lookdev_done_asset_button.pi = self.lookdev_done_asset_button.grid_info()
         self.lookdev_done_asset_button.grid_forget()
 
         self.var_asset_done = IntVar()
-        self.done_asset_button = Checkbutton(self.asset_state_line, text = "Asset done", variable = self.var_asset_done, bg = self.main_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDone)
+        self.done_asset_button = Checkbutton(self.asset_state_line, text = "Asset done", variable = self.var_asset_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDone)
         self.done_asset_button.grid(row = 0, column = 5)
         self.done_asset_button.pi = self.done_asset_button.grid_info()
         self.done_asset_button.grid_forget()
@@ -583,9 +602,11 @@ class SuperPipe(Frame):
         selected_shot = self.shot_list.get(selected_line)
 
         shot = self.current_project.getSelection()
-        shot.setShot()
+        shot.setShot(self.current_project.getResolution())
 
         self.set_shot_button.grid_forget()
+        self.frame_range_entry.grid(self.frame_range_entry.pi)
+        self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
 
         self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
@@ -603,6 +624,8 @@ class SuperPipe(Frame):
 
         selected_line = self.version_list.curselection()[0]
         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+
+        self.var_frame_range.set(self.current_project.getSelection().getFrameRange())
 
         self.versionlistCommand(None)
 
@@ -733,6 +756,8 @@ class SuperPipe(Frame):
 
             if shot.isSet():
                 self.set_shot_button.grid_forget()
+                self.frame_range_entry.grid(self.frame_range_entry.pi)
+                self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
 
                 self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
@@ -744,6 +769,8 @@ class SuperPipe(Frame):
 
                 self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
                 self.done_shot_button.grid(self.done_shot_button.pi)
+
+                self.var_frame_range.set(self.current_project.getSelection().getFrameRange())
 
                 if shot.getStep() == "Layout":
                     self.blocking_label.config(bg = "#999999")
@@ -789,6 +816,8 @@ class SuperPipe(Frame):
 
             else:
                 self.set_shot_button.grid(self.set_shot_button.pi)
+                self.frame_range_entry.grid_forget()
+                self.set_shot_frame_range_button.grid_forget()
                 self.open_shot_layout_button.grid_forget()
 
                 self.downgrade_shot_button.grid_forget()
@@ -1186,9 +1215,6 @@ class SuperPipe(Frame):
                     all_shots_preview.append([cur_shot.getShotNb(), "img/img_not_available.gif"])
 
         for nb, img in all_shots_preview:
-            # shot_peview_label = Label(self.shots_preview_list, text = nb, bg = self.main_color, fg = self.text_color)
-            # shot_peview_label.grid(row = int((nb - 1)/5), column = (nb - 1) % 5)
-
             shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.second_color, bd = 0, highlightthickness = 0)
 
             pict = PhotoImage(file = img)
@@ -1228,6 +1254,9 @@ class SuperPipe(Frame):
                 self.upgrade_shot_button.config(state = DISABLED)
 
             self.shotlistCommand(None)
+
+    def setShotFrameRangeCommand(self):
+        self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
     ###############################################################################################################
 
@@ -1307,6 +1336,15 @@ class SuperPipe(Frame):
 
         if yesno["result"] == "yes":
             self.current_project.removeAllStudentVersions()
+
+    def projectSettingsCommand(self):
+        settings = {"res" : ""}
+
+        dialog = lambda: ProjectSettingsDialog.ProjectSettingsDialog(self.parent, self.current_project, (settings, "res"))
+        self.wait_window(dialog().top)
+
+        if settings["res"]:            
+            self.current_project.setResolution(settings["res"])
 
     def preferencesCommand(self):
         preferences = {"maya_path" : "", "nuke_path" : ""}

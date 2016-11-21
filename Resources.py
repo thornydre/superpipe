@@ -23,6 +23,22 @@ class Resources:
                 f.write(l)
         f.close()
 
+    def insertAtLine(file, text, line):
+        with open(file, "r") as f:
+            lines = f.readlines()
+        f.close()
+
+        if len(lines) < line:
+            for i in range(line - len(lines)):
+                lines.append("\n")
+
+        lines.insert(line, text + "\n")
+
+        with open(file, "w") as f:
+            for l in lines:
+                f.write(l)
+        f.close()
+
     def readLine(file, line):
         lines = []
         with open(file, "r") as f:

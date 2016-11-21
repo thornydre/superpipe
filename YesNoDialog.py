@@ -6,27 +6,35 @@ from tkinter import *
 
 class YesNoDialog(object):
     def __init__(self, parent, window_name, question, dict_key):
+        ## THEME COLORS ##
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.button_color2 = Resources.readLine("save/themes.spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
+
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
         self.top.title(window_name)
-        self.top["bg"] = "#666666"
+        self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
 
-        top_frame = Frame(self.top, borderwidth = 0, bg = "#666666")
+        top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
-        label = Label(top_frame, text = question, bg = "#666666")
+        label = Label(top_frame, text = question, bg = self.main_color, fg = self.text_color)
         label.pack(padx = 4, pady = 4)
 
-        yes_button = Button(top_frame, text = "Yes", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 10, height = 1)
+        yes_button = Button(top_frame, text = "Yes", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 10, height = 1)
         yes_button["command"] = lambda: self.yes(dict_key)
         yes_button.pack(side = LEFT, padx = 4, pady = 4)
 
         self.top.bind("<Return>", lambda event, a = dict_key:self.yes(a))
 
-        no_button = Button(top_frame, text = "No", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 10, height = 1)
+        no_button = Button(top_frame, text = "No", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 10, height = 1)
         no_button["command"] = self.top.destroy
         no_button.pack(side = RIGHT, padx = 4, pady = 4)
 

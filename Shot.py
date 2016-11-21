@@ -17,6 +17,7 @@ class Shot:
         self.done = 0
         self.priority = "Low"
         self.step = "Layout"
+        self.frame_range = 200
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -35,7 +36,7 @@ class Shot:
             makedirs(self.directory + "/data")
             makedirs(self.directory + "/data/edits")
             with open(self.directory + "/data/shot_data.spi", "w") as f:
-                f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n")
+                f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n")
             f.close()
 
             open(self.directory + "/data/versions_data.spi", "a").close()
@@ -79,7 +80,7 @@ class Shot:
 
             if not path.isfile(self.directory + "/data/shot_data.spi"):
                 with open(self.directory + "/data/shot_data.spi", "w") as f:
-                    f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n")
+                    f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n")
                 f.close()
 
             shot_infos = []
@@ -91,6 +92,7 @@ class Shot:
             self.done = int(shot_infos[0])
             self.priority = shot_infos[1]
             self.step = shot_infos[2]
+            self.frame_range = int(shot_infos[3])
 
     def getShotNb(self):
         return self.shot_nb
@@ -109,6 +111,9 @@ class Shot:
 
     def getStep(self):
         return self.step
+
+    def getFrameRange(self):
+        return self.frame_range
 
     def getComment(self, version_file):
         if not path.isfile(self.directory + "/data/versions_data.spi"):
@@ -136,8 +141,24 @@ class Shot:
         else:
             return False
 
-    def setShot(self):
+    def setShot(self, res):
         copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
+
+        Resources.insertAtLine(self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+
+    def setFrameRange(self, frame_range):
+        self.frame_range = frame_range
+
+        Resources.writeAtLine(self.directory + "/data/shot_data.spi", str(self.frame_range), 4)
+
+        for file in listdir(self.directory + "/scenes/"):
+            if ".ma" in file:
+                Resources.insertAtLine(self.directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
+
+    def setResolution(self, res):
+        for file in listdir(self.directory + "/scenes/"):
+            if ".ma" in file:
+                Resources.insertAtLine(self.directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 
     def isSet(self):
         for shot_file in listdir(self.directory + "/scenes/"):

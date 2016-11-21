@@ -7,15 +7,24 @@ from Resources import *
 
 class NewAssetDialog(object):
     def __init__(self, parent, dict_key = None):
+        ## THEME COLORS ##
+        self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.second_color = Resources.readLine("save/themes.spi", 2)
+        self.button_color1 = Resources.readLine("save/themes.spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
+        self.button_color2 = Resources.readLine("save/themes.spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
+        self.text_color = Resources.readLine("save/themes.spi", 9)
+
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
         self.top.title("Super Pipe || Add asset")
-        self.top["bg"] = "#666666"
+        self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
 
-        top_frame = Frame(self.top, borderwidth = 0, bg = "#666666")
+        top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
         top_frame.columnconfigure(0, pad = 5)
@@ -27,38 +36,38 @@ class NewAssetDialog(object):
         top_frame.rowconfigure(3, pad = 5)
         top_frame.rowconfigure(4, pad = 5)
 
-        label = Label(top_frame, text = "Select asset category", bg = "#666666")
+        label = Label(top_frame, text = "Select asset category", bg = self.main_color, fg = self.text_color)
         label.grid(row = 0, column = 0, columnspan = 2)
 
         self.rb_selection = IntVar()
-        rb1 = Radiobutton(top_frame, text = "CHARACTER", variable = self.rb_selection, value = 1, bg = "#666666", activebackground = "#666666")
+        rb1 = Radiobutton(top_frame, text = "CHARACTER", variable = self.rb_selection, value = 1, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
         rb1.grid(row = 1, column = 0, sticky = W)
 
-        rb2 = Radiobutton(top_frame, text = "FX", variable = self.rb_selection, value = 2, bg = "#666666", activebackground = "#666666")
+        rb2 = Radiobutton(top_frame, text = "FX", variable = self.rb_selection, value = 2, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
         rb2.grid(row = 1, column = 1, sticky = W)
 
-        rb3 = Radiobutton(top_frame, text = "PROPS", variable = self.rb_selection, value = 3, bg = "#666666", activebackground = "#666666")
+        rb3 = Radiobutton(top_frame, text = "PROPS", variable = self.rb_selection, value = 3, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
         rb3.grid(row = 2, column = 0, sticky = W)
 
-        rb4 = Radiobutton(top_frame, text = "SET", variable = self.rb_selection, value = 4, bg = "#666666", activebackground = "#666666")
+        rb4 = Radiobutton(top_frame, text = "SET", variable = self.rb_selection, value = 4, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
         rb4.grid(row = 2, column = 1, sticky = W)
 
         rb1.select()
 
-        name_label = Label(top_frame, text = "Asset name : ", bg = "#666666", fg = "#FFFFFF")
+        name_label = Label(top_frame, text = "Asset name : ", bg = self.main_color, fg = self.text_color)
         name_label.grid(row = 3, column = 0, sticky = E)
 
-        self.name_entry = Entry(top_frame)
+        self.name_entry = Entry(top_frame, relief = FLAT, bg = self.button_color2)
         self.name_entry.grid(row = 3, column = 1, sticky = W)
         self.name_entry.focus_set()
 
-        submit_button = Button(top_frame, text = "Create asset", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 12, height = 1)
+        submit_button = Button(top_frame, text = "Create asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
         submit_button["command"] = lambda: self.submit(dict_key)
         submit_button.grid(row = 4, column = 0, sticky = W)
 
         self.top.bind("<Return>", lambda event, a = dict_key:self.submit(a))
 
-        cancel_button = Button(top_frame, text = "Cancel", bg = "#888888", fg = "#FFFFFF", bd = 0, width = 8, height = 1)
+        cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
         cancel_button.grid(row = 4, column = 1, sticky = E)
 

@@ -21,6 +21,8 @@ class Project:
         self.selected_shot = None
         self.selected_asset = None
         self.directory = directory
+        self.res_x = 1920
+        self.res_y = 1080
         self.valid = True
 
         if not path.isdir(self.directory):
@@ -69,11 +71,17 @@ class Project:
 
             with open(self.directory + "/project_option.spi", "w") as f:
                 f.write("www.google.fr\n")
+                f.write("1920*1080\n")
             f.close()
 
         elif path.isdir(self.directory + "/05_shot"):
             self.updateShotList()
             self.updateAssetList()
+
+            res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
+
+            self.res_x = res[0]
+            self.res_y = res[1]
 
             self.current_sequence = 1
 
@@ -252,3 +260,18 @@ class Project:
             for file in files:
                 if file[-3:] == ".ma":
                     Resources.removeStudentVersion(path.join(subdir, file))
+
+    def setResolution(self, res):
+        self.res_x = res[0]
+        self.res_y = res[1]
+
+        Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.res_x + "x" + self.res_y, 2)
+
+    def setAllShotsRes(self):
+        for shot in listdir(self.getDirectory() + "/05_shot/"):
+            if shot != "backup":
+                cur_shot = Shot(self.getDirectory(), shot)
+                cur_shot.setResolution(self.getResolution())
+
+    def getResolution(self):
+        return (self.res_x, self.res_y)
