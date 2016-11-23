@@ -9,10 +9,11 @@ from shutil import copyfile, copytree
 import time
 
 class Asset:
-    def __init__(self, directory = None, asset_name = None, category = None):
+    def __init__(self, directory = None, second_path = None, asset_name = None):
         self.asset_name = asset_name
-        self.category = category
-        self.directory = directory + "/04_asset/" + self.category + "/" + self.asset_name
+        self.project_dir = directory
+        self.second_path = second_path
+        self.directory = directory + "/" + second_path + "/" + self.asset_name
         self.priority = "Low"
         self.modeling_done = 0
         self.rig_done = 0
@@ -140,7 +141,7 @@ class Asset:
         return False
 
     def deleteAsset(self):
-        copytree(self.directory, self.directory +"/../backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+        copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[0] + "/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.directory)
 
     def getVersionsList(self, last_only):

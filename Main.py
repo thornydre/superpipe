@@ -33,6 +33,10 @@ class SuperPipe(Frame):
         self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
         self.separator_color = Resources.readLine("save/themes.spi", 8)
         self.text_color = Resources.readLine("save/themes.spi", 9)
+        self.done_color = Resources.readLine("save/themes.spi", 12)
+        self.urgent_color = Resources.readLine("save/themes.spi", 13)
+        self.high_color = Resources.readLine("save/themes.spi", 14)
+        self.medium_color = Resources.readLine("save/themes.spi", 15)
 
         Frame.__init__(self, parent, bg = self.main_color)
 
@@ -132,10 +136,10 @@ class SuperPipe(Frame):
 
         self.asset_list = ttk.Treeview(bottom_left_side_bar, height = 16, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
-        self.asset_list.tag_configure("done", background = "#89C17F")
-        self.asset_list.tag_configure("urgent", background = "#E55252")
-        self.asset_list.tag_configure("high", background = "#EFB462")
-        self.asset_list.tag_configure("medium", background = "#F4E255")
+        self.asset_list.tag_configure("done", background = self.done_color)
+        self.asset_list.tag_configure("urgent", background = self.urgent_color)
+        self.asset_list.tag_configure("high", background = self.high_color)
+        self.asset_list.tag_configure("medium", background = self.medium_color)
         self.asset_list.insert("", 1, "character", text = "CHARACTER")
         self.asset_list.insert("", 3, "fx", text = "FX")
         self.asset_list.insert("", 4, "props", text = "PROPS")
@@ -667,7 +671,19 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if yesno["result"] == "yes":
-            self.current_project.removeAsset(selected_asset, self.asset_list.parent(selected_asset))
+            cur_item = selected_asset
+            path_array = []
+
+            is_parent = True
+
+            while is_parent:
+                if self.asset_list.parent(cur_item):
+                    cur_item = self.asset_list.parent(cur_item)
+                    path_array.insert(0, cur_item)
+                else:
+                    is_parent = False
+
+            self.current_project.removeAsset(selected_asset, "/".join(path_array))
 
             self.updateAssetListView()
 
@@ -695,7 +711,19 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"]:
-            if self.current_project.createAsset(asset["name"], Resources.getCategoryName(asset["cat"])):
+            cur_item = selected_asset
+            path_array = []
+
+            is_parent = True
+
+            while is_parent:
+                if self.asset_list.parent(cur_item):
+                    cur_item = self.asset_list.parent(cur_item)
+                    path_array.insert(0, cur_item)
+                else:
+                    is_parent = False
+
+            if self.current_project.createAsset(asset["name"], "/".join(path_array)):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -865,10 +893,22 @@ class SuperPipe(Frame):
 
             self.shot_list.selection_clear(0, END)
 
-            if self.asset_list.focus() not in ["character", "fx", "props", "set"]:
+            if not self.asset_list.get_children(self.asset_list.focus()):
                 selected_asset = self.asset_list.focus()
 
-                self.current_project.setSelection(asset_name = selected_asset, asset_cat = self.asset_list.parent(selected_asset))
+                cur_item = selected_asset
+                path_array = []
+
+                is_parent = True
+
+                while is_parent:
+                    if self.asset_list.parent(cur_item):
+                        cur_item = self.asset_list.parent(cur_item)
+                        path_array.insert(0, cur_item)
+                    else:
+                        is_parent = False
+
+                self.current_project.setSelection(asset_name = selected_asset, second_path = "/" + "/".join(path_array))
                 asset = self.current_project.getSelection()
 
                 self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
@@ -1068,18 +1108,24 @@ class SuperPipe(Frame):
 
         for asset in assets:
             if asset[0] != "backup":
-                cur_asset = Asset(self.current_project.getDirectory(), asset[0], asset[1])
+                cur_asset = Asset(self.current_project.getDirectory(), asset[1], asset[0])
+
+                asset_subfolders = asset[1].split("/")
+
+                for i in range(len(asset_subfolders)):
+                    if i > 0:
+                        self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i], text = asset_subfolders[i].upper(), tags = ("folder"))
 
                 if cur_asset.isDone():
-                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("done"))
+                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
                 elif cur_asset.getPriority() == "Urgent":
-                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("urgent"))
+                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("urgent"))
                 elif cur_asset.getPriority() == "High":
-                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("high"))
+                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("high"))
                 elif cur_asset.getPriority() == "Medium":
-                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0], tags = ("medium"))
+                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("medium"))
                 else:
-                    self.asset_list.insert(asset[1], END, asset[0], text = asset[0])
+                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0])
 
     def updateVersionListView(self, shot = None, asset = None):
         self.version_list.delete(0, END)
@@ -1274,8 +1320,6 @@ class SuperPipe(Frame):
             f.close()
 
         base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
-
-        print(base_url)
 
         webbrowser.open(base_url)
 

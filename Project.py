@@ -78,7 +78,6 @@ class Project:
             self.updateShotList()
             self.updateAssetList()
 
-
             if not Resources.readLine(self.directory + "/project_option.spi", 2):
                 Resources.writeAtLine(self.directory + "/project_option.spi", "1920*1080", 2)
 
@@ -112,41 +111,10 @@ class Project:
     def updateAssetList(self):
         self.asset_list = []
 
-        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/character"):
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset"):
             if "scenes" in sub_dirs:
                 if not "backup" in cur_dir:
-                    print("#############################################################")
-                    print(path.basename(cur_dir))
-
-        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/FX"):
-            if "scenes" in sub_dirs:
-                if not "backup" in cur_dir:
-                    print("#############################################################")
-                    print(path.basename(cur_dir))
-
-        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/props"):
-            if "scenes" in sub_dirs:
-                if not "backup" in cur_dir:
-                    print("#############################################################")
-                    print(path.basename(cur_dir))
-
-        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/set"):
-            if "scenes" in sub_dirs:
-                if not "backup" in cur_dir:
-                    print("#############################################################")
-                    print(path.basename(cur_dir))
-
-        for asset in listdir(self.directory + "/04_asset/character"):
-            self.asset_list.append((asset, "character"))
-
-        for asset in listdir(self.directory + "/04_asset/FX"):
-            self.asset_list.append((asset, "fx"))
-
-        for asset in listdir(self.directory + "/04_asset/props"):
-            self.asset_list.append((asset, "props"))
-
-        for asset in listdir(self.directory + "/04_asset/set"):
-            self.asset_list.append((asset, "set"))
+                    self.asset_list.append((path.basename(cur_dir), path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset/", "")))
 
     def getDirectory(self):
         return self.directory
@@ -223,22 +191,22 @@ class Project:
         # if path.isdir(self.directory + "05_shot/s00p00"):
         #     rmtree(self.directory + "05_shot/s00p00")
 
-    def createAsset(self, asset_name, category):
-        if path.isdir(self.directory + "/04_asset/character/" + asset_name):
+    def createAsset(self, asset_name, second_path):
+        if path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
-        elif path.isdir(self.directory + "/04_asset/FX/" + asset_name):
+        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
-        elif path.isdir(self.directory + "/04_asset/props/" + asset_name):
+        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
-        elif path.isdir(self.directory + "/04_asset/set/" + asset_name):
+        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
         else:
-            asset = Asset(self.directory, asset_name, category)
-            self.asset_list.append((asset_name, category))
+            asset = Asset(self.directory, second_path, asset_name)
+            self.asset_list.append((asset_name, second_path))
             return True
 
-    def removeAsset(self, asset_name, category):
-        asset = Asset(self.directory, asset_name, category)
+    def removeAsset(self, asset_name, second_path):
+        asset = Asset(self.directory, second_path, asset_name)
         asset.deleteAsset()
         self.updateAssetList()
 
@@ -258,12 +226,12 @@ class Project:
         rmtree(self.directory + "/04_asset/set/backup")
         makedirs(self.directory + "/04_asset/set/backup")
 
-    def setSelection(self, shot_name = None, asset_name = None, asset_cat = None):
+    def setSelection(self, shot_name = None, asset_name = None, second_path = None):
         if shot_name:
             self.selected_shot = Shot(self.directory, shot_name)
             self.selected_asset = None
         elif asset_name:
-            self.selected_asset = Asset(self.directory, asset_name, asset_cat)
+            self.selected_asset = Asset(self.directory, second_path, asset_name)
             self.selected_shot = None
 
     def getSelection(self):
