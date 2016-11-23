@@ -50,3 +50,4 @@ options.spi
 *.pyc
 *.pyw
 test.py
+build
