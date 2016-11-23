@@ -80,9 +80,9 @@ class Project:
 
 
             if not Resources.readLine(self.directory + "/project_option.spi", 2):
-                Resources.writeAtLine(self.directory + "/project_option.spi", "1920x1080", 2)
+                Resources.writeAtLine(self.directory + "/project_option.spi", "1920*1080", 2)
 
-            res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
+            res = Resources.readLine(self.directory + "/project_option.spi", 2).split("*")
 
             self.res_x = res[0]
             self.res_y = res[1]
@@ -111,6 +111,30 @@ class Project:
                 
     def updateAssetList(self):
         self.asset_list = []
+
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/character"):
+            if "scenes" in sub_dirs:
+                if not "backup" in cur_dir:
+                    print("#############################################################")
+                    print(path.basename(cur_dir))
+
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/FX"):
+            if "scenes" in sub_dirs:
+                if not "backup" in cur_dir:
+                    print("#############################################################")
+                    print(path.basename(cur_dir))
+
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/props"):
+            if "scenes" in sub_dirs:
+                if not "backup" in cur_dir:
+                    print("#############################################################")
+                    print(path.basename(cur_dir))
+
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset/set"):
+            if "scenes" in sub_dirs:
+                if not "backup" in cur_dir:
+                    print("#############################################################")
+                    print(path.basename(cur_dir))
 
         for asset in listdir(self.directory + "/04_asset/character"):
             self.asset_list.append((asset, "character"))

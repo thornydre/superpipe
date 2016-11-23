@@ -52,10 +52,25 @@ class SuperPipe(Frame):
 
         self.initUI()
 
+        project_directory = Resources.readLine("save/options.spi", 3)
+
+        if project_directory:
+            if path.isdir(project_directory):
+                self.current_project = Project(project_directory)
+                self.current_sequence = self.current_project.getCurrentSequence()
+                self.add_shot_button.config(state = NORMAL)
+                self.add_asset_button.config(state = NORMAL)
+                self.shots_preview_button.config(state = NORMAL)
+
+                self.parent.title("Super Pipe || " + self.current_project.getDirectory())
+
+                self.updateShotListView()
+                self.updateAssetListView()
+
     def initUI(self):
         self.parent["bg"] = self.main_color
         self.parent.title("Super Pipe")
-        self.grid(sticky = N + S + E + W)
+        self.pack(fill = "both", expand = True)
 
         self.parent.bind("<F5>", self.refresh)
 
@@ -84,41 +99,38 @@ class SuperPipe(Frame):
 
         self.parent.config(menu = menu_bar)
 
-        self.parent.columnconfigure(0, pad = 0)
-        self.parent.columnconfigure(1, pad = 0)
-        self.parent.columnconfigure(2, pad = 0, weight = 2)
-        self.parent.columnconfigure(3, pad = 0)
-        self.parent.columnconfigure(4, pad = 0)
+        pw_main = PanedWindow(self.parent, orient="horizontal", height = 1200, bg = self.separator_color, bd = 0, sashwidth = 5)
+        pw_side_bar = PanedWindow(pw_main, orient = "vertical", width = 250, bg = self.separator_color, bd = 0, sashwidth = 5)
+        main = Frame(pw_main, width = 400, height = 400, background = "black")
+        pw_side_bar_top = Frame(pw_side_bar, width = 200, height = 200, background = "gray")
+        pw_side_bar_bottom = Frame(pw_side_bar, width = 200, height = 200, background = "white")
 
-        self.parent.rowconfigure(0, pad = 0)
+        pw_main.pack(fill = "both", expand = True)
+
+        pw_main.add(pw_side_bar)
+        pw_main.paneconfigure(pw_side_bar, minsize = 200)
 
         ###############################################################################################################
+       
+        bottom_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
 
-        ## // SIDE BAR \\ ##
-        left_side_bar = Frame(self.parent, bg = self.main_color)
-        left_side_bar.grid(row = 0, column = 0, sticky = N)
+        add_buttons = Frame(bottom_left_side_bar, bg = self.main_color)
+        add_buttons.pack(fill = X, pady = 10)
 
-        left_side_bar.columnconfigure(0, pad = 0)
-        left_side_bar.columnconfigure(1, pad = 0)
+        add_buttons.columnconfigure(0, weight = 1)
+        add_buttons.columnconfigure(1, weight = 1)
 
-        left_side_bar.rowconfigure(0, pad = 20)
-        left_side_bar.rowconfigure(1, pad = 5)
-        left_side_bar.rowconfigure(2, pad = 5)
-        left_side_bar.rowconfigure(3, pad = 5)
-        left_side_bar.rowconfigure(4, pad = 5)
-        left_side_bar.rowconfigure(5, pad = 20)
+        self.add_asset_button = Button(add_buttons, text = "Add asset", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addAssetCommand)
+        self.add_asset_button.grid(row = 0, column = 0, sticky = N)
 
-        self.add_asset_button = Button(left_side_bar, text = "Add asset", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addAssetCommand)
-        self.add_asset_button.grid(row = 0, column = 0)
-
-        self.add_shot_button = Button(left_side_bar, text = "Add shot", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addShotCommand)
-        self.add_shot_button.grid(row = 0, column = 1)
+        self.add_shot_button = Button(add_buttons, text = "Add shot", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1, command = self.addShotCommand)
+        self.add_shot_button.grid(row = 0, column = 1, sticky = N)
 
         ## ASSETS LIST ##
-        asset_label = Label(left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
-        asset_label.grid(row = 1, column = 0, columnspan = 2)
+        asset_label = Label(bottom_left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
+        asset_label.pack(fill = X, pady = 10)
 
-        self.asset_list = ttk.Treeview(left_side_bar, height = 16, show = "tree", selectmode = "browse")
+        self.asset_list = ttk.Treeview(bottom_left_side_bar, height = 16, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = "#89C17F")
         self.asset_list.tag_configure("urgent", background = "#E55252")
@@ -128,33 +140,38 @@ class SuperPipe(Frame):
         self.asset_list.insert("", 3, "fx", text = "FX")
         self.asset_list.insert("", 4, "props", text = "PROPS")
         self.asset_list.insert("", 5, "set", text = "SET")
-        self.asset_list.grid(row = 2, column = 0, columnspan = 2, sticky = N + S + W + E)
+        self.asset_list.pack(fill = BOTH, expand = Y)
         self.asset_list.bind("<ButtonRelease-1>", self.assetListCommand)
 
-        ## SHOTS LIST ##
-        shot_label = Label(left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
-        shot_label.grid(row = 3, column = 0, columnspan = 2)
+        pw_side_bar.add(bottom_left_side_bar)
 
-        self.shot_list = Listbox(left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, height = 31, exportselection = False)
-        self.shot_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
+        top_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
+
+        ## SHOTS LIST ##
+        shot_label = Label(top_left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
+        shot_label.pack(fill = X, pady = 10)
+
+        self.shot_list = Listbox(top_left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)
+        self.shot_list.pack(fill = BOTH, expand = Y)
         self.shot_list.bind("<<ListboxSelect>>", self.shotlistCommand)
 
-        self.shots_preview_button = Button(left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
-        self.shots_preview_button.grid(row = 5, column = 0, columnspan = 2)
+        self.shots_preview_button = Button(top_left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
+        self.shots_preview_button.pack(pady = 10)
 
-        self.custom_button = Button(left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
-        self.custom_button.grid(row = 6, column = 0, columnspan = 2)
+        self.custom_button = Button(top_left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button.pack(pady = 10)
 
-        ###############################################################################################################
-
-        separator = Frame(self.parent, bg = self.separator_color, bd = 0, width = 5, height = 10)
-        separator.grid(row = 0, column = 1, sticky = N + S + W + E)
+        pw_side_bar.add(top_left_side_bar)
 
         ###############################################################################################################
 
-        ## // SHOTS MAIN FRAME \\ ##
-        self.main_area_shot = Frame(self.parent, bg = self.main_color, bd = 0)
-        self.main_area_shot.grid(row = 0, column = 2, sticky = N + S + W + E)
+        main_area = Frame(pw_main, bg = self.main_color)
+
+        main_area.columnconfigure(0, weight = 1)
+
+         ## // SHOTS MAIN FRAME \\ ##
+        self.main_area_shot = Frame(main_area, bg = self.main_color, bd = 0)
+        self.main_area_shot.grid(row = 0, column = 0, sticky = N + S + W + E)
         self.main_area_shot.pi = self.main_area_shot.grid_info()
 
         self.main_area_shot.columnconfigure(0, pad = 10, minsize = 40)
@@ -292,8 +309,8 @@ class SuperPipe(Frame):
         pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
         pictures_shot.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
-        pictures_shot.columnconfigure(0, weight = 2, minsize = 550)
-        pictures_shot.columnconfigure(1, weight = 2, minsize = 550)
+        pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
+        pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
 
         prev_pict_label = Label(pictures_shot, text = "Previous shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
         prev_pict_label.grid(row = 0, column = 0, pady = 10)
@@ -345,8 +362,8 @@ class SuperPipe(Frame):
         ###############################################################################################################
 
         ## // ASSETS MAIN FRAME \\ ##
-        self.main_area_asset = Frame(self.parent, bg = self.main_color, bd = 0, width = 1000, height = 300)
-        self.main_area_asset.grid(row = 0, column = 2, sticky = N + S + W + E)
+        self.main_area_asset = Frame(main_area, bg = self.main_color, bd = 0)
+        self.main_area_asset.grid(row = 0, column = 0, sticky = N + S + W + E)
         self.main_area_asset.pi = self.main_area_asset.grid_info()
         self.main_area_asset.grid_forget()
 
@@ -440,10 +457,10 @@ class SuperPipe(Frame):
         pictures_asset = Frame(self.main_area_asset, bg = self.second_color, bd = 0)
         pictures_asset.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
-        pictures_asset.columnconfigure(0, weight = 1)
+        pictures_asset.columnconfigure(0, weight = 1, minsize = 550)
 
-        prev_pict_label = Label(pictures_asset, text = "This asset", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
-        prev_pict_label.grid(row = 0, column = 0, pady = 10)
+        pict_label = Label(pictures_asset, text = "This asset", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
+        pict_label.grid(row = 0, column = 0, pady = 10)
 
         self.asset_pict_caneva = Canvas(pictures_asset, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
@@ -483,8 +500,8 @@ class SuperPipe(Frame):
         ###############################################################################################################
 
         ## SHOTS PREVIEW ##
-        self.main_area_preview = Frame(self.parent, bg = self.main_color, bd = 0, width = 100, height = 100)
-        self.main_area_preview.grid(row = 0, column = 2, sticky = N + W + E)
+        self.main_area_preview = Frame(main_area, bg = self.main_color, bd = 0, width = 100, height = 100)
+        self.main_area_preview.grid(row = 0, column = 0, sticky = N + W + E)
         self.main_area_preview.pi = self.main_area_preview.grid_info()
         self.main_area_preview.grid_forget()
 
@@ -510,45 +527,22 @@ class SuperPipe(Frame):
 
         self.preview_gifdict = {}
 
-        ###############################################################################################################
-
-        separator = Frame(self.parent, bg = self.separator_color, bd = 0, width = 5, height = 10)
-        separator.grid(row = 0, column = 3, sticky = N + S + W + E)
+        pw_main.add(main_area)
+        pw_main.paneconfigure(main_area, minsize = 1100)
 
         ###############################################################################################################
 
-        right_side_bar = Frame(self.parent, bg = self.main_color)
-        right_side_bar.grid(row = 0, column = 4, sticky = N)
-
-        right_side_bar.columnconfigure(0, pad = 0)
-
-        right_side_bar.rowconfigure(0, pad = 20)
-        right_side_bar.rowconfigure(1, pad = 5)
+        right_side_bar = Frame(pw_main, bg = self.main_color)
 
         ## VERSIONS ##
         versions_label = Label(right_side_bar, text = "Versions", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
-        versions_label.grid(row = 1, column = 0, columnspan = 2)
+        versions_label.pack(fill = X, pady = 10)
 
         self.version_list = Listbox(right_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
-        self.version_list.grid(row = 4, column = 0, columnspan = 2, sticky = N + S + W + E)
+        self.version_list.pack(fill = X, pady = 10)
         self.version_list.bind("<<ListboxSelect>>", self.versionlistCommand)
 
-        ###############################################################################################################
-
-        project_directory = Resources.readLine("save/options.spi", 3)
-
-        if project_directory:
-            if path.isdir(project_directory):
-                self.current_project = Project(project_directory)
-                self.current_sequence = self.current_project.getCurrentSequence()
-                self.add_shot_button.config(state = NORMAL)
-                self.add_asset_button.config(state = NORMAL)
-                self.shots_preview_button.config(state = NORMAL)
-
-                self.parent.title("Super Pipe || " + self.current_project.getDirectory())
-
-                self.updateShotListView()
-                self.updateAssetListView()
+        pw_main.add(right_side_bar)
 
     def newProjectCommand(self):
         self.current_sequence = 1

@@ -8,6 +8,7 @@ from shutil import copyfile, copytree, rmtree
 from Resources import *
 
 import time
+# import thread
 
 class Shot:
     def __init__(self, directory = None, shot_name = None):
@@ -254,7 +255,7 @@ class Shot:
                 copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.gif")
                 copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.gif")
         elif self.step == "Rendering":
-            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
+            copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
             if version != 0:
                 copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.gif")
                 copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.gif")
