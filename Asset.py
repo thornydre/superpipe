@@ -13,7 +13,7 @@ class Asset:
         self.asset_name = asset_name
         self.project_dir = directory
         self.second_path = second_path
-        self.directory = directory + "/" + second_path + "/" + self.asset_name
+        self.directory = directory + "/04_asset/" + second_path + "/" + self.asset_name
         self.priority = "Low"
         self.modeling_done = 0
         self.rig_done = 0
@@ -141,7 +141,7 @@ class Asset:
         return False
 
     def deleteAsset(self):
-        copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[0] + "/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+        copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[0] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.directory)
 
     def getVersionsList(self, last_only):

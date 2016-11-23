@@ -711,19 +711,7 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"]:
-            cur_item = selected_asset
-            path_array = []
-
-            is_parent = True
-
-            while is_parent:
-                if self.asset_list.parent(cur_item):
-                    cur_item = self.asset_list.parent(cur_item)
-                    path_array.insert(0, cur_item)
-                else:
-                    is_parent = False
-
-            if self.current_project.createAsset(asset["name"], "/".join(path_array)):
+            if self.current_project.createAsset(asset["name"], Resources.getCategoryName(asset["cat"])):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -1184,6 +1172,7 @@ class SuperPipe(Frame):
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
         self.asset_list.focus(selected_asset)
+        self.asset_list.see(selected_asset)
 
     def toggleAssetRigDone(self):
         selected_asset = self.asset_list.focus()
@@ -1192,6 +1181,7 @@ class SuperPipe(Frame):
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
         self.asset_list.focus(selected_asset)
+        self.asset_list.see(selected_asset)
 
     def toggleAssetLookdevDone(self):
         selected_asset = self.asset_list.focus()
@@ -1200,6 +1190,7 @@ class SuperPipe(Frame):
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
         self.asset_list.focus(selected_asset)
+        self.asset_list.see(selected_asset)
 
     def toggleAssetDone(self):
         selected_asset = self.asset_list.focus()
@@ -1208,6 +1199,7 @@ class SuperPipe(Frame):
         self.asset_list.selection_set(selected_asset)
         self.asset_list.focus_set()
         self.asset_list.focus(selected_asset)
+        self.asset_list.see(selected_asset)
 
     def priorityShotCommand(self, priority):
         selected_shot = self.shot_list.curselection()[0]
@@ -1401,16 +1393,17 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
     def refresh(self, e):
-        selected_version = self.version_list.curselection()[0]
+        if self.version_list.curselection():
+            selected_version = self.version_list.curselection()[0]
+            
+            if self.current_project.getSelectionType() == "shot":
+                self.updateVersionListView(shot = self.current_project.getSelection())
+            elif self.current_project.getSelectionType() == "asset":
+                self.updateVersionListView(asset = self.current_project.getSelection())
 
-        if self.current_project.getSelectionType() == "shot":
-            self.updateVersionListView(shot = self.current_project.getSelection())
-        elif self.current_project.getSelectionType() == "asset":
-            self.updateVersionListView(asset = self.current_project.getSelection())
+            self.version_list.select_set(selected_version)
 
-        self.version_list.select_set(selected_version)
-
-        self.versionlistCommand(None)
+            self.versionlistCommand(None)
 
     def scrollCommand(self, e):
         self.preview_canva_scroll.configure(scrollregion = self.preview_canva_scroll.bbox("all"), width = 2000, height = self.parent.winfo_height())
