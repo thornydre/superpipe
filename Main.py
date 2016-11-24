@@ -116,9 +116,9 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
        
-        bottom_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
+        top_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
 
-        add_buttons = Frame(bottom_left_side_bar, bg = self.main_color)
+        add_buttons = Frame(top_left_side_bar, bg = self.main_color)
         add_buttons.pack(fill = X, pady = 10)
 
         add_buttons.columnconfigure(0, weight = 1)
@@ -131,10 +131,10 @@ class SuperPipe(Frame):
         self.add_shot_button.grid(row = 0, column = 1, sticky = N)
 
         ## ASSETS LIST ##
-        asset_label = Label(bottom_left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
+        asset_label = Label(top_left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         asset_label.pack(fill = X, pady = 10)
 
-        self.asset_list = ttk.Treeview(bottom_left_side_bar, height = 16, show = "tree", selectmode = "browse")
+        self.asset_list = ttk.Treeview(top_left_side_bar, height = 16, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = self.done_color)
         self.asset_list.tag_configure("urgent", background = self.urgent_color)
@@ -147,25 +147,27 @@ class SuperPipe(Frame):
         self.asset_list.pack(fill = BOTH, expand = Y)
         self.asset_list.bind("<ButtonRelease-1>", self.assetListCommand)
 
-        pw_side_bar.add(bottom_left_side_bar)
+        pw_side_bar.add(top_left_side_bar)
+        pw_side_bar.paneconfigure(top_left_side_bar, minsize = 175)
 
-        top_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
+        bottom_left_side_bar = Frame(pw_side_bar, bg = self.main_color)
 
         ## SHOTS LIST ##
-        shot_label = Label(top_left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
+        shot_label = Label(bottom_left_side_bar, text = "Shots", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         shot_label.pack(fill = X, pady = 10)
 
-        self.shot_list = Listbox(top_left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)
+        self.shot_list = Listbox(bottom_left_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)
         self.shot_list.pack(fill = BOTH, expand = Y)
         self.shot_list.bind("<<ListboxSelect>>", self.shotlistCommand)
 
-        self.shots_preview_button = Button(top_left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
+        self.shots_preview_button = Button(bottom_left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.pack(pady = 10)
 
-        self.custom_button = Button(top_left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button = Button(bottom_left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
         self.custom_button.pack(pady = 10)
 
-        pw_side_bar.add(top_left_side_bar)
+        pw_side_bar.add(bottom_left_side_bar)
+        pw_side_bar.paneconfigure(bottom_left_side_bar, minsize = 300)
 
         ###############################################################################################################
 

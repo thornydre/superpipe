@@ -71,7 +71,7 @@ class Project:
 
             with open(self.directory + "/project_option.spi", "w") as f:
                 f.write("www.google.fr\n")
-                f.write("1920*1080\n")
+                f.write("1920x1080\n")
             f.close()
 
         elif path.isdir(self.directory + "/05_shot"):
@@ -79,9 +79,9 @@ class Project:
             self.updateAssetList()
 
             if not Resources.readLine(self.directory + "/project_option.spi", 2):
-                Resources.writeAtLine(self.directory + "/project_option.spi", "1920*1080", 2)
+                Resources.writeAtLine(self.directory + "/project_option.spi", "1920x1080", 2)
 
-            res = Resources.readLine(self.directory + "/project_option.spi", 2).split("*")
+            res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
 
             self.res_x = res[0]
             self.res_y = res[1]
