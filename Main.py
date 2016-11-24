@@ -233,8 +233,7 @@ class SuperPipe(Frame):
 
         self.var_frame_range = StringVar()
 
-        self.frame_range_entry = Entry(self.main_area_shot, textvariable = self.var_frame_range, relief = FLAT, bg = self.button_color2, bd = 5, width = 6, justify = CENTER)
-        # self.frame_range_entry = MaxLengthEntry(self.main_area_shot, maxlength = 6)
+        self.frame_range_entry = Entry(self.main_area_shot, relief = FLAT, bg = self.button_color2, bd = 5, width = 6, justify = CENTER, validate="key", validatecommand = (self.register(self.validateFrameRangeEntry), '%P', '%S'))
         self.frame_range_entry.grid(row = 0, column = 3)
         self.frame_range_entry.pi = self.frame_range_entry.grid_info()
         self.frame_range_entry.grid_forget()
@@ -243,10 +242,6 @@ class SuperPipe(Frame):
         self.set_shot_frame_range_button.grid(row = 0, column = 4)
         self.set_shot_frame_range_button.pi = self.set_shot_frame_range_button.grid_info()
         self.set_shot_frame_range_button.grid_forget()
-
-        self.var_selection_path_label = StringVar()
-        shot_path_label = Label(self.main_area_shot, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
-        shot_path_label.grid(row = 0, column = 5)
 
         self.var_check_show_last = IntVar()
         shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
@@ -258,8 +253,8 @@ class SuperPipe(Frame):
 
         self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
         self.shot_state_line.columnconfigure(1, pad = 10, minsize = 100)
-        self.shot_state_line.columnconfigure(2, pad = 20)
-        self.shot_state_line.columnconfigure(7, pad = 20)
+        self.shot_state_line.columnconfigure(2, pad = 50)
+        self.shot_state_line.columnconfigure(7, pad = 50)
 
         self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
@@ -365,6 +360,13 @@ class SuperPipe(Frame):
         shot_version_comment = Message(self.shot_version_management_line, textvariable = self.var_shot_version_comment, bg = self.second_color, fg = self.text_color, pady = 10, width = 750)
         shot_version_comment.grid(row = 1, column = 1, sticky = N)
 
+        ## PATHS ##
+        maya_file_path_label = Label()
+
+        self.var_selection_path_label = StringVar()
+        shot_path_label = Entry(self.main_area_shot, textvariable = self.var_selection_path_label, relief = FLAT, justify = CENTER, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
+        shot_path_label.grid(row = 0, column = 5, sticky = W + E)
+
         ###############################################################################################################
 
         ## // ASSETS MAIN FRAME \\ ##
@@ -407,8 +409,8 @@ class SuperPipe(Frame):
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
 
-        asset_path_label = Label(self.main_area_asset, textvariable = self.var_selection_path_label, bg = self.main_color, fg = self.text_color, height = 1, anchor = NW)
-        asset_path_label.grid(row = 0, column = 5)
+        asset_path_label = Entry(self.main_area_asset, textvariable = self.var_selection_path_label, relief = FLAT, justify = CENTER, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
+        asset_path_label.grid(row = 0, column = 5, sticky = W + E)
 
         asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         asset_show_last_only_button.grid(row = 0, column = 6, sticky = E)
@@ -548,7 +550,7 @@ class SuperPipe(Frame):
         self.version_list.pack(fill = X, pady = 10)
         self.version_list.bind("<<ListboxSelect>>", self.versionlistCommand)
 
-        pw_main.add(right_side_bar)
+        pw_main.add(right_side_bar, width = 50)
 
     def newProjectCommand(self):
         self.current_sequence = 1
@@ -624,7 +626,8 @@ class SuperPipe(Frame):
         selected_line = self.version_list.curselection()[0]
         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
-        self.var_frame_range.set(self.current_project.getSelection().getFrameRange())
+        self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
+        self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
 
         self.versionlistCommand(None)
 
@@ -781,7 +784,8 @@ class SuperPipe(Frame):
                 self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
                 self.done_shot_button.grid(self.done_shot_button.pi)
 
-                self.var_frame_range.set(self.current_project.getSelection().getFrameRange())
+                self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
+                self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
 
                 if shot.getStep() == "Layout":
                     self.blocking_label.config(bg = "#999999")
@@ -1293,6 +1297,14 @@ class SuperPipe(Frame):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
     ###############################################################################################################
+
+    def validateFrameRangeEntry(self, P, S):
+        valid = S.isnumeric() and len(P) < 6
+
+        if not valid:
+            self.bell()
+
+        return valid
 
     def editCustomLinkCommand(self):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):

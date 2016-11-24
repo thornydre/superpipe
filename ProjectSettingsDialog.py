@@ -56,14 +56,20 @@ class ProjectSettingsDialog(object):
         res_x_label = Label(top_frame, text = "x :", bg = self.main_color, fg = self.text_color)
         res_x_label.grid(row = 1, column = 0, sticky = E)
 
-        self.res_x_entry = Entry(top_frame, justify = CENTER, textvariable = self.var_res_x, width = 6, relief = FLAT, bg = self.button_color2)
+        self.res_x_entry = Entry(top_frame, justify = CENTER, width = 6, relief = FLAT, bg = self.button_color2, validate="key", validatecommand = (self.root.register(self.validateResEntry), '%P', '%S'))
         self.res_x_entry.grid(row = 1, column = 1, sticky = W)
+
+        self.res_x_entry.delete(0)
+        self.res_x_entry.insert(0, res[0])
 
         res_y_label = Label(top_frame, text = "y :", bg = self.main_color, fg = self.text_color)
         res_y_label.grid(row = 1, column = 2, sticky = E)
 
-        self.res_y_entry = Entry(top_frame, justify = CENTER, textvariable = self.var_res_y, width = 6, relief = FLAT, bg = self.button_color2)
+        self.res_y_entry = Entry(top_frame, justify = CENTER, width = 6, relief = FLAT, bg = self.button_color2, validate="key", validatecommand = (self.root.register(self.validateResEntry), '%P', '%S'))
         self.res_y_entry.grid(row = 1, column = 3, sticky = W)
+
+        self.res_y_entry.delete(0)
+        self.res_y_entry.insert(0, res[1])
 
         cancel_button = Button(top_frame, text = "Apply to all shots", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 14, height = 1)
         cancel_button["command"] = lambda: self.applyResToAll(project)
@@ -90,6 +96,14 @@ class ProjectSettingsDialog(object):
 
         self.top.iconbitmap("img/icon.ico")
         self.top.focus()
+
+    def validateResEntry(self, P, S):
+        valid = S.isnumeric() and len(P) < 5
+
+        if not valid:
+            self.root.bell()
+
+        return valid
 
     def applyResToAll(self, project):
         project.setResolution((self.res_x_entry.get(), self.res_y_entry.get()))
