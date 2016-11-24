@@ -1101,8 +1101,9 @@ class SuperPipe(Frame):
                 asset_subfolders = asset[1].split("/")
 
                 for i in range(len(asset_subfolders)):
-                    if i > 0:
-                        self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i], text = asset_subfolders[i].upper(), tags = ("folder"))
+                    if not self.asset_list.exists(asset_subfolders[i]):
+                        if i > 0:
+                            self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i], text = asset_subfolders[i].upper(), tags = ("folder"))
 
                 if cur_asset.isDone():
                     self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
