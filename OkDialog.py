@@ -5,7 +5,7 @@ from Main import *
 from tkinter import *
 
 class OkDialog(object):
-    def __init__(self, parent, window_name, message):
+    def __init__(self, parent, window_name, message, padding = 10):
         ## THEME COLORS ##
         self.main_color = Resources.readLine("save/themes.spi", 1)
         self.button_color1 = Resources.readLine("save/themes.spi", 4)
@@ -21,7 +21,7 @@ class OkDialog(object):
         self.top.resizable(width = False, height = False)
 
         top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
-        top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
+        top_frame.pack(fill = "both", expand = True, padx = padding, pady = padding)
 
         label = Label(top_frame, text = message, bg = self.main_color, fg = self.text_color)
         label.pack(padx = 4, pady = 4)

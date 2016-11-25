@@ -23,6 +23,8 @@ def incrementalSave(comment):
 
     version = int(file_name[-2:]) + 1
 
+    current_frame = cmds.currentTime(q = True)
+
     if "edits" in directory:
         for f in listdir(directory + "/.."):
             if file_name[:-2] in f:
@@ -51,13 +53,13 @@ def incrementalSave(comment):
     if "edits" in directory:
         if not path.isdir(directory + "/../../images/screenshots"):
             mkdir(directory + "/../../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False, os = True)
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../../images/screenshots/" + new_file_name + "_small.gif", v = False, wh = (249, 135), p = 100, orn = False, os = True)
+        cmds.playblast(frame = current_frame, format = "image", cf = directory + "/../../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False, os = True)
+        cmds.playblast(frame = current_frame, format = "image", cf = directory + "/../../images/screenshots/" + new_file_name + "_small.gif", v = False, wh = (249, 135), p = 100, orn = False, os = True)
     else:
         if not path.isdir(directory + "/../images/screenshots"):
             mkdir(directory + "/../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False, os = True)
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../images/screenshots/" + new_file_name + "_small.gif", v = False, wh = (249, 135), p = 100, orn = False, os = True)
+        cmds.playblast(frame = current_frame, format = "image", cf = directory + "/../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False, os = True)
+        cmds.playblast(frame = current_frame, format = "image", cf = directory + "/../images/screenshots/" + new_file_name + "_small.gif", v = False, wh = (249, 135), p = 100, orn = False, os = True)
 
     cmds.setAttr("defaultRenderGlobals.imageFormat", frm)
 

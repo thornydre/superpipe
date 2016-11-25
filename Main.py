@@ -42,6 +42,9 @@ class SuperPipe(Frame):
 
         self.parent = parent
 
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
         self.current_project = None
         self.current_sequence = 1
 
@@ -69,6 +72,8 @@ class SuperPipe(Frame):
 
                 self.updateShotListView()
                 self.updateAssetListView()
+
+        self.parent.config(cursor = "")
 
     def initUI(self):
         self.parent["bg"] = self.main_color
@@ -102,7 +107,7 @@ class SuperPipe(Frame):
 
         self.parent.config(menu = menu_bar)
 
-        pw_main = PanedWindow(self.parent, orient="horizontal", height = 1200, bg = self.separator_color, bd = 0, sashwidth = 5)
+        pw_main = PanedWindow(self.parent, orient="horizontal", height = 2000, bg = self.separator_color, bd = 0, sashwidth = 5)
         pw_side_bar = PanedWindow(pw_main, orient = "vertical", width = 250, bg = self.separator_color, bd = 0, sashwidth = 5)
         main = Frame(pw_main, width = 400, height = 400, background = "black")
         pw_side_bar_top = Frame(pw_side_bar, width = 200, height = 200, background = "gray")
@@ -306,25 +311,26 @@ class SuperPipe(Frame):
         self.done_shot_button.grid_forget()
 
         ## PICTURES ##
-        pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
-        pictures_shot.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
+        self.pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
+        self.pictures_shot.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
-        pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
-        pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
+        self.pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
+        self.pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
 
-        prev_pict_label = Label(pictures_shot, text = "Previous shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
-        prev_pict_label.grid(row = 0, column = 0, pady = 10)
+        self.prev_pict_label = Label(self.pictures_shot, text = "Previous shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
+        self.prev_pict_label.grid(row = 0, column = 0, pady = 10)
+        self.prev_pict_label.pi = self.prev_pict_label.grid_info()
 
-        self.shot_prev_pict_caneva = Canvas(pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
+        self.shot_prev_pict_caneva = Canvas(self.pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.shot_prev_pict_caneva.grid(row = 1, column = 0, pady = 20)
         self.shot_prev_pict_caneva.pi = self.shot_prev_pict_caneva.grid_info()
         self.shot_prev_pict_caneva.grid_forget()
         self.shot_prev_gifdict = {}
 
-        shot_nb_label = Label(pictures_shot, text = "This shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
-        shot_nb_label.grid(row = 0, column = 1, pady = 10)
+        this_pict_label = Label(self.pictures_shot, text = "This shot", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
+        this_pict_label.grid(row = 0, column = 1, pady = 10)
 
-        self.shot_pict_caneva = Canvas(pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
+        self.shot_pict_caneva = Canvas(self.pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
         self.shot_pict_caneva.grid(row = 1, column = 1, pady = 20)
         self.shot_pict_caneva.pi = self.shot_pict_caneva.grid_info()
         self.shot_pict_caneva.grid_forget()
@@ -549,7 +555,9 @@ class SuperPipe(Frame):
         self.version_list.pack(fill = X, pady = 10)
         self.version_list.bind("<<ListboxSelect>>", self.versionlistCommand)
 
-        pw_main.add(right_side_bar, width = 50)
+        pw_main.add(right_side_bar)
+        pw_main.update()
+        pw_main.sash_place(1, 1650, 0)
 
     def newProjectCommand(self):
         self.current_sequence = 1
@@ -581,22 +589,26 @@ class SuperPipe(Frame):
         self.parent.update()
 
         if directory:
-            self.current_project = Project(directory)
+            if path.isdir(directory):
+                self.current_project = Project(directory)
 
-            if self.current_project.isValid():
+                if self.current_project.isValid():
 
-                Resources.writeAtLine("save/options.spi", directory, 3)
+                    Resources.writeAtLine("save/options.spi", directory, 3)
 
-                self.current_sequence = self.current_project.getCurrentSequence()
+                    self.current_sequence = self.current_project.getCurrentSequence()
 
-                self.add_shot_button.config(state = NORMAL)
-                self.add_asset_button.config(state = NORMAL)
-                self.shots_preview_button.config(state = NORMAL)
+                    self.add_shot_button.config(state = NORMAL)
+                    self.add_asset_button.config(state = NORMAL)
+                    self.shots_preview_button.config(state = NORMAL)
 
-                self.parent.title("Super Pipe || " + self.current_project.getDirectory())
+                    self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
-                self.updateShotListView()
-                self.updateAssetListView()
+                    self.updateShotListView()
+                    self.updateAssetListView()
+                else:
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "Set project", "\"" + directory + "\" is not a project folder")
+                    self.wait_window(dialog().top)
             else:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Set project", "\"" + directory + "\" is not a project folder")
                 self.wait_window(dialog().top)
@@ -721,7 +733,7 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"]:
-            if self.current_project.createAsset(asset["name"], Resources.getCategoryName(asset["cat"])):
+            if self.current_project.createAsset(asset["name"], "/" + Resources.getCategoryName(asset["cat"])):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -741,15 +753,23 @@ class SuperPipe(Frame):
             self.var_shot_nb_label.set(selected_shot.replace("s", "SEQUENCE ").replace("p", " SHOT "))
 
             if selected_line == 0 and selected_line == self.shot_list.size() - 1:
+                self.prev_pict_label.grid(self.prev_pict_label.pi)
+                self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
                 self.up_button.grid_forget()
                 self.down_button.grid_forget()
             elif selected_line == 0:
+                self.prev_pict_label.grid_forget()
+                self.shot_prev_pict_caneva.grid_forget()
                 self.up_button.grid_forget()
                 self.down_button.grid(self.down_button.pi)
             elif selected_line == self.shot_list.size() - 1:
+                self.prev_pict_label.grid(self.prev_pict_label.pi)
+                self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
                 self.down_button.grid_forget()
                 self.up_button.grid(self.up_button.pi)
             else:
+                self.prev_pict_label.grid(self.prev_pict_label.pi)
+                self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
                 self.down_button.grid(self.down_button.pi)
                 self.up_button.grid(self.up_button.pi)
 
@@ -1061,6 +1081,9 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset_name["name"]:
+            self.parent(cursor = "wait")
+            self.parent.update()
+
             asset = self.current_project.getSelection()
             if asset.renameAsset(asset_name["name"]):
                 self.current_project.updateAssetList()
@@ -1073,6 +1096,8 @@ class SuperPipe(Frame):
             else:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
                 self.wait_window(dialog().top)
+            
+            self.parent(cursor = "")
 
     def updateShotListView(self):
         self.shot_list.delete(0, END)
@@ -1228,6 +1253,9 @@ class SuperPipe(Frame):
         self.asset_list.focus(selected_asset)
 
     def shotsPreviewCommand(self):
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
 
@@ -1253,22 +1281,27 @@ class SuperPipe(Frame):
                 cur_shot = Shot(self.current_project.getDirectory(), shot_dir)
 
                 if all_picts_path_array:
-                    all_shots_preview.append([cur_shot.getShotNb(), max(all_picts_path_array, key = path.getmtime)])
+                    all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), max(all_picts_path_array, key = path.getmtime)])
                 else:
-                    all_shots_preview.append([cur_shot.getShotNb(), "img/img_not_available.gif"])
+                    all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.gif"])
 
-        for nb, img in all_shots_preview:
+        for nb, name, img in all_shots_preview:
             shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.second_color, bd = 0, highlightthickness = 0)
 
             pict = PhotoImage(file = img)
 
             self.preview_gifdict[nb] = pict
 
+            shot_preview_label = Label(self.shots_preview_list, text = name, bg = self.main_color, fg = self.text_color)
+            shot_preview_label.grid(row = int((nb - 1)/5) * 2, column = (nb - 1) % 5, pady = (20, 5))
+
             shot_preview_caneva.create_image(0, 0, anchor = N + W, image = pict)
             shot_preview_caneva.config(height = pict.height(), width = pict.width())
 
-            shot_preview_caneva.grid(row = int((nb - 1)/5), column = (nb - 1) % 5, pady = 20)
+            shot_preview_caneva.grid(row = (int((nb - 1)/5) * 2) + 1, column = (nb - 1) % 5)
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
+
+        self.parent.config(cursor = "")
 
     def upgradeShotCommand(self):
         selected_shot = self.shot_list.curselection()[0]
@@ -1409,7 +1442,7 @@ class SuperPipe(Frame):
             Resources.writeAtLine("save/options.spi", preferences["nuke_path"], 2)
 
     def about(self):
-        dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot")
+        dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)
         self.wait_window(dialog().top)
 
     def refresh(self, e):

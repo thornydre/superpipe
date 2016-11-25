@@ -8,7 +8,6 @@ from shutil import copyfile, copytree, rmtree
 from Resources import *
 
 import time
-# import thread
 
 class Shot:
     def __init__(self, directory = None, shot_name = None):
@@ -153,6 +152,9 @@ class Shot:
     def setFrameRange(self, frame_range):
         self.frame_range = frame_range
 
+        if path.isdir(self.directory + "/scenes/.mayaSwatches"):
+                    rmtree(self.directory + "/scenes/.mayaSwatches")
+
         Resources.writeAtLine(self.directory + "/data/shot_data.spi", str(self.frame_range), 4)
 
         for file in listdir(self.directory + "/scenes/"):
@@ -160,6 +162,9 @@ class Shot:
                 Resources.insertAtLine(self.directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
 
     def setResolution(self, res):
+        if path.isdir(self.directory + "/scenes/.mayaSwatches"):
+                    rmtree(self.directory + "/scenes/.mayaSwatches")
+
         for file in listdir(self.directory + "/scenes/"):
             if ".ma" in file:
                 Resources.insertAtLine(self.directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
