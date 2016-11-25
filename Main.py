@@ -577,10 +577,14 @@ class SuperPipe(Frame):
     def setProjectCommand(self):
         directory = filedialog.askdirectory(title = "New project", mustexist  = False)
 
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
         if directory:
             self.current_project = Project(directory)
 
             if self.current_project.isValid():
+
                 Resources.writeAtLine("save/options.spi", directory, 3)
 
                 self.current_sequence = self.current_project.getCurrentSequence()
@@ -596,6 +600,8 @@ class SuperPipe(Frame):
             else:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Set project", "\"" + directory + "\" is not a project folder")
                 self.wait_window(dialog().top)
+
+        self.parent.config(cursor = "")
 
     def setShotCommand(self):
         selected_line = self.shot_list.curselection()[0]
