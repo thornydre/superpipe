@@ -13,13 +13,13 @@ class Asset:
         self.asset_name = asset_name
         self.project_dir = directory
         self.second_path = second_path
-        self.directory = directory + "/04_asset" + second_path + "/" + self.asset_name
+        self.directory = directory + "/04_asset" + self.second_path + "/" + self.asset_name
         self.priority = "Low"
         self.modeling_done = 0
         self.rig_done = 0
         self.lookdev_done = 0
         self.done = 0
-        
+
         if not path.isdir(self.directory):
             makedirs(self.directory)
 

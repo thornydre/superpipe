@@ -49,7 +49,7 @@ class NewProjectDialog(object):
         directory_button["command"] = lambda: self.directoryEntry()
         directory_button.grid(row = 1, column = 3, sticky = E)
 
-        name_label = Label(top_frame, text = "Project name : ", bg = self.main_color, fg = "#FFFFFF")
+        name_label = Label(top_frame, text = "Project name : ", bg = self.main_color, fg = self.text_color)
         name_label.grid(row = 2, column = 0, sticky = E)
 
         self.name_entry = Entry(top_frame, relief = FLAT, bg = self.button_color2)

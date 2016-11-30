@@ -70,6 +70,8 @@ class SuperPipe(Frame):
 
                 self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
+                self.asset_list.configure(selectmode = "browse")
+
                 self.updateShotListView()
                 self.updateAssetListView()
 
@@ -138,7 +140,7 @@ class SuperPipe(Frame):
         asset_label = Label(top_left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         asset_label.pack(fill = X, pady = 10)
 
-        self.asset_list = ttk.Treeview(top_left_side_bar, height = 16, show = "tree", selectmode = "browse")
+        self.asset_list = ttk.Treeview(top_left_side_bar, height = 16, show = "tree", selectmode = "none")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = self.done_color)
         self.asset_list.tag_configure("urgent", background = self.urgent_color)
@@ -340,9 +342,14 @@ class SuperPipe(Frame):
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
         self.shot_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
-        self.shot_actions_line.columnconfigure(0, pad = 10)
+        self.shot_actions_line.columnconfigure(0, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
+
+        self.open_shot_folder_button = Button(self.shot_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotFolderCommand)
+        self.open_shot_folder_button.grid(row = 0, column = 0, sticky = N)
+        self.open_shot_folder_button.pi = self.open_shot_folder_button.grid_info()
+        self.open_shot_folder_button.grid_forget()
 
         self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
@@ -579,6 +586,8 @@ class SuperPipe(Frame):
 
             self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
+            self.asset_list.configure(selectmode = "browse")
+
             self.updateShotListView()
             self.updateAssetListView()
 
@@ -604,6 +613,8 @@ class SuperPipe(Frame):
 
                     self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
+                    self.asset_list.configure(selectmode = "browse")
+
                     self.updateShotListView()
                     self.updateAssetListView()
                 else:
@@ -626,6 +637,7 @@ class SuperPipe(Frame):
         self.frame_range_entry.grid(self.frame_range_entry.pi)
         self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+        self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
         self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -798,6 +810,7 @@ class SuperPipe(Frame):
                 self.frame_range_entry.grid(self.frame_range_entry.pi)
                 self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+                self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
                 self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -859,6 +872,7 @@ class SuperPipe(Frame):
                 self.frame_range_entry.grid_forget()
                 self.set_shot_frame_range_button.grid_forget()
                 self.open_shot_layout_button.grid_forget()
+                self.open_shot_folder_button.grid_forget()
 
                 self.downgrade_shot_button.grid_forget()
 
@@ -912,7 +926,9 @@ class SuperPipe(Frame):
 
             self.shot_list.selection_clear(0, END)
 
-            if not self.asset_list.get_children(self.asset_list.focus()):
+            categories = ["character", "fx", "props", "set"]
+
+            if not self.asset_list.get_children(self.asset_list.focus()) and not self.asset_list.focus() in categories:
                 selected_asset = self.asset_list.focus()
 
                 cur_item = selected_asset
@@ -1056,6 +1072,9 @@ class SuperPipe(Frame):
         else:
             dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
             self.wait_window(dialog().top)
+
+    def openShotFolderCommand(self):
+        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     def openAssetCommand(self):
         selected_line = self.version_list.curselection()[0]
@@ -1293,12 +1312,12 @@ class SuperPipe(Frame):
             self.preview_gifdict[nb] = pict
 
             shot_preview_label = Label(self.shots_preview_list, text = name, bg = self.main_color, fg = self.text_color)
-            shot_preview_label.grid(row = int((nb - 1)/5) * 2, column = (nb - 1) % 5, pady = (20, 5))
+            shot_preview_label.grid(row = int((nb - 1)/5) * 2, column = (nb - 1) % 5, pady = (10, 5))
 
             shot_preview_caneva.create_image(0, 0, anchor = N + W, image = pict)
             shot_preview_caneva.config(height = pict.height(), width = pict.width())
 
-            shot_preview_caneva.grid(row = (int((nb - 1)/5) * 2) + 1, column = (nb - 1) % 5)
+            shot_preview_caneva.grid(row = (int((nb - 1)/5) * 2) + 1, column = (nb - 1) % 5, pady = (0, 10))
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
 
         self.parent.config(cursor = "")
@@ -1377,6 +1396,7 @@ class SuperPipe(Frame):
             self.var_selection_path_label.set("")
             self.shot_pict_caneva.grid_forget()
             self.open_shot_layout_button.grid_forget()
+            self.open_shot_folder_button.grid_forget()
             self.priority_shot_menu.grid_forget()
             self.priority_shot_label.grid_forget()
             self.downgrade_shot_button.grid_forget()
