@@ -16,6 +16,7 @@ import RenameAssetDialog
 import ProjectSettingsDialog
 import PreferencesDialog
 import EditCustomLinkDialog
+import ManageBackupDialog
 import YesNoDialog
 import OkDialog
 import subprocess
@@ -148,9 +149,9 @@ class SuperPipe(Frame):
         self.asset_list.tag_configure("high", background = self.high_color)
         self.asset_list.tag_configure("medium", background = self.medium_color)
         self.asset_list.insert("", 1, "character", text = "CHARACTER")
-        self.asset_list.insert("", 3, "fx", text = "FX")
-        self.asset_list.insert("", 4, "props", text = "PROPS")
-        self.asset_list.insert("", 5, "set", text = "SET")
+        self.asset_list.insert("", 2, "fx", text = "FX")
+        self.asset_list.insert("", 3, "props", text = "PROPS")
+        self.asset_list.insert("", 4, "set", text = "SET")
         self.asset_list.pack(fill = BOTH, expand = Y)
         self.asset_list.bind("<ButtonRelease-1>", self.assetListCommand)
 
@@ -726,7 +727,7 @@ class SuperPipe(Frame):
                 else:
                     is_parent = False
 
-            self.current_project.removeAsset(selected_asset, "/".join(path_array))
+            self.current_project.removeAsset(selected_asset, "/" + "/".join(path_array))
 
             self.updateAssetListView()
 
@@ -1436,15 +1437,18 @@ class SuperPipe(Frame):
             self.done_asset_button.grid_forget()
 
     def cleanBackupsCommand(self):
-        yesno = {"result" : ""}
+        settings = {"res" : ""}
 
-        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Clean backups", "Clean all the backups ?", (yesno, "result"))
+        dialog = lambda: ManageBackupDialog.ManageBackupDialog(self.parent, self.current_project, (settings, "res"))
         self.wait_window(dialog().top)
 
-        if yesno["result"] == "yes":
-            self.current_project.cleanBackups()
+        if settings["res"]:            
+            self.current_project.setResolution(settings["res"])
 
     def cleanStudentCommand(self):
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
         yesno = {"result" : ""}
 
         dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Clean student versions", "Make all your files easy to save again ?", (yesno, "result"))
@@ -1452,6 +1456,8 @@ class SuperPipe(Frame):
 
         if yesno["result"] == "yes":
             self.current_project.removeAllStudentVersions()
+
+        self.parent.config(cursor = "")
 
     def projectSettingsCommand(self):
         settings = {"res" : ""}
