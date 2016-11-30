@@ -67,6 +67,7 @@ class SuperPipe(Frame):
                 self.add_shot_button.config(state = NORMAL)
                 self.add_asset_button.config(state = NORMAL)
                 self.shots_preview_button.config(state = NORMAL)
+                self.custom_button.config(state = NORMAL)
 
                 self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
@@ -169,7 +170,7 @@ class SuperPipe(Frame):
         self.shots_preview_button = Button(bottom_left_side_bar, text = "Shots preview", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.shotsPreviewCommand)
         self.shots_preview_button.pack(pady = 10)
 
-        self.custom_button = Button(bottom_left_side_bar, text = "Custom link", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
+        self.custom_button = Button(bottom_left_side_bar, text = "Custom link", state = DISABLED, bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 12, height = 1, command = self.customButtonCommand)
         self.custom_button.pack(pady = 10)
 
         pw_side_bar.add(bottom_left_side_bar)
@@ -346,7 +347,7 @@ class SuperPipe(Frame):
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_shot_folder_button = Button(self.shot_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotFolderCommand)
+        self.open_shot_folder_button = Button(self.shot_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openFolderCommand)
         self.open_shot_folder_button.grid(row = 0, column = 0, sticky = N)
         self.open_shot_folder_button.pi = self.open_shot_folder_button.grid_info()
         self.open_shot_folder_button.grid_forget()
@@ -492,9 +493,14 @@ class SuperPipe(Frame):
         self.asset_actions_line = Frame(self.main_area_asset, bg = self.main_color, bd = 0)
         self.asset_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
-        self.asset_actions_line.columnconfigure(0, pad = 10)
+        self.asset_actions_line.columnconfigure(0, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
+
+        self.open_asset_folder_button = Button(self.asset_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openFolderCommand)
+        self.open_asset_folder_button.grid(row = 0, column = 0, sticky = N)
+        self.open_asset_folder_button.pi = self.open_asset_folder_button.grid_info()
+        self.open_asset_folder_button.grid_forget()
 
         self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
@@ -583,6 +589,7 @@ class SuperPipe(Frame):
             self.add_shot_button.config(state = NORMAL)
             self.add_asset_button.config(state = NORMAL)
             self.shots_preview_button.config(state = NORMAL)
+            self.custom_button.config(state = NORMAL)
 
             self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
@@ -610,6 +617,7 @@ class SuperPipe(Frame):
                     self.add_shot_button.config(state = NORMAL)
                     self.add_asset_button.config(state = NORMAL)
                     self.shots_preview_button.config(state = NORMAL)
+                    self.custom_button.config(state = NORMAL)
 
                     self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
@@ -668,6 +676,7 @@ class SuperPipe(Frame):
 
         self.set_asset_button.grid_forget()
         self.open_asset_button.grid(self.open_asset_button.pi)
+        self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
         self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
         self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
         self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
@@ -966,6 +975,7 @@ class SuperPipe(Frame):
                     if asset.isSet():
                         self.set_asset_button.grid_forget()
                         self.open_asset_button.grid(self.open_asset_button.pi)
+                        self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
                         selected_line = self.version_list.curselection()[0]
                         self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
@@ -991,6 +1001,7 @@ class SuperPipe(Frame):
                     else:
                         self.set_asset_button.grid(self.set_asset_button.pi)
                         self.open_asset_button.grid_forget()
+                        self.open_asset_folder_button.grid_forget()
                         self.var_selection_path_label.set("")
                         self.asset_pict_caneva.grid_forget()
                         self.modeling_done_asset_button.grid_forget()
@@ -1005,6 +1016,7 @@ class SuperPipe(Frame):
                 self.rename_asset_button.grid_forget()
                 self.set_asset_button.grid_forget()
                 self.open_asset_button.grid_forget()
+                self.open_asset_folder_button.grid_forget()
                 self.version_list.delete(0, END)
                 self.asset_pict_caneva.grid_forget()
                 self.priority_asset_label.grid_forget()
@@ -1017,6 +1029,7 @@ class SuperPipe(Frame):
     def versionlistCommand(self, e):
         if self.version_list.size() != 0:
             self.open_asset_button.grid(self.open_asset_button.pi)
+            self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
             selected_line = self.version_list.curselection()[0]
             selected_version = self.version_list.get(selected_line)
@@ -1072,9 +1085,6 @@ class SuperPipe(Frame):
         else:
             dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
             self.wait_window(dialog().top)
-
-    def openShotFolderCommand(self):
-        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     def openAssetCommand(self):
         selected_line = self.version_list.curselection()[0]
@@ -1353,6 +1363,9 @@ class SuperPipe(Frame):
     def setShotFrameRangeCommand(self):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
+    def openFolderCommand(self):
+        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
+
     ###############################################################################################################
 
     def validateFrameRangeEntry(self, P, S):
@@ -1414,6 +1427,7 @@ class SuperPipe(Frame):
             self.var_selection_path_label.set("")
             self.asset_pict_caneva.grid_forget()
             self.open_asset_button.grid_forget()
+            self.open_asset_folder_button.grid_forget()
             self.priority_asset_menu.grid_forget()
             self.priority_asset_label.grid_forget()
             self.modeling_done_asset_button.grid_forget()
