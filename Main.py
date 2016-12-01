@@ -251,6 +251,11 @@ class SuperPipe(Frame):
         self.set_shot_frame_range_button.pi = self.set_shot_frame_range_button.grid_info()
         self.set_shot_frame_range_button.grid_forget()
 
+        self.open_shot_folder_button = Button(self.main_area_shot, text = "Open shot folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 16, height = 1, command = self.openFolderCommand)
+        self.open_shot_folder_button.grid(row = 0, column = 5)
+        self.open_shot_folder_button.pi = self.open_shot_folder_button.grid_info()
+        self.open_shot_folder_button.grid_forget()
+
         self.var_check_show_last = IntVar()
         shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         shot_show_last_only_button.grid(row = 0, column = 6, sticky = E)
@@ -344,14 +349,9 @@ class SuperPipe(Frame):
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
         self.shot_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
-        self.shot_actions_line.columnconfigure(0, pad = 10, weight = 1)
+        self.shot_actions_line.columnconfigure(0, pad = 10)
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
-
-        self.open_shot_folder_button = Button(self.shot_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openFolderCommand)
-        self.open_shot_folder_button.grid(row = 0, column = 0, sticky = N)
-        self.open_shot_folder_button.pi = self.open_shot_folder_button.grid_info()
-        self.open_shot_folder_button.grid_forget()
 
         self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
@@ -375,11 +375,16 @@ class SuperPipe(Frame):
         shot_version_comment.grid(row = 1, column = 1, sticky = N)
 
         ## PATHS ##
+        self.shot_paths_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
+        self.shot_paths_line.grid(row = 5, column = 0, columnspan = 7, sticky = W + E, pady = 10, padx = 20)
+
+        self.shot_paths_line.columnconfigure(0, pad = 10, weight = 1)
+
         maya_file_path_label = Label()
 
         self.var_selection_path_label = StringVar()
-        shot_path_label = Entry(self.main_area_shot, textvariable = self.var_selection_path_label, relief = FLAT, justify = CENTER, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
-        shot_path_label.grid(row = 0, column = 5, sticky = W + E)
+        shot_path_label = Entry(self.shot_paths_line, textvariable = self.var_selection_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
+        shot_path_label.grid(row = 0, column = 0, sticky = W + E)
 
         ###############################################################################################################
 
@@ -423,8 +428,10 @@ class SuperPipe(Frame):
         self.set_asset_button.pi = self.set_asset_button.grid_info()
         self.set_asset_button.grid_forget()
 
-        asset_path_label = Entry(self.main_area_asset, textvariable = self.var_selection_path_label, relief = FLAT, justify = CENTER, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
-        asset_path_label.grid(row = 0, column = 5, sticky = W + E)
+        self.open_asset_folder_button = Button(self.main_area_asset, text = "Open asset folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 16, height = 1, command = self.openFolderCommand)
+        self.open_asset_folder_button.grid(row = 0, column = 5)
+        self.open_asset_folder_button.pi = self.open_asset_folder_button.grid_info()
+        self.open_asset_folder_button.grid_forget()
 
         asset_show_last_only_button = Checkbutton(self.main_area_asset, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         asset_show_last_only_button.grid(row = 0, column = 6, sticky = E)
@@ -494,14 +501,9 @@ class SuperPipe(Frame):
         self.asset_actions_line = Frame(self.main_area_asset, bg = self.main_color, bd = 0)
         self.asset_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
-        self.asset_actions_line.columnconfigure(0, pad = 10, weight = 1)
+        self.asset_actions_line.columnconfigure(0, pad = 10)
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
-
-        self.open_asset_folder_button = Button(self.asset_actions_line, text = "Open folder", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openFolderCommand)
-        self.open_asset_folder_button.grid(row = 0, column = 0, sticky = N)
-        self.open_asset_folder_button.pi = self.open_asset_folder_button.grid_info()
-        self.open_asset_folder_button.grid_forget()
 
         self.open_asset_button = Button(self.asset_actions_line, text = "Open selected version", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
@@ -523,6 +525,17 @@ class SuperPipe(Frame):
         self.var_asset_version_comment_label.set("No comment")
         asset_version_comment_label = Message(self.asset_version_management_line, textvariable = self.var_asset_version_comment_label, bg = self.second_color, fg = self.text_color, pady = 10, width = 750)
         asset_version_comment_label.grid(row = 1, column = 1, sticky = N)
+
+        ## PATHS ##
+        self.asset_paths_line = Frame(self.main_area_asset, bg = self.main_color, bd = 0)
+        self.asset_paths_line.grid(row = 5, column = 0, columnspan = 7, sticky = W + E, pady = 10, padx = 20)
+
+        self.asset_paths_line.columnconfigure(0, pad = 10, weight = 1)
+
+        maya_file_path_label = Label()
+
+        asset_path_label = Entry(self.asset_paths_line, textvariable = self.var_selection_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
+        asset_path_label.grid(row = 0, column = 0, sticky = W + E)
 
         ###############################################################################################################
 
