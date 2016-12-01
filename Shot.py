@@ -185,12 +185,12 @@ class Shot:
         for shot_file in listdir(self.directory + "/scenes/"):
             if not "reference" in shot_file:
                 if shot_file[-3:] == ".ma":
-                    versions_list.append((path.getctime(self.directory + "/scenes/" + shot_file), shot_file))
+                    versions_list.append((path.getmtime(self.directory + "/scenes/" + shot_file), shot_file))
 
         if not last_only:
             for shot_file in listdir(self.directory + "/scenes/edits/"):
                 if shot_file[-3:] == ".ma":
-                    versions_list.append((path.getctime(self.directory + "/scenes/edits/" + shot_file), shot_file))
+                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
 
