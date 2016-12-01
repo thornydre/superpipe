@@ -129,9 +129,9 @@ class Asset:
             return False
 
     def setAsset(self):
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
         copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
+        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
+        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
 
     def isSet(self):
         for asset_file in listdir(self.directory + "/scenes/"):
@@ -149,12 +149,12 @@ class Asset:
         for asset_file in listdir(self.directory + "/scenes/"):
             if not "reference" in asset_file:
                 if asset_file[-3:] == ".ma":
-                    versions_list.append(asset_file)
+                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
         if not last_only:
             for asset_file in listdir(self.directory + "/scenes/edits/"):
                 if asset_file[-3:] == ".ma":
-                    versions_list.append(asset_file)
+                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)
 

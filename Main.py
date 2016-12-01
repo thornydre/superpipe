@@ -353,7 +353,7 @@ class SuperPipe(Frame):
         self.open_shot_folder_button.pi = self.open_shot_folder_button.grid_info()
         self.open_shot_folder_button.grid_forget()
 
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open shot", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
         self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
         self.open_shot_layout_button.grid_forget()
@@ -503,7 +503,7 @@ class SuperPipe(Frame):
         self.open_asset_folder_button.pi = self.open_asset_folder_button.grid_info()
         self.open_asset_folder_button.grid_forget()
 
-        self.open_asset_button = Button(self.asset_actions_line, text = "Open asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 13, height = 1, command = self.openAssetCommand)
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open selected version", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
@@ -646,7 +646,6 @@ class SuperPipe(Frame):
         self.frame_range_entry.grid(self.frame_range_entry.pi)
         self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
         self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
-        self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
         self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -814,13 +813,13 @@ class SuperPipe(Frame):
 
             self.priority_shot_label.grid(self.priority_shot_label.pi)
             self.priority_shot_menu.grid(self.priority_shot_menu.pi)
+            self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
             if shot.isSet():
                 self.set_shot_button.grid_forget()
                 self.frame_range_entry.grid(self.frame_range_entry.pi)
                 self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
                 self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
-                self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
                 self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -882,7 +881,6 @@ class SuperPipe(Frame):
                 self.frame_range_entry.grid_forget()
                 self.set_shot_frame_range_button.grid_forget()
                 self.open_shot_layout_button.grid_forget()
-                self.open_shot_folder_button.grid_forget()
 
                 self.downgrade_shot_button.grid_forget()
 
@@ -1190,14 +1188,14 @@ class SuperPipe(Frame):
 
             if shot_versions:
                 for shot_version in shot_versions:
-                    self.version_list.insert(END, shot_version)
+                    self.version_list.insert(END, shot_version[1])
 
         elif asset:
             asset_versions = asset.getVersionsList(self.var_check_show_last.get())
 
             if asset_versions:
                 for asset_version in asset_versions:
-                    self.version_list.insert(END, asset_version)
+                    self.version_list.insert(END, asset_version[1])
 
     def moveShotUpCommand(self):
         self.current_project.moveShotUp(self.current_project.getSelection().getShotName())
