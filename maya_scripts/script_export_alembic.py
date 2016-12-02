@@ -8,10 +8,12 @@ file_name = path.basename(current_file)
 
 end_frame = cmds.playbackOptions(q = True, animationEndTime = True)
 
-print(directory + "/../cache/alembic/" + file_name + ".abc")
-
-if not path.isdir(directory + "/../cache/alembic"):
-    mkdir(directory + "/../cache/alembic")
-
 ## EXPORT ##
-cmds.AbcExport(j = "-frameRange 800 " + str(end_frame) + " -dataFormat ogawa -file " + directory + "/../cache/alembic/" + file_name + ".abc")
+if "edits" in directory:
+    if not path.isdir(directory + "/../../cache/alembic"):
+        mkdir(directory + "/../../cache/alembic")
+    cmds.AbcExport(j = "-frameRange 800 " + str(end_frame) + " -dataFormat ogawa -file " + directory + "/../../cache/alembic/" + file_name + ".abc")
+else:
+    if not path.isdir(directory + "/../cache/alembic"):
+        mkdir(directory + "/../cache/alembic")
+    cmds.AbcExport(j = "-frameRange 800 " + str(end_frame) + " -dataFormat ogawa -file " + directory + "/../cache/alembic/" + file_name + ".abc")

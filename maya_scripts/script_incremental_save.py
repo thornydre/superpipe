@@ -65,14 +65,14 @@ def incrementalSave(comment):
 
     ## SAVE ##
     if "edits" in directory:
+        copyfile(directory + "/../" + current_file_ext, directory + "/" + current_file_ext)
         cmds.file(rename = directory + "/../" + new_file_name + ".ma")
         cmds.file(save = True, type = "mayaAscii")
-        copyfile(directory + "/../" + current_file_ext, directory + "/" + current_file_ext)
         remove(directory + "/../" + current_file_ext)
     else:
+        copyfile(current_file_ext, directory + "/edits/" + file_name + ".ma")
         cmds.file(rename = directory + "/" + new_file_name + ".ma")
         cmds.file(save = True, type = "mayaAscii")
-        copyfile(current_file_ext, directory + "/edits/" + file_name + ".ma")
         remove(current_file_ext)
 
     ## CREATE REFERENCE ##
