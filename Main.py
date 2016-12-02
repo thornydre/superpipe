@@ -353,7 +353,7 @@ class SuperPipe(Frame):
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openShotCommand)
+        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 19, height = 1, command = self.openShotCommand)
         self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
         self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
         self.open_shot_layout_button.grid_forget()
@@ -384,7 +384,11 @@ class SuperPipe(Frame):
 
         self.var_selection_path_label = StringVar()
         shot_path_label = Entry(self.shot_paths_line, textvariable = self.var_selection_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
-        shot_path_label.grid(row = 0, column = 0, sticky = W + E)
+        shot_path_label.grid(row = 0, column = 0, sticky = W + E, pady = [0, 5])
+
+        self.var_selection_abc_path_label = StringVar()
+        shot_abc_path_label = Entry(self.shot_paths_line, textvariable = self.var_selection_abc_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
+        shot_abc_path_label.grid(row = 1, column = 0, sticky = W + E, pady = 5)
 
         ###############################################################################################################
 
@@ -505,7 +509,7 @@ class SuperPipe(Frame):
         self.asset_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.asset_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_asset_button = Button(self.asset_actions_line, text = "Open selected version", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 18, height = 1, command = self.openAssetCommand)
+        self.open_asset_button = Button(self.asset_actions_line, text = "Open selected version", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 19, height = 1, command = self.openAssetCommand)
         self.open_asset_button.grid(row = 0, column = 1, sticky = N)
         self.open_asset_button.pi = self.open_asset_button.grid_info()
         self.open_asset_button.grid_forget()
@@ -877,6 +881,11 @@ class SuperPipe(Frame):
                 selected_line = self.version_list.curselection()[0]
                 self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
+                if path.isfile(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"):
+                    self.var_selection_abc_path_label.set(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc")
+                else:
+                    self.var_selection_abc_path_label.set("")
+
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
 
@@ -908,6 +917,7 @@ class SuperPipe(Frame):
                 self.shot_pict_caneva.grid_forget()
 
                 self.var_selection_path_label.set("")
+                self.var_selection_abc_path_label.set("")
 
             prev_pict_path = ""
 
