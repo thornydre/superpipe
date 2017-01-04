@@ -133,7 +133,7 @@ class Project:
 
         shot_name = Resources.makeShotName(shot_nb, sequence)
 
-        shot = Shot(self.directory, shot_name)
+        shot = Shot(self.directory, shot_name, software = "maya")
         self.shot_list.append((shot.getShotNb(), shot.getShotName()))
 
     def removeShot(self, shot_name):
@@ -191,7 +191,7 @@ class Project:
         # if path.isdir(self.directory + "05_shot/s00p00"):
         #     rmtree(self.directory + "05_shot/s00p00")
 
-    def createAsset(self, asset_name, second_path):
+    def createAsset(self, asset_name, second_path, software):
         if path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
         elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
@@ -201,7 +201,7 @@ class Project:
         elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
             return False
         else:
-            asset = Asset(self.directory, second_path, asset_name)
+            asset = Asset(self.directory, second_path, asset_name, software)
             self.asset_list.append((asset_name, second_path))
             return True
 

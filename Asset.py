@@ -9,7 +9,7 @@ from shutil import copyfile, copytree
 import time
 
 class Asset:
-    def __init__(self, directory = None, second_path = None, asset_name = None):
+    def __init__(self, directory = None, second_path = None, asset_name = None, software = None):
         self.asset_name = asset_name
         self.project_dir = directory
         self.second_path = second_path
@@ -19,76 +19,137 @@ class Asset:
         self.rig_done = 0
         self.lookdev_done = 0
         self.done = 0
+        self.software = software
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
 
-            makedirs(self.directory + "/assets")
-            
-            makedirs(self.directory + "/autosave")
-            
-            makedirs(self.directory + "/cache")
-            makedirs(self.directory + "/cache/nCache")
-            makedirs(self.directory + "/cache/nCache/fluid")
-            makedirs(self.directory + "/cache/particles")
+            makedirs(self.directory + "/superpipe")
 
-            makedirs(self.directory + "/clips")
-            
-            makedirs(self.directory + "/data")
-            makedirs(self.directory + "/data/edits")
-            with open(self.directory + "/data/asset_data.spi", "w") as f:
-                f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done))
+            with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
+                    f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
             f.close()
 
-            open(self.directory + "/data/versions_data.spi", "a").close()
-            
-            makedirs(self.directory + "/images")
-            makedirs(self.directory + "/images/screenshots")
-            
-            makedirs(self.directory + "/movies")
-            
-            makedirs(self.directory + "/renderData")
-            makedirs(self.directory + "/renderData/depth")
-            makedirs(self.directory + "/renderData/fur")
-            makedirs(self.directory + "/renderData/fur/furAttrMap")
-            makedirs(self.directory + "/renderData/fur/furEqualMap")
-            makedirs(self.directory + "/renderData/fur/furFiles")
-            makedirs(self.directory + "/renderData/fur/furImages")
-            makedirs(self.directory + "/renderData/fur/furShadowMap")
-            makedirs(self.directory + "/renderData/iprImages")
-            makedirs(self.directory + "/renderData/shaders")
-            
-            makedirs(self.directory + "/scenes")
-            makedirs(self.directory + "/scenes/backup")
-            makedirs(self.directory + "/scenes/edits")
+            open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
-            makedirs(self.directory + "/scripts")
-            
-            makedirs(self.directory + "/sound")
-            
-            makedirs(self.directory + "/sourceimages")
-            makedirs(self.directory + "/sourceimages/3dPatinTextures")
-            makedirs(self.directory + "/sourceimages/edits")
-            makedirs(self.directory + "/sourceimages/environement")
-            makedirs(self.directory + "/sourceimages/imagePlane")
-            makedirs(self.directory + "/sourceimages/imageSequence")
+            if self.software == "maya":
+                makedirs(self.directory + "/assets")
+                
+                makedirs(self.directory + "/autosave")
+                
+                makedirs(self.directory + "/cache")
+                makedirs(self.directory + "/cache/nCache")
+                makedirs(self.directory + "/cache/nCache/fluid")
+                makedirs(self.directory + "/cache/particles")
 
-            copyfile("src/workspace.mel", self.directory + "/workspace.mel")
+                makedirs(self.directory + "/clips")
+                
+                makedirs(self.directory + "/data")
+                makedirs(self.directory + "/data/edits")
+                
+                makedirs(self.directory + "/images")
+                makedirs(self.directory + "/images/screenshots")
+                
+                makedirs(self.directory + "/movies")
+                
+                makedirs(self.directory + "/renderData")
+                makedirs(self.directory + "/renderData/depth")
+                makedirs(self.directory + "/renderData/fur")
+                makedirs(self.directory + "/renderData/fur/furAttrMap")
+                makedirs(self.directory + "/renderData/fur/furEqualMap")
+                makedirs(self.directory + "/renderData/fur/furFiles")
+                makedirs(self.directory + "/renderData/fur/furImages")
+                makedirs(self.directory + "/renderData/fur/furShadowMap")
+                makedirs(self.directory + "/renderData/iprImages")
+                makedirs(self.directory + "/renderData/shaders")
+                
+                makedirs(self.directory + "/scenes")
+                makedirs(self.directory + "/scenes/backup")
+                makedirs(self.directory + "/scenes/edits")
+
+                makedirs(self.directory + "/scripts")
+                
+                makedirs(self.directory + "/sound")
+                
+                makedirs(self.directory + "/sourceimages")
+                makedirs(self.directory + "/sourceimages/3dPatinTextures")
+                makedirs(self.directory + "/sourceimages/edits")
+                makedirs(self.directory + "/sourceimages/environement")
+                makedirs(self.directory + "/sourceimages/imagePlane")
+                makedirs(self.directory + "/sourceimages/imageSequence")
+
+                copyfile("src/workspace.mel", self.directory + "/workspace.mel")
+
+            elif self.software == "houdini":
+                makedirs(self.directory + "/abc")
+
+                makedirs(self.directory + "/audio")
+
+                makedirs(self.directory + "/backup")
+
+                makedirs(self.directory + "/comp")
+
+                makedirs(self.directory + "/desk")
+
+                makedirs(self.directory + "/flip")
+
+                makedirs(self.directory + "/geo")
+
+                makedirs(self.directory + "/hda")
+
+                makedirs(self.directory + "/render")
+
+                makedirs(self.directory + "/scripts")
+
+                makedirs(self.directory + "/sim")
+
+                makedirs(self.directory + "/tex")
+
+                makedirs(self.directory + "/video")
 
         else:
-            if not path.isfile(self.directory + "/data/versions_data.spi"):
-                open(self.directory + "/data/versions_data.spi", "a").close()
+            if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
+                open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
-            if not path.isfile(self.directory + "/data/asset_data.spi"):
-                with open(self.directory + "/data/asset_data.spi", "w") as f:
-                    f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done))
+            if not path.isfile(self.directory + "/superpipe/asset_data.spi"):
+                with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
+                    f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
                 f.close()
 
-            self.priority = Resources.readLine(self.directory + "/data/asset_data.spi", 1)
-            self.modeling_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 2))
-            self.rig_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 3))
-            self.lookdev_done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 4))
-            self.done = int(Resources.readLine(self.directory + "/data/asset_data.spi", 5))
+            asset_infos = []
+            with open(self.directory + "/superpipe/asset_data.spi", "r") as f:
+                for l in f:
+                    asset_infos.append(l.strip("\n"))
+            f.close()
+
+            self.priority = asset_infos[0]
+            self.modeling_done = int(asset_infos[1])
+            if len(asset_infos) > 2:
+                self.rig_done = int(asset_infos[2])
+            else:
+                self.rig_done = "0"
+
+            if len(asset_infos) > 3:
+                self.lookdev_done = int(asset_infos[3])
+            else:
+                self.lookdev_done = "0"
+
+            if len(asset_infos) > 4:
+                self.done = int(asset_infos[4])
+            else:
+                self.done = "0"
+            
+            if len(asset_infos) > 5:
+                self.software = asset_infos[5]
+            else:
+                self.software = "maya"
+
+            # self.software = Resources.readLinereadLine(self.directory + "/superpipe/asset_data.spi", 1)
+            # self.modeling_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 2))
+            # self.rig_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 3))
+            # self.lookdev_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 4))
+            # self.done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 5))
+            # self.software = Resources.readLine(self.directory + "/superpipe/asset_data.spi", 6)
 
     def getAssetName(self):
         return self.asset_name
@@ -103,10 +164,10 @@ class Asset:
         return self.priority
 
     def getComment(self, version_file):
-        if not path.isfile(self.directory + "/data/versions_data.spi"):
-                open(self.directory + "/data/versions_data.spi", "a").close()
+        if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
+                open(self.directory + "/superpipe/versions_data.spi", "a").close()
         else:
-            with open(self.directory + "/data/versions_data.spi", "r") as f:
+            with open(self.directory + "/superpipe/versions_data.spi", "r") as f:
                 all_comments = f.read()
             f.close()
 
@@ -129,9 +190,12 @@ class Asset:
             return False
 
     def setAsset(self):
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
-        copyfile("src/set_up_file_asset.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
+        if self.software == "maya":
+            copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
+            copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
+            copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
+        elif self.soft == "houdini":
+            copyfile("src/set_up_file_asset_houdini.hipnc", self.directory + "/" + self.asset_name + "_v01.hipnc")
 
     def isSet(self):
         for asset_file in listdir(self.directory + "/scenes/"):
@@ -146,15 +210,27 @@ class Asset:
 
     def getVersionsList(self, last_only):
         versions_list = []
-        for asset_file in listdir(self.directory + "/scenes/"):
-            if not "reference" in asset_file:
-                if asset_file[-3:] == ".ma":
-                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
-        if not last_only:
-            for asset_file in listdir(self.directory + "/scenes/edits/"):
-                if asset_file[-3:] == ".ma":
-                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+        if self.software == "maya":
+            for asset_file in listdir(self.directory + "/scenes/"):
+                if not "reference" in asset_file:
+                    if asset_file[-3:] == ".ma":
+                        versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+
+            if not last_only:
+                for asset_file in listdir(self.directory + "/scenes/edits/"):
+                    if asset_file[-3:] == ".ma":
+                        versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+
+        elif self.software == "houdini":
+            for asset_file in listdir(self.directory + "/"):
+                if asset_file[-6:] == ".hipnc":
+                    versions_list.append((path.getmtime(self.directory + "/" + asset_file), asset_file))
+
+            if not last_only:
+                for asset_file in listdir(self.directory + "/"):
+                    if asset_file[-6:] == ".hipnc":
+                        versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)
 
@@ -187,20 +263,20 @@ class Asset:
 
     def setPriority(self, priority):
         self.priority = priority
-        Resources.writeAtLine(self.directory + "/data/asset_data.spi", self.priority, 1)
+        Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", self.priority, 1)
 
     def setModelingDone(self, modeling_done):
         self.modeling_done = modeling_done
-        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.modeling_done), 2)
+        Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.modeling_done), 2)
 
     def setRigDone(self, rig_done):
         self.rig_done = rig_done
-        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.rig_done), 3)
+        Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.rig_done), 3)
 
     def setLookdevDone(self, lookdev_done):
         self.lookdev_done = lookdev_done
-        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.lookdev_done), 4)
+        Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.lookdev_done), 4)
 
     def setDone(self, done):
         self.done = done
-        Resources.writeAtLine(self.directory + "/data/asset_data.spi", str(self.done), 5)
+        Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.done), 5)

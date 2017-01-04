@@ -7,7 +7,7 @@ from Project import *
 from Resources import *
 from tkinter import *
 from tkinter import filedialog, ttk
-from os import path, makedirs
+from os import path, mkdir
 from urllib.parse import urlsplit
 
 import NewShotDialog
@@ -91,6 +91,8 @@ class SuperPipe(Frame):
         menu_file = Menu(menu_bar, tearoff = 0)
         menu_file.add_command(label="New project", command = self.newProjectCommand)
         menu_file.add_command(label="Set project", command = self.setProjectCommand)
+        menu_file.add_separator()
+        menu_file.add_command(label="Update project", command = self.updateProjectCommand)
         menu_file.add_separator()
         menu_file.add_command(label="Quit", command = self.parent.destroy)
         menu_bar.add_cascade(label="File", menu = menu_file)
@@ -652,6 +654,31 @@ class SuperPipe(Frame):
 
         self.parent.config(cursor = "")
 
+    def updateProjectCommand(self):
+        directory = filedialog.askdirectory(title = "New project", mustexist  = False)
+
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
+        if directory:
+            if path.isdir(directory):
+                for cat in listdir(directory + "/04_asset/"):
+                    for asset in listdir(directory + "/04_asset/" + cat):
+                        if asset != "backup":
+                            if not path.isdir(directory + "/04_asset/" + cat + "/" + asset + "/superpipe"):
+                                print(directory + "/04_asset/" + cat + "/" + asset + "/data")
+                                rename(directory + "/04_asset/" + cat + "/" + asset + "/data", directory + "/04_asset/" + cat + "/" + asset + "/superpipe")
+                                mkdir(directory + "/04_asset/" + cat + "/" + asset + "/data")
+
+                for shot in listdir(directory + "/05_shot/"):
+                    if shot != "backup":
+                        if not path.isdir(directory + "/05_shot/" + shot + "/superpipe"):
+                            print(directory + "/05_shot/" + shot + "/data")
+                            rename(directory + "/05_shot/" + shot + "/data", directory + "/05_shot/" + shot + "/superpipe")
+                            mkdir(directory + "/05_shot/" + shot + "/data")
+
+        self.parent.config(cursor = "")
+
     def setShotCommand(self):
         selected_line = self.shot_list.curselection()[0]
         selected_shot = self.shot_list.get(selected_line)
@@ -765,13 +792,13 @@ class SuperPipe(Frame):
             self.shotlistCommand(None)
 
     def addAssetCommand(self):
-        asset = {"cat": None, "name" : None}
+        asset = {"cat": None, "name" : None, "software" : None}
 
-        dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, (asset, "cat", "name"))
+        dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, (asset, "cat", "name", "software"))
         self.wait_window(dialog().top)
 
-        if asset["cat"] and asset["name"]:
-            if self.current_project.createAsset(asset["name"], "/" + Resources.getCategoryName(asset["cat"])):
+        if asset["cat"] and asset["name"] and asset["software"]:
+            if self.current_project.createAsset(asset["name"], "/" + Resources.getCategoryName(asset["cat"]), Resources.getSoftwareName(asset["software"])):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -825,8 +852,8 @@ class SuperPipe(Frame):
             self.updateVersionListView(shot = shot)
             self.version_list.select_set(0)
 
-            self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 1)))
-            self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/data/shot_data.spi", 2))
+            self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 1)))
+            self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 2))
 
             self.priority_shot_label.grid(self.priority_shot_label.pi)
             self.priority_shot_menu.grid(self.priority_shot_menu.pi)
@@ -987,11 +1014,11 @@ class SuperPipe(Frame):
                 self.updateVersionListView(asset = asset)
                 self.version_list.select_set(0)
 
-                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 1))
-                self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 2)))
-                self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 3)))
-                self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 4)))
-                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/data/asset_data.spi", 5)))
+                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
+                self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
+                self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 3)))
+                self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
+                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
 
                 if asset:
                     if asset.isSet():
@@ -1132,7 +1159,7 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset_name["name"]:
-            self.parent(cursor = "wait")
+            self.parent.config(cursor = "wait")
             self.parent.update()
 
             asset = self.current_project.getSelection()
@@ -1148,7 +1175,7 @@ class SuperPipe(Frame):
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
                 self.wait_window(dialog().top)
             
-            self.parent(cursor = "")
+            self.parent.config(cursor = "")
 
     def updateShotListView(self):
         self.shot_list.delete(0, END)
@@ -1188,9 +1215,9 @@ class SuperPipe(Frame):
                 asset_subfolders = asset[1].split("/")
 
                 for i in range(len(asset_subfolders)):
-                    if not self.asset_list.exists(asset_subfolders[i]):
+                    if not self.asset_list.exists(asset_subfolders[i].lower()):
                         if i > 0:
-                            self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i], text = asset_subfolders[i].upper(), tags = ("folder"))
+                            self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
 
                 if cur_asset.isDone():
                     self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))

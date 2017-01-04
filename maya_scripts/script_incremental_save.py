@@ -40,10 +40,10 @@ def incrementalSave(comment):
     ## COMMENT ##
     final_comment = file_name + ".ma\n---\n" + comment + "\n---\n"
     if "edits" in directory:
-        with open(directory + "/../../data/versions_data.spi", "a") as f:
+        with open(directory + "/../../superpipe/versions_data.spi", "a") as f:
             f.write(final_comment)
     else:
-        with open(directory + "/../data/versions_data.spi", "a") as f:
+        with open(directory + "/../superpipe/versions_data.spi", "a") as f:
             f.write(final_comment)
         f.close()
 

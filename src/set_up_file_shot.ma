@@ -1,5 +1,5 @@
 //Maya ASCII 2017 scene
-//Name: test.ma
+//Name: set_up_file_shot.ma
 //Last modified: Wed, Oct 12, 2016 04:34:39 PM
 //Codeset: 1252
 requires maya "2017";
@@ -9,7 +9,6 @@ fileInfo "product" "Maya 2017";
 fileInfo "version" "2017";
 fileInfo "cutIdentifier" "201606150345-997974";
 fileInfo "osv" "Microsoft Windows 7 Business Edition, 64-bit Windows 7 Service Pack 1 (Build 7601)\n";
-fileInfo "license" "education";
 createNode transform -s -n "persp";
 	rename -uid "C6053063-4FE8-3FCC-1A52-CF973C07F82D";
 	setAttr ".v" no;
