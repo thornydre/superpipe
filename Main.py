@@ -1130,6 +1130,10 @@ class SuperPipe(Frame):
             else:
                 maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
 
+            if path.isfile(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma"):
+                Resources.removeStudentVersion(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma")
+
+            Resources.removeStudentVersion(maya_file)
             subprocess.Popen("%s %s" % (self.maya_path, maya_file))
         else:
             dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
@@ -1147,6 +1151,10 @@ class SuperPipe(Frame):
             else:
                 maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
+            if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
+                Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
+
+            Resources.removeStudentVersion(maya_file)
             subprocess.Popen("%s %s" % (self.maya_path, maya_file))
         else:
             dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")

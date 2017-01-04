@@ -100,9 +100,20 @@ class Resources:
 
         new_lines = []
 
+        corrected = False
+
         for l in lines:
-            if 'fileInfo "license" "student";' not in l:
+            if corrected:
                 new_lines.append(l)
+
+            else:
+                if 'fileInfo "license" "student";' not in l:
+                    corrected = True
+                if 'fileInfo "license" "educational";' not in l:
+                    corrected = True
+
+                if not corrected:
+                    new_lines.append(l)
 
         with open(file, "w") as f:
             for l in new_lines:
