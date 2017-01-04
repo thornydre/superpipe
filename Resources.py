@@ -109,7 +109,7 @@ class Resources:
             else:
                 if 'fileInfo "license" "student";' not in l:
                     corrected = True
-                if 'fileInfo "license" "educational";' not in l:
+                if 'fileInfo "license" "education";' not in l:
                     corrected = True
 
                 if not corrected:
