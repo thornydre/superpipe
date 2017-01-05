@@ -706,10 +706,7 @@ class SuperPipe(Frame):
 
         selected_line = self.version_list.curselection()[0]
 
-        if asset.getSoftware() == "maya":
-            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
-        elif asset.getSoftware() == "houdini":
-            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
+        self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
 
         self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
         self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
@@ -910,10 +907,14 @@ class SuperPipe(Frame):
                 pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
                 selected_line = self.version_list.curselection()[0]
-                if asset.getSoftware() == "maya":
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
-                elif asset.getSoftware() == "houdini":
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
+                if self.current_project.getSelectionType() == "shot":
+                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                elif self.current_project.getSelection().getSoftware() == "maya":
+                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                elif self.current_project.getSelection().getSoftware() == "houdini":
+                    temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+
+                self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
                 if path.isfile(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"):
                     self.var_selection_abc_path_label.set(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc")
@@ -1094,9 +1095,11 @@ class SuperPipe(Frame):
             selected_version = self.version_list.get(selected_line)
 
             if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
-                if current_project.getS.getSoftware() == "maya":
+                if self.current_project.getSelectionType() == "shot":
                     self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
-                elif asset.getSoftware() == "houdini":
+                elif self.current_project.getSelection().getSoftware() == "maya":
+                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
+                elif self.current_project.getSelection().getSoftware() == "houdini":
                     self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + selected_version)
             else:
                 self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version)
