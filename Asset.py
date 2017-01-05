@@ -214,7 +214,7 @@ class Asset:
         return False
 
     def deleteAsset(self):
-        copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[0] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+        copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[1] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.directory)
 
     def getVersionsList(self, last_only):

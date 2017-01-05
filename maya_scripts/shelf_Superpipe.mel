@@ -76,11 +76,11 @@ global proc shelf_Superpipe () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "import maya.cmds as cmds\nfrom os import path, mkdir\n\ncurrent_file_ext = cmds.file(query = True, expandName = True)\ncurrent_file = current_file_ext.strip(\".ma\")\ndirectory = path.dirname(current_file_ext)\nfile_name = path.basename(current_file)\n\nend_frame = cmds.playbackOptions(q = True, animationEndTime = True)\n\nprint(directory + \"/../cache/alembic/\" + file_name + \".abc\")\n\nif not path.isdir(directory + \"/../cache/alembic\"):\n    mkdir(directory + \"/../cache/alembic\")\n\n## EXPORT ##\ncmds.AbcExport(j = \"-frameRange 800 \" + str(end_frame) + \" -dataFormat ogawa -file \" + directory + \"/../cache/alembic/\" + file_name + \".abc\")\n" 
+        -annotation "Export current scene to alembic cache (check the link in the Superpipe software)" 
         -enableBackground 0
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "import maya.cmds as cmds\nfrom os import path, mkdir\n\ncurrent_fil..." 
+        -label "export_scene_to_alembic" 
         -labelOffset 0
         -rotation 0
         -flipX 0

@@ -248,6 +248,8 @@ class SuperPipe(Frame):
         self.frame_range_entry.pi = self.frame_range_entry.grid_info()
         self.frame_range_entry.grid_forget()
 
+        self.frame_range_entry.bind("<Return>", self.frameRangeReturnClick)
+
         self.set_shot_frame_range_button = Button(self.main_area_shot, text = "Set frame range", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.setShotFrameRangeCommand)
         self.set_shot_frame_range_button.grid(row = 0, column = 4)
         self.set_shot_frame_range_button.pi = self.set_shot_frame_range_button.grid_info()
@@ -706,7 +708,9 @@ class SuperPipe(Frame):
 
         selected_line = self.version_list.curselection()[0]
 
-        self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+        temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+
+        self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
         self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
         self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
@@ -916,10 +920,12 @@ class SuperPipe(Frame):
 
                 self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-                if path.isfile(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"):
-                    self.var_selection_abc_path_label.set(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc")
-                else:
-                    self.var_selection_abc_path_label.set("")
+                temp_path = self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"
+
+                if not path.isfile(temp_path):
+                    temp_path = ""
+
+                self.var_selection_abc_path_label.set(temp_path.replace("/", "\\"))
 
                 if path.isfile(pict_path):
                     pict = PhotoImage(file = pict_path)
@@ -1036,9 +1042,11 @@ class SuperPipe(Frame):
 
                         selected_line = self.version_list.curselection()[0]
                         if asset.getSoftware() == "maya":
-                            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                            temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
                         elif asset.getSoftware() == "houdini":
-                            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
+                            temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+
+                        self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
                         self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
                         self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
@@ -1096,13 +1104,15 @@ class SuperPipe(Frame):
 
             if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
                 if self.current_project.getSelectionType() == "shot":
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
+                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
                 elif self.current_project.getSelection().getSoftware() == "maya":
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
+                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
                 elif self.current_project.getSelection().getSoftware() == "houdini":
-                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + selected_version)
+                    temp_path = self.current_project.getSelection().getDirectory() + "/" + selected_version
             else:
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version)
+                temp_path = self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version
+
+            self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
             pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_version.strip(".ma") + ".gif"
 
@@ -1582,6 +1592,10 @@ class SuperPipe(Frame):
             self.version_list.select_set(selected_version)
 
             self.versionlistCommand(None)
+
+    def frameRangeReturnClick(self, e):
+        self.setShotFrameRangeCommand()
+        self.set_shot_frame_range_button.focus_set()
 
     def scrollCommand(self, e):
         self.preview_canva_scroll.configure(scrollregion = self.preview_canva_scroll.bbox("all"), width = 2000, height = self.parent.winfo_height())
