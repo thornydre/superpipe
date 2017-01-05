@@ -53,19 +53,19 @@ class PreferencesDialog(object):
         maya_path_button["command"] = lambda: self.mayaPathEntry()
         maya_path_button.grid(row = 1, column = 3, sticky = E)
 
-        ## NUKE ##
-        label = Label(top_frame, text = "Path to Nuke", bg = self.main_color, fg = self.text_color)
+        ## HOUDINI ##
+        label = Label(top_frame, text = "Path to Houdini", bg = self.main_color, fg = self.text_color)
         label.grid(row = 2, column = 0, columnspan = 4)
 
-        self.nuke_var_text = StringVar()
-        self.nuke_var_text.set(Resources.readLine("save/options.spi", 1))
+        self.houdini_var_text = StringVar()
+        self.houdini_var_text.set(Resources.readLine("save/options.spi", 1))
 
-        self.nuke_path_entry = Entry(top_frame, textvariable = self.nuke_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
-        self.nuke_path_entry.grid(row = 3, column = 0, columnspan = 3)
+        self.houdini_path_entry = Entry(top_frame, textvariable = self.houdini_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
+        self.houdini_path_entry.grid(row = 3, column = 0, columnspan = 3)
 
-        nuke_path_button = Button(top_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
-        nuke_path_button["command"] = lambda: self.nukePathEntry()
-        nuke_path_button.grid(row = 3, column = 3, sticky = E)
+        houdini_path_button = Button(top_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
+        houdini_path_button["command"] = lambda: self.houdiniPathEntry()
+        houdini_path_button.grid(row = 3, column = 3, sticky = E)
 
         ## SAVE/CANCEL ##
         save_button = Button(top_frame, text = "Save", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
@@ -97,19 +97,19 @@ class PreferencesDialog(object):
 
         self.top.focus()
 
-    def nukePathEntry(self):
-        nuke_path = filedialog.askopenfilename(title = "Select Nuke.exe",  filetypes = [("Nuke","*nuke*.exe")])
+    def houdiniPathEntry(self):
+        houdini_path = filedialog.askopenfilename(title = "Select Houdini.exe",  filetypes = [("Houdini","*Houdini*.exe")])
 
-        if nuke_path:
-            self.nuke_var_text.set(nuke_path)
+        if houdini_path:
+            self.houdini_var_text.set(houdini_path)
 
         self.top.focus()
 
     def saveEntry(self, dict_key):
         maya_path = self.maya_path_entry.get()
-        nuke_path = self.nuke_path_entry.get()
-        if maya_path and nuke_path:
+        houdini_path = self.houdini_path_entry.get()
+        if maya_path and houdini_path:
             d, key1, key2 = dict_key
             d[key1] = maya_path
-            d[key2] = nuke_path
+            d[key2] = houdini_path
             self.top.destroy()

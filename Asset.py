@@ -163,6 +163,9 @@ class Asset:
     def getPriority(self):
         return self.priority
 
+    def getSoftware(self):
+        return self.software
+
     def getComment(self, version_file):
         if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
                 open(self.directory + "/superpipe/versions_data.spi", "a").close()
@@ -194,13 +197,19 @@ class Asset:
             copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
             copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
             copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
-        elif self.soft == "houdini":
-            copyfile("src/set_up_file_asset_houdini.hipnc", self.directory + "/" + self.asset_name + "_v01.hipnc")
+        elif self.software == "houdini":
+            copyfile("src/set_up_file_asset_houdini.hip", self.directory + "/" + self.asset_name + "_v01.hip")
 
     def isSet(self):
-        for asset_file in listdir(self.directory + "/scenes/"):
-            if asset_file[-3:] == ".ma":
-                return True
+        if self.software == "maya":
+            for asset_file in listdir(self.directory + "/scenes/"):
+                if asset_file[-3:] == ".ma":
+                    return True
+
+        elif self.software == "houdini":
+            for asset_file in listdir(self.directory):
+                if asset_file[-4:] == ".hip":
+                    return True
 
         return False
 
@@ -224,13 +233,13 @@ class Asset:
 
         elif self.software == "houdini":
             for asset_file in listdir(self.directory + "/"):
-                if asset_file[-6:] == ".hipnc":
+                if asset_file[-4:] == ".hip":
                     versions_list.append((path.getmtime(self.directory + "/" + asset_file), asset_file))
 
             if not last_only:
-                for asset_file in listdir(self.directory + "/"):
-                    if asset_file[-6:] == ".hipnc":
-                        versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+                for asset_file in listdir(self.directory + "/backup/"):
+                    if asset_file[-4:] == ".hip":
+                        versions_list.append((path.getmtime(self.directory + "/backup/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)
 
@@ -240,21 +249,27 @@ class Asset:
         if not path.isdir(new_dir):
             rename(self.directory, new_dir)
 
-            for f in listdir(new_dir + "/scenes/"):
-                if self.asset_name in f:
-                    rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f.replace(self.asset_name, new_name))
+            if self.software == "maya":
+                for f in listdir(new_dir + "/scenes/"):
+                    if self.asset_name in f:
+                        rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f.replace(self.asset_name, new_name))
 
-            for f in listdir(new_dir + "/scenes/edits/"):
-                if self.asset_name in f:
-                    rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.asset_name, new_name))
+                for f in listdir(new_dir + "/scenes/edits/"):
+                    if self.asset_name in f:
+                        rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.asset_name, new_name))
 
-            for f in listdir(new_dir + "/scenes/backup/"):
-                if self.asset_name in f:
-                    rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.asset_name, new_name))
+                for f in listdir(new_dir + "/scenes/backup/"):
+                    if self.asset_name in f:
+                        rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.asset_name, new_name))
 
-            for f in listdir(new_dir + "/images/screenshots/"):
-                if self.asset_name in f:
-                    rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.asset_name, new_name))
+                for f in listdir(new_dir + "/images/screenshots/"):
+                    if self.asset_name in f:
+                        rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.asset_name, new_name))
+
+            elif self.software == "houdini":
+                for f in listdir(new_dir):
+                    if self.asset_name in f:
+                        rename(new_dir + "/" + f, new_dir + "/" + f.replace(self.asset_name, new_name))
 
             return True
 

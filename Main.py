@@ -55,7 +55,7 @@ class SuperPipe(Frame):
             f.close()
 
         self.maya_path = Resources.readLine("save/options.spi", 1)
-        self.nuke_path = Resources.readLine("save/options.spi", 2)
+        self.houdini_path = Resources.readLine("save/options.spi", 2)
 
         self.initUI()
 
@@ -382,7 +382,7 @@ class SuperPipe(Frame):
 
         self.shot_paths_line.columnconfigure(0, pad = 10, weight = 1)
 
-        maya_file_path_label = Label()
+        file_path_label = Label()
 
         self.var_selection_path_label = StringVar()
         shot_path_label = Entry(self.shot_paths_line, textvariable = self.var_selection_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
@@ -538,7 +538,7 @@ class SuperPipe(Frame):
 
         self.asset_paths_line.columnconfigure(0, pad = 10, weight = 1)
 
-        maya_file_path_label = Label()
+        file_path_label = Label()
 
         asset_path_label = Entry(self.asset_paths_line, textvariable = self.var_selection_path_label, relief = FLAT, state = "readonly", readonlybackground = self.main_color, fg = self.text_color)
         asset_path_label.grid(row = 0, column = 0, sticky = W + E)
@@ -705,7 +705,11 @@ class SuperPipe(Frame):
         self.version_list.select_set(0)
 
         selected_line = self.version_list.curselection()[0]
-        self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+
+        if asset.getSoftware() == "maya":
+            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+        elif asset.getSoftware() == "houdini":
+            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
 
         self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
         self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
@@ -906,7 +910,10 @@ class SuperPipe(Frame):
                 pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
 
                 selected_line = self.version_list.curselection()[0]
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                if asset.getSoftware() == "maya":
+                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                elif asset.getSoftware() == "houdini":
+                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
 
                 if path.isfile(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"):
                     self.var_selection_abc_path_label.set(self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc")
@@ -1027,7 +1034,10 @@ class SuperPipe(Frame):
                         self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
                         selected_line = self.version_list.curselection()[0]
-                        self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                        if asset.getSoftware() == "maya":
+                            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line))
+                        elif asset.getSoftware() == "houdini":
+                            self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line))
 
                         self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
                         self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
@@ -1084,7 +1094,10 @@ class SuperPipe(Frame):
             selected_version = self.version_list.get(selected_line)
 
             if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
-                self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
+                if current_project.getS.getSoftware() == "maya":
+                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version)
+                elif asset.getSoftware() == "houdini":
+                    self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/" + selected_version)
             else:
                 self.var_selection_path_label.set(self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version)
 
@@ -1145,20 +1158,33 @@ class SuperPipe(Frame):
 
         asset = self.current_project.getSelection()
 
-        if path.isfile(self.maya_path):
-            if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
-                maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+        if asset.getSoftware() == "maya":
+            if path.isfile(self.maya_path):
+                if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
+                    maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+                else:
+                    maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+
+                if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
+                    Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
+
+                Resources.removeStudentVersion(maya_file)
+                subprocess.Popen("%s %s" % (self.maya_path, maya_file))
             else:
-                maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
+                self.wait_window(dialog().top)
 
-            if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
-                Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
+        elif asset.getSoftware() == "houdini":
+            if path.isfile(self.houdini_path):
+                if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                    houdini_file = asset.getDirectory() + "/" + selected_asset_version
+                else:
+                    houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
-            Resources.removeStudentVersion(maya_file)
-            subprocess.Popen("%s %s" % (self.maya_path, maya_file))
-        else:
-            dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-            self.wait_window(dialog().top)
+                subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
+            else:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
+                self.wait_window(dialog().top)
 
     def renameAssetCommand(self):
         asset_name = {"name" : None}
@@ -1525,17 +1551,17 @@ class SuperPipe(Frame):
             self.current_project.setResolution(settings["res"])
 
     def preferencesCommand(self):
-        preferences = {"maya_path" : "", "nuke_path" : ""}
+        preferences = {"maya_path" : "", "houdini_path" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, (preferences, "maya_path", "nuke_path"))
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, (preferences, "maya_path", "houdini_path"))
         self.wait_window(dialog().top)
 
-        if preferences["maya_path"] and preferences["nuke_path"]:
+        if preferences["maya_path"] and preferences["houdini_path"]:
             self.maya_path = preferences["maya_path"]
-            self.nuke_path = preferences["nuke_path"]
+            self.houdini_path = preferences["houdini_path"]
 
             Resources.writeAtLine("save/options.spi", preferences["maya_path"], 1)
-            Resources.writeAtLine("save/options.spi", preferences["nuke_path"], 2)
+            Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 2)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)

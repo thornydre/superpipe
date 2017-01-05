@@ -107,9 +107,9 @@ class Resources:
                 new_lines.append(l)
 
             else:
-                if 'fileInfo "license" "student";' not in l:
+                if 'fileInfo "license" "student";' in l:
                     corrected = True
-                if 'fileInfo "license" "education";' not in l:
+                if 'fileInfo "license" "education";' in l:
                     corrected = True
 
                 if not corrected:
