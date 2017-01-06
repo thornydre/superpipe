@@ -17,7 +17,7 @@ class YesNoDialog(object):
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
-        self.top.title(window_name)
+        self.top.title("Superpipe || " + window_name)
         self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)

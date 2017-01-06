@@ -6,7 +6,7 @@ from tkinter import *
 from Resources import *
 from tkinter import ttk
 
-class ManageBackupDialog(object):
+class ManageBackupsDialog(object):
     def __init__(self, parent, project, dict_key = None):
         ## THEME COLORS ##
         self.main_color = Resources.readLine("save/themes.spi", 1)
@@ -21,7 +21,7 @@ class ManageBackupDialog(object):
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
-        self.top.title("Super Pipe || Clean backup")
+        self.top.title("Super Pipe || Clean backups")
         self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)

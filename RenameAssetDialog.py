@@ -18,7 +18,7 @@ class RenameAssetDialog(object):
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
-        self.top.title("Rename asset")
+        self.top.title("Superpipe || Rename asset")
         self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)

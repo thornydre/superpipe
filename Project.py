@@ -128,7 +128,10 @@ class Project:
         return self.valid
 
     def createShot(self, shot_sequence):
-        current_sequence = Shot(self.directory, self.shot_list[-1][1]).getSequence()
+        current_sequence = 1
+
+        if self.shot_list:
+            current_sequence = Shot(self.directory, self.shot_list[-1][1]).getSequence()
 
         if shot_sequence >= current_sequence:
             shot_nb = len(self.shot_list) + 1
@@ -259,17 +262,6 @@ class Project:
             return "shot"
         elif self.selected_asset:
             return "asset"
-
-    def removeAllStudentVersions(self):
-        for subdir, dirs, files in walk(self.directory + "/04_asset/"):
-            for file in files:
-                if file[-3:] == ".ma":
-                    Resources.removeStudentVersion(path.join(subdir, file))
-
-        for subdir, dirs, files in walk(self.directory + "/05_shot/"):
-            for file in files:
-                if file[-3:] == ".ma":
-                    Resources.removeStudentVersion(path.join(subdir, file))
 
     def setResolution(self, res):
         self.res_x = res[0]

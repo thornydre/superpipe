@@ -15,8 +15,7 @@ import NewAssetDialog
 import RenameAssetDialog
 import ProjectSettingsDialog
 import PreferencesDialog
-import EditCustomLinkDialog
-import ManageBackupDialog
+import ManageBackupsDialog
 import YesNoDialog
 import OkDialog
 import subprocess
@@ -72,6 +71,11 @@ class SuperPipe(Frame):
 
                 self.asset_list.configure(selectmode = "browse")
 
+                self.menu_project.entryconfig(0, state = NORMAL)
+                self.menu_project.entryconfig(1, state = NORMAL)
+                self.menu_project.entryconfig(3, state = NORMAL)
+                self.menu_project.entryconfig(5, state = NORMAL)
+
                 self.updateShotListView()
                 self.updateAssetListView()
 
@@ -90,20 +94,23 @@ class SuperPipe(Frame):
         menu_file.add_command(label="New project", command = self.newProjectCommand)
         menu_file.add_command(label="Set project", command = self.setProjectCommand)
         menu_file.add_separator()
-        menu_file.add_command(label="Update project", command = self.updateProjectCommand)
-        menu_file.add_separator()
+        # menu_file.add_command(label="Update project", command = self.updateProjectCommand)
+        # menu_file.add_separator()
         menu_file.add_command(label="Quit", command = self.parent.destroy)
         menu_bar.add_cascade(label="File", menu = menu_file)
 
         menu_edit = Menu(menu_bar, tearoff = 0)
-        menu_edit.add_command(label = "Clean backups", command = self.cleanBackupsCommand)
-        menu_edit.add_command(label = "Clean student versions", command = self.cleanStudentCommand)
-        menu_edit.add_separator()
-        menu_edit.add_command(label = "Project settings", command = self.projectSettingsCommand)
-        menu_edit.add_separator()
-        menu_edit.add_command(label = "Edit custom link", command = self.editCustomLinkCommand)
         menu_edit.add_command(label = "Preferences", command = self.preferencesCommand)
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
+
+        self.menu_project = Menu(menu_bar, tearoff = 0)
+        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand)
+        self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand)
+        self.menu_project.add_separator()
+        self.menu_project.add_command(label = "Project settings", state = DISABLED, command = self.projectSettingsCommand)
+        self.menu_project.add_separator()
+        self.menu_project.add_command(label = "Clean backups", state = DISABLED, command = self.cleanBackupsCommand)
+        menu_bar.add_cascade(label = "Project", menu = self.menu_project)
 
         menu_help = Menu(menu_bar, tearoff = 0)
         menu_help.add_command(label = "Credits", command = self.about)
@@ -612,6 +619,11 @@ class SuperPipe(Frame):
 
             self.asset_list.configure(selectmode = "browse")
 
+            self.menu_project.entryconfig(0, state = NORMAL)
+            self.menu_project.entryconfig(1, state = NORMAL)
+            self.menu_project.entryconfig(3, state = NORMAL)
+            self.menu_project.entryconfig(5, state = NORMAL)
+
             self.updateShotListView()
             self.updateAssetListView()
 
@@ -637,6 +649,11 @@ class SuperPipe(Frame):
                     self.parent.title("Super Pipe || " + self.current_project.getDirectory())
 
                     self.asset_list.configure(selectmode = "browse")
+
+                    self.menu_project.entryconfig(0, state = NORMAL)
+                    self.menu_project.entryconfig(1, state = NORMAL)
+                    self.menu_project.entryconfig(3, state = NORMAL)
+                    self.menu_project.entryconfig(5, state = NORMAL)
 
                     self.updateShotListView()
                     self.updateAssetListView()
@@ -1463,20 +1480,6 @@ class SuperPipe(Frame):
 
         return valid
 
-    def editCustomLinkCommand(self):
-        if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
-            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
-                f.write("www.google.fr\n")
-            f.close()
-
-        link = {"link" : None}
-
-        dialog = lambda: EditCustomLinkDialog.EditCustomLinkDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (link, "link"))
-        self.wait_window(dialog().top)
-
-        if link["link"]:
-            Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", link["link"], 1)
-
     def customButtonCommand(self):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
             with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
@@ -1525,25 +1528,11 @@ class SuperPipe(Frame):
     def cleanBackupsCommand(self):
         settings = {"res" : ""}
 
-        dialog = lambda: ManageBackupDialog.ManageBackupDialog(self.parent, self.current_project, (settings, "res"))
+        dialog = lambda: ManageBackupsDialog.ManageBackupsDialog(self.parent, self.current_project, (settings, "res"))
         self.wait_window(dialog().top)
 
         if settings["res"]:            
             self.current_project.setResolution(settings["res"])
-
-    def cleanStudentCommand(self):
-        self.parent.config(cursor = "wait")
-        self.parent.update()
-
-        yesno = {"result" : ""}
-
-        dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Clean student versions", "Make all your files easy to save again ?", (yesno, "result"))
-        self.wait_window(dialog().top)
-
-        if yesno["result"] == "yes":
-            self.current_project.removeAllStudentVersions()
-
-        self.parent.config(cursor = "")
 
     def projectSettingsCommand(self):
         settings = {"res" : ""}
@@ -1555,15 +1544,21 @@ class SuperPipe(Frame):
             self.current_project.setResolution(settings["res"])
 
     def preferencesCommand(self):
-        preferences = {"maya_path" : "", "houdini_path" : ""}
+        if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
+            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
+                f.write("www.google.fr\n")
+            f.close()
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, (preferences, "maya_path", "houdini_path"))
+        preferences = {"link" : None, "maya_path" : "", "houdini_path" : ""}
+
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path"))
         self.wait_window(dialog().top)
 
-        if preferences["maya_path"] and preferences["houdini_path"]:
+        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"]:
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
 
+            Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["link"], 1)
             Resources.writeAtLine("save/options.spi", preferences["maya_path"], 2)
             Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 3)
 

@@ -19,7 +19,7 @@ class NewProjectDialog(object):
         self.root = parent
         self.top = Toplevel(self.root)
         self.top.transient(self.root)
-        self.top.title("New project")
+        self.top.title("Superpipe || New project")
         self.top["bg"] = self.main_color
 
         self.top.resizable(width = False, height = False)
