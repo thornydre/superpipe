@@ -47,24 +47,22 @@ class SuperPipe(Frame):
         self.parent.update()
 
         self.current_project = None
-        self.current_sequence = 1
 
         if not path.isfile("save/options.spi"):
             with open("save/options.spi", "w") as f:
                 f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\n\n")
             f.close()
 
-        self.maya_path = Resources.readLine("save/options.spi", 1)
-        self.houdini_path = Resources.readLine("save/options.spi", 2)
+        self.maya_path = Resources.readLine("save/options.spi", 2)
+        self.houdini_path = Resources.readLine("save/options.spi", 3)
 
         self.initUI()
 
-        project_directory = Resources.readLine("save/options.spi", 3)
+        project_directory = Resources.readLine("save/options.spi", 1)
 
         if project_directory:
             if path.isdir(project_directory):
                 self.current_project = Project(project_directory)
-                self.current_sequence = self.current_project.getCurrentSequence()
                 self.add_shot_button.config(state = NORMAL)
                 self.add_asset_button.config(state = NORMAL)
                 self.shots_preview_button.config(state = NORMAL)
@@ -595,8 +593,6 @@ class SuperPipe(Frame):
         pw_main.sash_place(1, 1650, 0)
 
     def newProjectCommand(self):
-        self.current_sequence = 1
-
         directory = {"dir":""}
 
         dialog = lambda: NewProjectDialog.NewProjectDialog(self.parent, (directory, "dir"))
@@ -604,9 +600,8 @@ class SuperPipe(Frame):
 
         if directory["dir"]:
             self.current_project = Project(directory["dir"])
-            self.current_sequence = self.current_project.getCurrentSequence()
 
-            Resources.writeAtLine("save/options.spi", directory["dir"], 3)
+            Resources.writeAtLine("save/options.spi", directory["dir"], 1)
 
             self.add_shot_button.config(state = NORMAL)
             self.add_asset_button.config(state = NORMAL)
@@ -632,9 +627,7 @@ class SuperPipe(Frame):
 
                 if self.current_project.isValid():
 
-                    Resources.writeAtLine("save/options.spi", directory, 3)
-
-                    self.current_sequence = self.current_project.getCurrentSequence()
+                    Resources.writeAtLine("save/options.spi", directory, 1)
 
                     self.add_shot_button.config(state = NORMAL)
                     self.add_asset_button.config(state = NORMAL)
@@ -668,14 +661,12 @@ class SuperPipe(Frame):
                     for asset in listdir(directory + "/04_asset/" + cat):
                         if asset != "backup":
                             if not path.isdir(directory + "/04_asset/" + cat + "/" + asset + "/superpipe"):
-                                print(directory + "/04_asset/" + cat + "/" + asset + "/data")
                                 rename(directory + "/04_asset/" + cat + "/" + asset + "/data", directory + "/04_asset/" + cat + "/" + asset + "/superpipe")
                                 mkdir(directory + "/04_asset/" + cat + "/" + asset + "/data")
 
                 for shot in listdir(directory + "/05_shot/"):
                     if shot != "backup":
                         if not path.isdir(directory + "/05_shot/" + shot + "/superpipe"):
-                            print(directory + "/05_shot/" + shot + "/data")
                             rename(directory + "/05_shot/" + shot + "/data", directory + "/05_shot/" + shot + "/superpipe")
                             mkdir(directory + "/05_shot/" + shot + "/data")
 
@@ -784,16 +775,15 @@ class SuperPipe(Frame):
             self.updateVersionListView()
 
     def addShotCommand(self):
-        sequence = {"seq": -1}
+        sequence = {"seq": 0}
 
-        dialog = lambda: NewShotDialog.NewShotDialog(self.parent, (sequence, "seq"))
+        dialog = lambda: NewShotDialog.NewShotDialog(self.parent, self.current_project, (sequence, "seq"))
         self.wait_window(dialog().top)
 
-        if sequence["seq"] >= 0:
-            self.current_sequence += sequence["seq"]
-            self.current_project.createShot(self.current_sequence)
+        if sequence["seq"]:
+            shot_nb = self.current_project.createShot(sequence["seq"])
             self.updateShotListView()
-            self.shot_list.select_set(END)
+            self.shot_list.select_set(shot_nb - 1)
             self.shotlistCommand(None)
 
     def addAssetCommand(self):
@@ -973,8 +963,9 @@ class SuperPipe(Frame):
                             all_picts_path_array = []
 
                             for f in listdir(all_picts_path):
-                                if "small.gif" not in f:
-                                    all_picts_path_array.append(all_picts_path + f)
+                                if ".gif" in f:
+                                    if "small.gif" not in f:
+                                        all_picts_path_array.append(all_picts_path + f)
 
                             if all_picts_path_array:
                                 prev_pict_path = max(all_picts_path_array, key = path.getmtime)
@@ -1573,8 +1564,8 @@ class SuperPipe(Frame):
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
 
-            Resources.writeAtLine("save/options.spi", preferences["maya_path"], 1)
-            Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 2)
+            Resources.writeAtLine("save/options.spi", preferences["maya_path"], 2)
+            Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 3)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)

@@ -5,9 +5,11 @@ from Main import *
 from tkinter import *
 
 class NewShotDialog(object):
-    def __init__(self, parent, dict_key = None):
+    def __init__(self, parent, project, dict_key = None):
         ## THEME COLORS ##
         self.main_color = Resources.readLine("save/themes.spi", 1)
+        self.second_color = Resources.readLine("save/themes.spi", 2)
+        self.list_color = Resources.readLine("save/themes.spi", 3)
         self.button_color1 = Resources.readLine("save/themes.spi", 4)
         self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
         self.button_color2 = Resources.readLine("save/themes.spi", 6)
@@ -22,20 +24,30 @@ class NewShotDialog(object):
 
         self.top.resizable(width = False, height = False)
 
+        self.project = project
+
         top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
         label = Label(top_frame, text = "Select sequence", bg = self.main_color)
         label.pack(padx = 4, pady = 4)
 
-        keep_sequence_button = Button(top_frame, text = "Keep sequence", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
-        keep_sequence_button["command"] = lambda: self.keepSequenceEntry(dict_key)
-        keep_sequence_button.pack(side = LEFT, padx = 4, pady = 4)
+        self.sequence_list = Listbox(top_frame, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)
+        self.sequence_list.pack(fill = BOTH, pady = (5, 15))
 
-        self.top.bind("<Return>", lambda event, a = dict_key:self.keepSequenceEntry(a))
+        for sequence in range(self.project.getSequenceNumber()):
+            self.sequence_list.insert(END, "Sequence " + str(sequence + 1))
+
+        self.sequence_list.select_set(END)
+
+        submit_button = Button(top_frame, text = "Create shot", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
+        submit_button["command"] = lambda: self.createShotEntry(dict_key)
+        submit_button.pack(side = LEFT, padx = 4, pady = 4)
+
+        self.top.bind("<Return>", lambda event, a = dict_key:self.createShotEntry(a))
 
         add_sequence_button = Button(top_frame, text = "Add sequence", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
-        add_sequence_button["command"] = lambda: self.addSequenceEntry(dict_key)
+        add_sequence_button["command"] = lambda: self.addSequenceEntry(self.project)
         add_sequence_button.pack(side = LEFT, padx = 4, pady = 4)
 
         cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
@@ -55,15 +67,20 @@ class NewShotDialog(object):
         self.top.iconbitmap("img/icon.ico")
         self.top.focus()
 
-    def keepSequenceEntry(self, dict_key):
-        sequence = 0
-        data = sequence
-        d, key = dict_key
-        d[key] = data
-        self.top.destroy()
+    def addSequenceEntry(self, project):
+        project.addSequence()
 
-    def addSequenceEntry(self, dict_key):
-        sequence = 1
-        d, key = dict_key
-        d[key] = sequence
-        self.top.destroy()
+        self.sequence_list.delete(0, END)
+
+        for sequence in range(project.getSequenceNumber()):
+            self.sequence_list.insert(END, "Sequence " + str(sequence + 1))
+
+        self.sequence_list.select_set(END)
+
+    def createShotEntry(self, dict_key):
+        sequence = self.sequence_list.curselection()
+        if sequence:
+            data = sequence[0] + 1
+            d, key = dict_key
+            d[key] = data
+            self.top.destroy()

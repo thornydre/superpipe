@@ -144,13 +144,6 @@ class Asset:
             else:
                 self.software = "maya"
 
-            # self.software = Resources.readLinereadLine(self.directory + "/superpipe/asset_data.spi", 1)
-            # self.modeling_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 2))
-            # self.rig_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 3))
-            # self.lookdev_done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 4))
-            # self.done = int(Resources.readLine(self.directory + "/superpipe/asset_data.spi", 5))
-            # self.software = Resources.readLine(self.directory + "/superpipe/asset_data.spi", 6)
-
     def getAssetName(self):
         return self.asset_name
 

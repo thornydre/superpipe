@@ -85,10 +85,17 @@ class Resources:
         return ""
 
     def makeShotName(shot_nb, sequence):
-        if shot_nb < 10:
-            return "s0" + str(sequence) + "p0" + str(shot_nb)
+        if sequence < 10:
+            seq_name = "s0" + str(sequence)
         else:
-            return "s0" + str(sequence) + "p" + str(shot_nb)
+            seq_name = "s" + str(sequence)
+
+        if shot_nb < 10:
+            shot_name = "p0" + str(shot_nb)
+        else:
+            shot_name = "p" + str(shot_nb)
+
+        return seq_name + shot_name
 
     def makeShotNbs(shot_name):
         return (int(shot_name[-2:]), int(shot_name[1:3]))

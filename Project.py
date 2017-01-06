@@ -17,7 +17,7 @@ class Project:
         self.shot_list = []
         self.asset_list = []
 
-        self.current_sequence = 1
+        self.sequence_number = 1
         self.selected_shot = None
         self.selected_asset = None
         self.directory = directory
@@ -79,18 +79,17 @@ class Project:
             self.updateAssetList()
 
             if not Resources.readLine(self.directory + "/project_option.spi", 2):
-                Resources.writeAtLine(self.directory + "/project_option.spi", "1920x1080", 2)
+                Resources.writeAtLine(self.directory + "/project_option.spi", self.res_x + "x" + self.res_y, 2)
+
+            if not Resources.readLine(self.directory + "/project_option.spi", 3):
+                Resources.writeAtLine(self.directory + "/project_option.spi", str(self.sequence_number), 3)
 
             res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
 
             self.res_x = res[0]
             self.res_y = res[1]
 
-            self.current_sequence = 1
-
-            if self.shot_list:
-                shot = Shot(self.directory, self.shot_list[-1][1])
-                self.current_sequence = shot.getSequence()
+            self.sequence_number = int(Resources.readLine(self.directory + "/project_option.spi", 3))
 
         else:
             self.valid = False
@@ -107,7 +106,7 @@ class Project:
             if shot_name != "backup":
                 shot = Shot(self.directory, shot_name)
                 self.shot_list.append((shot.getShotNb(), shot.getShotName()))
-                
+
     def updateAssetList(self):
         self.asset_list = []
 
@@ -119,8 +118,8 @@ class Project:
     def getDirectory(self):
         return self.directory
 
-    def getCurrentSequence(self):
-        return self.current_sequence
+    def getSequenceNumber(self):
+        return self.sequence_number
 
     def getShot(self, shot_name):
         return Shot(self.directory, shot_name)
@@ -128,13 +127,39 @@ class Project:
     def isValid(self):
         return self.valid
 
-    def createShot(self, sequence):
-        shot_nb = len(self.shot_list) + 1
+    def createShot(self, shot_sequence):
+        current_sequence = Shot(self.directory, self.shot_list[-1][1]).getSequence()
 
-        shot_name = Resources.makeShotName(shot_nb, sequence)
+        if shot_sequence >= current_sequence:
+            shot_nb = len(self.shot_list) + 1
 
-        shot = Shot(self.directory, shot_name, software = "maya")
+            shot_name = Resources.makeShotName(shot_nb, shot_sequence)
+
+            shot = Shot(self.directory, shot_name, software = "maya")
+
+        else:
+            shots_to_rename = []
+
+            for shot in self.shot_list:
+                if Resources.makeShotNbs(shot[1])[1] > shot_sequence :
+                    shots_to_rename.append(shot)
+
+            shots_to_rename = shots_to_rename[::-1]
+
+            for shot_to_rename in shots_to_rename:
+                cur_shot = Shot(self.directory, shot_to_rename[1])
+
+                cur_shot.renameShot(Resources.makeShotName(shot_to_rename[0] + 1, cur_shot.getSequence()))
+
+            shot_nb = shots_to_rename[-1][0]
+
+            shot = Shot(self.directory, Resources.makeShotName(shot_nb, shot_sequence), software = "maya")
+
         self.shot_list.append((shot.getShotNb(), shot.getShotName()))
+
+        self.updateShotList()
+
+        return shot_nb
 
     def removeShot(self, shot_name):
         shot = Shot(self.directory, shot_name)
@@ -146,12 +171,7 @@ class Project:
 
             cur_shot = Shot(self.directory, self.shot_list[n][1])
 
-            if self.shot_list[n - 1][0] < 10:
-                new_name = "s0" + str(cur_shot.getSequence()) + "p0" + str(self.shot_list[n - 1][0])
-            else:
-                new_name = "s0" + str(cur_shot.getSequence()) + "p" + str(self.shot_list[n - 1][0])
-
-            cur_shot.renameShot(new_name)
+            cur_shot.renameShot(Resources.makeShotName(self.shot_list[n - 1][0], cur_shot.getSequence()))
 
         self.updateShotList()
 
@@ -170,9 +190,6 @@ class Project:
 
         shot.renameShot(swap_shot_name_backup)
 
-        # if path.isdir(self.directory + "05_shot/s00p00"):
-        #     rmtree(self.directory + "05_shot/s00p00")
-
     def moveShotDown(self, shot_name):
         shot = Shot(self.directory, shot_name)
         shot_name_backup = shot.getShotName()
@@ -187,9 +204,6 @@ class Project:
         shot = Shot(self.directory, "s00p00")
 
         shot.renameShot(swap_shot_name_backup)
-
-        # if path.isdir(self.directory + "05_shot/s00p00"):
-        #     rmtree(self.directory + "05_shot/s00p00")
 
     def createAsset(self, asset_name, second_path, software):
         if path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
@@ -271,3 +285,7 @@ class Project:
 
     def getResolution(self):
         return (self.res_x, self.res_y)
+
+    def addSequence(self):
+        self.sequence_number += 1
+        Resources.writeAtLine(self.getDirectory() + "/project_option.spi", str(self.sequence_number), 3)
