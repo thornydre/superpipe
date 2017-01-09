@@ -1064,7 +1064,7 @@ class SuperPipe(Frame):
                         self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
                         self.done_asset_button.grid(self.done_asset_button.pi)
 
-                        pict_path = asset.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
+                        pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".gif"
 
                         if path.isfile(pict_path):
                             pict = PhotoImage(file = pict_path)

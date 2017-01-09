@@ -13,113 +13,114 @@ class Shot:
     def __init__(self, directory = None, shot_name = None, software = None):
         self.shot_name = shot_name
         self.shot_nb, self.sequence = Resources.makeShotNbs(self.shot_name)
-        self.directory = directory + "/05_shot/" + self.shot_name
+        self.shot_directory = directory + "/05_shot/" + self.shot_name
+        self.postprod_directory = directory + "/06_postprod/" + self.shot_name
         self.done = 0
         self.priority = "Low"
         self.step = "Layout"
         self.frame_range = 200
         self.software = software
 
-        if not path.isdir(self.directory):
-            makedirs(self.directory)
+        if not path.isdir(self.shot_directory):
+            makedirs(self.shot_directory)
 
-            makedirs(self.directory + "/superpipe")
+            makedirs(self.shot_directory + "/superpipe")
 
-            with open(self.directory + "/superpipe/shot_data.spi", "w") as f:
+            with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
                 f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
             f.close()
 
-            open(self.directory + "/superpipe/versions_data.spi", "a").close()
+            open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
             if self.software == "maya":
-                makedirs(self.directory + "/assets")
+                makedirs(self.shot_directory + "/assets")
                 
-                makedirs(self.directory + "/autosave")
+                makedirs(self.shot_directory + "/autosave")
                 
-                makedirs(self.directory + "/cache")
-                makedirs(self.directory + "/cache/nCache")
-                makedirs(self.directory + "/cache/nCache/fluid")
-                makedirs(self.directory + "/cache/particles")
+                makedirs(self.shot_directory + "/cache")
+                makedirs(self.shot_directory + "/cache/nCache")
+                makedirs(self.shot_directory + "/cache/nCache/fluid")
+                makedirs(self.shot_directory + "/cache/particles")
 
-                makedirs(self.directory + "/clips")
+                makedirs(self.shot_directory + "/clips")
                 
-                makedirs(self.directory + "/data")
-                makedirs(self.directory + "/data/edits")
+                makedirs(self.shot_directory + "/data")
+                makedirs(self.shot_directory + "/data/edits")
                 
-                makedirs(self.directory + "/images")
-                makedirs(self.directory + "/images/screenshots")
+                makedirs(self.shot_directory + "/images")
+                makedirs(self.shot_directory + "/images/screenshots")
                 
-                makedirs(self.directory + "/movies")
+                makedirs(self.shot_directory + "/movies")
                 
-                makedirs(self.directory + "/renderData")
-                makedirs(self.directory + "/renderData/depth")
-                makedirs(self.directory + "/renderData/fur")
-                makedirs(self.directory + "/renderData/fur/furAttrMap")
-                makedirs(self.directory + "/renderData/fur/furEqualMap")
-                makedirs(self.directory + "/renderData/fur/furFiles")
-                makedirs(self.directory + "/renderData/fur/furImages")
-                makedirs(self.directory + "/renderData/fur/furShadowMap")
-                makedirs(self.directory + "/renderData/iprImages")
-                makedirs(self.directory + "/renderData/shaders")
+                makedirs(self.shot_directory + "/renderData")
+                makedirs(self.shot_directory + "/renderData/depth")
+                makedirs(self.shot_directory + "/renderData/fur")
+                makedirs(self.shot_directory + "/renderData/fur/furAttrMap")
+                makedirs(self.shot_directory + "/renderData/fur/furEqualMap")
+                makedirs(self.shot_directory + "/renderData/fur/furFiles")
+                makedirs(self.shot_directory + "/renderData/fur/furImages")
+                makedirs(self.shot_directory + "/renderData/fur/furShadowMap")
+                makedirs(self.shot_directory + "/renderData/iprImages")
+                makedirs(self.shot_directory + "/renderData/shaders")
                 
-                makedirs(self.directory + "/scenes")
-                makedirs(self.directory + "/scenes/backup")
-                makedirs(self.directory + "/scenes/edits")
+                makedirs(self.shot_directory + "/scenes")
+                makedirs(self.shot_directory + "/scenes/backup")
+                makedirs(self.shot_directory + "/scenes/edits")
 
-                makedirs(self.directory + "/scripts")
+                makedirs(self.shot_directory + "/scripts")
                 
-                makedirs(self.directory + "/sound")
+                makedirs(self.shot_directory + "/sound")
                 
-                makedirs(self.directory + "/sourceimages")
-                makedirs(self.directory + "/sourceimages/3dPatinTextures")
-                makedirs(self.directory + "/sourceimages/edits")
-                makedirs(self.directory + "/sourceimages/environement")
-                makedirs(self.directory + "/sourceimages/imagePlane")
-                makedirs(self.directory + "/sourceimages/imageSequence")
+                makedirs(self.shot_directory + "/sourceimages")
+                makedirs(self.shot_directory + "/sourceimages/3dPatinTextures")
+                makedirs(self.shot_directory + "/sourceimages/edits")
+                makedirs(self.shot_directory + "/sourceimages/environement")
+                makedirs(self.shot_directory + "/sourceimages/imagePlane")
+                makedirs(self.shot_directory + "/sourceimages/imageSequence")
 
-                copyfile("src/workspace.mel", self.directory + "/workspace.mel")
+                copyfile("src/workspace.mel", self.shot_directory + "/workspace.mel")
 
             elif self.software == "houdini":
-                makedirs(self.directory + "/abc")
+                makedirs(self.shot_directory + "/abc")
 
-                makedirs(self.directory + "/audio")
+                makedirs(self.shot_directory + "/audio")
 
-                makedirs(self.directory + "/backup")
+                makedirs(self.shot_directory + "/backup")
 
-                makedirs(self.directory + "/comp")
+                makedirs(self.shot_directory + "/comp")
 
-                makedirs(self.directory + "/desk")
+                makedirs(self.shot_directory + "/desk")
 
-                makedirs(self.directory + "/flip")
+                makedirs(self.shot_directory + "/flip")
 
-                makedirs(self.directory + "/geo")
+                makedirs(self.shot_directory + "/geo")
 
-                makedirs(self.directory + "/hda")
+                makedirs(self.shot_directory + "/hda")
 
-                makedirs(self.directory + "/render")
+                makedirs(self.shot_directory + "/render")
 
-                makedirs(self.directory + "/scripts")
+                makedirs(self.shot_directory + "/scripts")
 
-                makedirs(self.directory + "/sim")
+                makedirs(self.shot_directory + "/sim")
 
-                makedirs(self.directory + "/tex")
+                makedirs(self.shot_directory + "/tex")
 
-                makedirs(self.directory + "/video")
+                makedirs(self.shot_directory + "/video")
 
         else:
-            if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
-                open(self.directory + "/superpipe/versions_data.spi", "a").close()
+            if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
+                open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
-            if not path.isfile(self.directory + "/superpipe/shot_data.spi"):
-                with open(self.directory + "/superpipe/shot_data.spi", "w") as f:
+            if not path.isfile(self.shot_directory + "/superpipe/shot_data.spi"):
+                with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
                     f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
                 f.close()
 
-            if not Resources.readLine(self.directory + "/superpipe/shot_data.spi", 4):
-                Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", "200", 4)
+            if not Resources.readLine(self.shot_directory + "/superpipe/shot_data.spi", 4):
+                Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", "200", 4)
 
             shot_infos = []
-            with open(self.directory + "/superpipe/shot_data.spi", "r") as f:
+            with open(self.shot_directory + "/superpipe/shot_data.spi", "r") as f:
                 for l in f:
                     shot_infos.append(l.strip("\n"))
             f.close()
@@ -133,6 +134,12 @@ class Shot:
             else:
                 self.software = "maya"
 
+        if not path.isdir(self.postprod_directory):
+            makedirs(self.postprod_directory)
+
+            makedirs(self.postprod_directory + "/input")
+            makedirs(self.postprod_directory + "/output")
+
     def getShotNb(self):
         return self.shot_nb
 
@@ -140,7 +147,7 @@ class Shot:
         return self.shot_name
 
     def getDirectory(self):
-        return self.directory
+        return self.shot_directory
 
     def getSequence(self):
         return self.sequence
@@ -155,10 +162,10 @@ class Shot:
         return self.frame_range
 
     def getComment(self, version_file):
-        if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
-                open(self.directory + "/superpipe/versions_data.spi", "a").close()
+        if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
+                open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
         else:
-            with open(self.directory + "/superpipe/versions_data.spi", "r") as f:
+            with open(self.shot_directory + "/superpipe/versions_data.spi", "r") as f:
                 all_comments = f.read()
             f.close()
 
@@ -181,60 +188,60 @@ class Shot:
             return False
 
     def setShot(self, res):
-        copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
+        copyfile("src/set_up_file_shot.ma", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
 
-        Resources.insertAtLine(self.directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+        Resources.insertAtLine(self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 
     def setFrameRange(self, frame_range):
         self.frame_range = frame_range
 
-        if path.isdir(self.directory + "/scenes/.mayaSwatches"):
-                    rmtree(self.directory + "/scenes/.mayaSwatches")
+        if path.isdir(self.shot_directory + "/scenes/.mayaSwatches"):
+                    rmtree(self.shot_directory + "/scenes/.mayaSwatches")
 
-        Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", str(self.frame_range), 4)
+        Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.frame_range), 4)
 
-        for file in listdir(self.directory + "/scenes/"):
+        for file in listdir(self.shot_directory + "/scenes/"):
             if ".ma" in file:
-                Resources.insertAtLine(self.directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
+                Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
 
     def setResolution(self, res):
-        if path.isdir(self.directory + "/scenes/.mayaSwatches"):
-                    rmtree(self.directory + "/scenes/.mayaSwatches")
+        if path.isdir(self.shot_directory + "/scenes/.mayaSwatches"):
+                    rmtree(self.shot_directory + "/scenes/.mayaSwatches")
 
-        for file in listdir(self.directory + "/scenes/"):
+        for file in listdir(self.shot_directory + "/scenes/"):
             if ".ma" in file:
-                Resources.insertAtLine(self.directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+                Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 
     def isSet(self):
-        for shot_file in listdir(self.directory + "/scenes/"):
+        for shot_file in listdir(self.shot_directory + "/scenes/"):
             if shot_file[-3:] == ".ma":
                 return True
 
         return False
 
     def deleteShot(self):
-        copytree(self.directory, self.directory +"/../backup/" + self.shot_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
-        rmtree(self.directory)
+        copytree(self.shot_directory, self.shot_directory +"/../backup/" + self.shot_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
+        rmtree(self.shot_directory)
 
     def getVersionsList(self, last_only):
         versions_list = []
-        for shot_file in listdir(self.directory + "/scenes/"):
+        for shot_file in listdir(self.shot_directory + "/scenes/"):
             if not "reference" in shot_file:
                 if shot_file[-3:] == ".ma":
-                    versions_list.append((path.getmtime(self.directory + "/scenes/" + shot_file), shot_file))
+                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
         if not last_only:
-            for shot_file in listdir(self.directory + "/scenes/edits/"):
+            for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
                 if shot_file[-3:] == ".ma":
-                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + shot_file), shot_file))
+                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
 
     def renameShot(self, new_name):
-        new_dir = path.dirname(self.directory) + "/" + new_name
+        new_dir = path.dirname(self.shot_directory) + "/" + new_name
 
         if not path.isdir(new_dir):
-            rename(self.directory, new_dir)
+            rename(self.shot_directory, new_dir)
 
             for f in listdir(new_dir + "/scenes/"):
                 if self.shot_name in f:
@@ -254,17 +261,17 @@ class Shot:
 
     def setDone(self, done):
         self.done = done
-        Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", str(self.done), 1)
+        Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.done), 1)
 
     def setPriority(self, priority):
         self.priority = priority
-        Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", self.priority, 2)
+        Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.priority, 2)
 
     def upgrade(self):
         version = 0
         version_str = ""
 
-        for file in listdir(self.directory + "/images/screenshots/"):
+        for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
                 if not "small" in file:
                     tmp_version_str = file.strip(".gif")[-2:]
@@ -279,40 +286,40 @@ class Shot:
         elif self.step == "Splining":
             self.step = "Rendering"
 
-        Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", self.step, 3)
+        Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
 
-        for file in listdir(self.directory + "/scenes/"):
+        for file in listdir(self.shot_directory + "/scenes/"):
             if file[:6] == self.shot_name:
                 file_to_upgrade = file
 
         if self.step == "Blocking":
-            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
+            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
             if version != 0:
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.gif")
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01_small.gif")
         elif self.step == "Splining":
-            copyfile(self.directory + "/scenes/" + file_to_upgrade, self.directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
+            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
             if version != 0:
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.gif")
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.gif")
         elif self.step == "Rendering":
-            copyfile("src/set_up_file_shot.ma", self.directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
+            copyfile("src/set_up_file_shot.ma", self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
             if version != 0:
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.gif")
-                copyfile(self.directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.gif", self.directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.gif")
 
     def downgrade(self):
-        for file in listdir(self.directory + "/scenes/"):
+        for file in listdir(self.shot_directory + "/scenes/"):
             if self.step.lower() in file:
-                rename(self.directory +"/scenes/" + file, self.directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
 
-        for file in listdir(self.directory + "/scenes/edits/"):
+        for file in listdir(self.shot_directory + "/scenes/edits/"):
             if self.step.lower() in file:
-                rename(self.directory +"/scenes/edits/" + file, self.directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
 
-        for file in listdir(self.directory + "/images/screenshots/"):
+        for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
-                remove(self.directory + "/images/screenshots/" + file)
+                remove(self.shot_directory + "/images/screenshots/" + file)
 
         if self.step == "Blocking":
             self.step = "Layout"
@@ -321,4 +328,4 @@ class Shot:
         elif self.step == "Rendering":
             self.step = "Splining"
 
-        Resources.writeAtLine(self.directory + "/superpipe/shot_data.spi", self.step, 3)
+        Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
