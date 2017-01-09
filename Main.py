@@ -87,20 +87,23 @@ class SuperPipe(Frame):
         self.pack(fill = "both", expand = True)
 
         self.parent.bind("<F5>", self.refresh)
+        self.parent.bind("<Control-n>", self.newProjectCommand)
+        self.parent.bind("s", self.setProjectCommand)
+        self.parent.bind("<Control-p>", self.preferencesCommand)
 
         menu_bar = Menu(self.parent)
 
         menu_file = Menu(menu_bar, tearoff = 0)
-        menu_file.add_command(label="New project", command = self.newProjectCommand)
-        menu_file.add_command(label="Set project", command = self.setProjectCommand)
+        menu_file.add_command(label = "New project", command = self.newProjectCommand, accelerator = "Ctrl+N")
+        menu_file.add_command(label = "Set project", command = self.setProjectCommand, accelerator = "S")
         menu_file.add_separator()
-        # menu_file.add_command(label="Update project", command = self.updateProjectCommand)
+        # menu_file.add_command(label = "Update project", command = self.updateProjectCommand)
         # menu_file.add_separator()
-        menu_file.add_command(label="Quit", command = self.parent.destroy)
-        menu_bar.add_cascade(label="File", menu = menu_file)
+        menu_file.add_command(label = "Quit", command = self.parent.destroy)
+        menu_bar.add_cascade(label = "File", menu = menu_file)
 
         menu_edit = Menu(menu_bar, tearoff = 0)
-        menu_edit.add_command(label = "Preferences", command = self.preferencesCommand)
+        menu_edit.add_command(label = "Preferences", command = self.preferencesCommand, accelerator = "Ctrl + P")
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
 
         self.menu_project = Menu(menu_bar, tearoff = 0)
@@ -599,7 +602,7 @@ class SuperPipe(Frame):
         pw_main.update()
         pw_main.sash_place(1, 1650, 0)
 
-    def newProjectCommand(self):
+    def newProjectCommand(self, e = None):
         directory = {"dir":""}
 
         dialog = lambda: NewProjectDialog.NewProjectDialog(self.parent, (directory, "dir"))
@@ -627,7 +630,7 @@ class SuperPipe(Frame):
             self.updateShotListView()
             self.updateAssetListView()
 
-    def setProjectCommand(self):
+    def setProjectCommand(self, e = None):
         directory = filedialog.askdirectory(title = "New project", mustexist  = False)
 
         self.parent.config(cursor = "wait")
@@ -1543,7 +1546,7 @@ class SuperPipe(Frame):
         if settings["res"]:            
             self.current_project.setResolution(settings["res"])
 
-    def preferencesCommand(self):
+    def preferencesCommand(self, e = None):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
             with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
                 f.write("www.google.fr\n")
