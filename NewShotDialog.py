@@ -29,7 +29,7 @@ class NewShotDialog(object):
         top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
-        label = Label(top_frame, text = "Select sequence", bg = self.main_color)
+        label = Label(top_frame, text = "Select sequence", bg = self.main_color, fg = self.text_color)
         label.pack(padx = 4, pady = 4)
 
         self.sequence_list = Listbox(top_frame, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)

@@ -35,6 +35,8 @@ class NewAssetDialog(object):
         top_frame.rowconfigure(2, pad = 5)
         top_frame.rowconfigure(3, pad = 5)
         top_frame.rowconfigure(4, pad = 5)
+        top_frame.rowconfigure(5, pad = 5)
+        top_frame.rowconfigure(6, pad = 5)
 
         label = Label(top_frame, text = "Select asset software", bg = self.main_color, fg = self.text_color)
         label.grid(row = 0, column = 0, columnspan = 2)
@@ -75,13 +77,13 @@ class NewAssetDialog(object):
 
         submit_button = Button(top_frame, text = "Create asset", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 12, height = 1)
         submit_button["command"] = lambda: self.submit(dict_key)
-        submit_button.grid(row = 6, column = 0, sticky = W)
+        submit_button.grid(row = 6, column = 0, sticky = W, pady = (10, 0))
 
         self.top.bind("<Return>", lambda event, a = dict_key:self.submit(a))
 
         cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
-        cancel_button.grid(row = 6, column = 1, sticky = E)
+        cancel_button.grid(row = 6, column = 1, sticky = E, pady = (10, 0))
 
         self.top.bind("<Escape>", lambda event: self.top.destroy())
 

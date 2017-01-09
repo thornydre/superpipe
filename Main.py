@@ -88,18 +88,20 @@ class SuperPipe(Frame):
 
         self.parent.bind("<F5>", self.refresh)
         self.parent.bind("<Control-n>", self.newProjectCommand)
-        self.parent.bind("s", self.setProjectCommand)
+        self.parent.bind("<Control-o>", self.setProjectCommand)
         self.parent.bind("<Control-p>", self.preferencesCommand)
+        self.parent.bind("a", self.addAssetCommand)
+        self.parent.bind("s", self.addShotCommand)
 
         menu_bar = Menu(self.parent)
 
         menu_file = Menu(menu_bar, tearoff = 0)
         menu_file.add_command(label = "New project", command = self.newProjectCommand, accelerator = "Ctrl+N")
-        menu_file.add_command(label = "Set project", command = self.setProjectCommand, accelerator = "S")
+        menu_file.add_command(label = "Set project", command = self.setProjectCommand, accelerator = "Ctrl+O")
         menu_file.add_separator()
         # menu_file.add_command(label = "Update project", command = self.updateProjectCommand)
         # menu_file.add_separator()
-        menu_file.add_command(label = "Quit", command = self.parent.destroy)
+        menu_file.add_command(label = "Quit", command = self.parent.destroy, accelerator = "Alt+F4")
         menu_bar.add_cascade(label = "File", menu = menu_file)
 
         menu_edit = Menu(menu_bar, tearoff = 0)
@@ -107,8 +109,8 @@ class SuperPipe(Frame):
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
 
         self.menu_project = Menu(menu_bar, tearoff = 0)
-        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand)
-        self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand)
+        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand, accelerator = "A")
+        self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand, accelerator = "S")
         self.menu_project.add_separator()
         self.menu_project.add_command(label = "Project settings", state = DISABLED, command = self.projectSettingsCommand)
         self.menu_project.add_separator()
@@ -794,7 +796,7 @@ class SuperPipe(Frame):
 
             self.updateVersionListView()
 
-    def addShotCommand(self):
+    def addShotCommand(self, e = None):
         sequence = {"seq": 0}
 
         dialog = lambda: NewShotDialog.NewShotDialog(self.parent, self.current_project, (sequence, "seq"))
@@ -806,7 +808,7 @@ class SuperPipe(Frame):
             self.shot_list.select_set(shot_nb - 1)
             self.shotlistCommand(None)
 
-    def addAssetCommand(self):
+    def addAssetCommand(self, e = None):
         asset = {"cat": None, "name" : None, "software" : None}
 
         dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, (asset, "cat", "name", "software"))
@@ -918,7 +920,7 @@ class SuperPipe(Frame):
                     self.upgrade_shot_button.config(state = DISABLED)
                     self.downgrade_shot_button.config(state = NORMAL)
 
-                pict_path = shot.getDirectory() + "/images/screenshots/" + self.version_list.get(self.version_list.curselection()[0]).strip(".ma") + ".gif"
+                pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".gif"
 
                 selected_line = self.version_list.curselection()[0]
                 if self.current_project.getSelectionType() == "shot":
@@ -930,7 +932,7 @@ class SuperPipe(Frame):
 
                 self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-                temp_path = self.current_project.getSelection().getDirectory() + "/cache/alembic/" + self.version_list.get(selected_line).strip(".ma") + ".abc"
+                temp_path = self.current_project.getSelection().getDirectory() + "/cache/alembic/" + path.splitext(self.version_list.get(selected_line))[0] + ".abc"
 
                 if not path.isfile(temp_path):
                     temp_path = ""
@@ -1125,7 +1127,7 @@ class SuperPipe(Frame):
 
             self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + selected_version.strip(".ma") + ".gif"
+            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + path.splitext(selected_version)[0] + ".gif"
 
             if self.current_project.getSelectionType() == "shot":
                 self.var_shot_version_comment.set(self.current_project.getSelection().getComment(selected_version))

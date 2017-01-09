@@ -1,3 +1,0 @@
-menu -l "SuperPipe" -p "MayaWindow";
-menuItem -l "Increment and Save";
-menuItem -l "Save";

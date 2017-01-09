@@ -196,12 +196,12 @@ class Asset:
     def isSet(self):
         if self.software == "maya":
             for asset_file in listdir(self.directory + "/scenes/"):
-                if asset_file[-3:] == ".ma":
+                if path.splitext(asset_file)[1] == ".ma":
                     return True
 
         elif self.software == "houdini":
             for asset_file in listdir(self.directory):
-                if asset_file[-4:] == ".hip":
+                if path.splitext(asset_file)[1] == ".hip":
                     return True
 
         return False
@@ -216,22 +216,22 @@ class Asset:
         if self.software == "maya":
             for asset_file in listdir(self.directory + "/scenes/"):
                 if not "reference" in asset_file:
-                    if asset_file[-3:] == ".ma":
+                    if path.splitext(asset_file)[1] == ".ma":
                         versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/scenes/edits/"):
-                    if asset_file[-3:] == ".ma":
+                    if path.splitext(asset_file)[1] == ".ma":
                         versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         elif self.software == "houdini":
             for asset_file in listdir(self.directory + "/"):
-                if asset_file[-4:] == ".hip":
+                if path.splitext(asset_file)[1] == ".hip":
                     versions_list.append((path.getmtime(self.directory + "/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/backup/"):
-                    if asset_file[-4:] == ".hip":
+                    if path.splitext(asset_file)[1] == ".hip":
                         versions_list.append((path.getmtime(self.directory + "/backup/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)

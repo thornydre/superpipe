@@ -78,11 +78,11 @@ class ProjectSettingsDialog(object):
         ## SAVE/CANCEL ##
         save_button = Button(top_frame, text = "Save", bg = self.button_color1, activebackground = self.over_button_color1, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1)
         save_button["command"] = lambda: self.saveEntry(dict_key)
-        save_button.grid(row = 2, column = 0, columnspan = 2, sticky = W)
+        save_button.grid(row = 2, column = 0, columnspan = 2, sticky = W, pady = (10, 0))
 
         cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
-        cancel_button.grid(row = 2, column = 4, sticky = E)
+        cancel_button.grid(row = 2, column = 4, sticky = E, pady = (10, 0))
 
         self.top.bind("<Escape>", lambda event: self.top.destroy())
 

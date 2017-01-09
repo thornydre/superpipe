@@ -201,7 +201,7 @@ class Shot:
         Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.frame_range), 4)
 
         for file in listdir(self.shot_directory + "/scenes/"):
-            if ".ma" in file:
+            if path.splitext(file)[1] == ".ma":
                 Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
 
     def setResolution(self, res):
@@ -209,12 +209,12 @@ class Shot:
                     rmtree(self.shot_directory + "/scenes/.mayaSwatches")
 
         for file in listdir(self.shot_directory + "/scenes/"):
-            if ".ma" in file:
+            if path.splitext(file)[1] == ".ma":
                 Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 
     def isSet(self):
         for shot_file in listdir(self.shot_directory + "/scenes/"):
-            if shot_file[-3:] == ".ma":
+            if path.splitext(shot_file)[1] == ".ma":
                 return True
 
         return False
@@ -227,12 +227,12 @@ class Shot:
         versions_list = []
         for shot_file in listdir(self.shot_directory + "/scenes/"):
             if not "reference" in shot_file:
-                if shot_file[-3:] == ".ma":
+                if path.splitext(shot_file)[1] == ".ma":
                     versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
         if not last_only:
             for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
-                if shot_file[-3:] == ".ma":
+                if path.splitext(shot_file)[1] == ".ma":
                     versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
@@ -274,7 +274,7 @@ class Shot:
         for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
                 if not "small" in file:
-                    tmp_version_str = file.strip(".gif")[-2:]
+                    tmp_version_str = path.splitext(file)[0][-2:]
                     if int(tmp_version_str) > version:
                         version = int(tmp_version_str)
                         version_str = tmp_version_str
@@ -311,11 +311,11 @@ class Shot:
     def downgrade(self):
         for file in listdir(self.shot_directory + "/scenes/"):
             if self.step.lower() in file:
-                rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
 
         for file in listdir(self.shot_directory + "/scenes/edits/"):
             if self.step.lower() in file:
-                rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + file.strip(".ma") + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
 
         for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
