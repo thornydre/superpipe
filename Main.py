@@ -90,8 +90,8 @@ class SuperPipe(Frame):
         self.parent.bind("<Control-n>", self.newProjectCommand)
         self.parent.bind("<Control-o>", self.setProjectCommand)
         self.parent.bind("<Control-p>", self.preferencesCommand)
-        self.parent.bind("a", self.addAssetCommand)
-        self.parent.bind("s", self.addShotCommand)
+        self.parent.bind("<Control-a>", self.addAssetCommand)
+        self.parent.bind("<Control-s>", self.addShotCommand)
 
         menu_bar = Menu(self.parent)
 
@@ -105,12 +105,12 @@ class SuperPipe(Frame):
         menu_bar.add_cascade(label = "File", menu = menu_file)
 
         menu_edit = Menu(menu_bar, tearoff = 0)
-        menu_edit.add_command(label = "Preferences", command = self.preferencesCommand, accelerator = "Ctrl + P")
+        menu_edit.add_command(label = "Preferences", command = self.preferencesCommand, accelerator = "Ctrl+P")
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
 
         self.menu_project = Menu(menu_bar, tearoff = 0)
-        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand, accelerator = "A")
-        self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand, accelerator = "S")
+        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand, accelerator = "Ctrl+A")
+        self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand, accelerator = "Ctrl+S")
         self.menu_project.add_separator()
         self.menu_project.add_command(label = "Project settings", state = DISABLED, command = self.projectSettingsCommand)
         self.menu_project.add_separator()
@@ -210,8 +210,9 @@ class SuperPipe(Frame):
 
         self.main_area_shot.rowconfigure(0, pad = 20, minsize = 75)
         self.main_area_shot.rowconfigure(1, pad = 5, minsize = 75)
-        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 410)
-        self.main_area_shot.rowconfigure(3, pad = 5, minsize = 50)
+        self.main_area_shot.rowconfigure(2, pad = 5, minsize = 75)
+        self.main_area_shot.rowconfigure(3, pad = 5, minsize = 410)
+        self.main_area_shot.rowconfigure(4, pad = 5, minsize = 50)
 
         ## SHOT INFOS ##
         self.up_down_shot = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
@@ -253,7 +254,7 @@ class SuperPipe(Frame):
 
         self.var_frame_range = StringVar()
 
-        self.frame_range_entry = Entry(self.main_area_shot, relief = FLAT, bg = self.button_color2, bd = 5, width = 6, justify = CENTER, validate="key", validatecommand = (self.register(self.validateFrameRangeEntry), '%P', '%S'))
+        self.frame_range_entry = Entry(self.main_area_shot, relief = FLAT, bg = self.button_color2, bd = 5, width = 6, justify = CENTER, validate = "key", validatecommand = (self.register(self.validateFrameRangeEntry), '%P', '%S'))
         self.frame_range_entry.grid(row = 0, column = 3)
         self.frame_range_entry.pi = self.frame_range_entry.grid_info()
         self.frame_range_entry.grid_forget()
@@ -274,9 +275,24 @@ class SuperPipe(Frame):
         shot_show_last_only_button = Checkbutton(self.main_area_shot, text = "Show only last versions", variable = self.var_check_show_last, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleLastVersions)
         shot_show_last_only_button.grid(row = 0, column = 6, sticky = E)
 
+        ## SHOT DESCRIPTION ##
+        self.shot_description_line = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
+        self.shot_description_line.grid(row = 1, column = 0, columnspan = 7, sticky = W + E, pady = 10)
+
+        self.shot_description_line.columnconfigure(0, pad = 10)
+        self.shot_description_line.columnconfigure(1, pad = 10, weight = 1)
+        self.shot_description_line.columnconfigure(2, pad = 10)
+
+        shot_description_label = Label(self.shot_description_line, text = "Shot description :", bg = self.second_color, fg = self.text_color, height = 1, pady = 10, anchor = NW, font = "Helvetica 9 bold")
+        shot_description_label.grid(row = 0, column = 1)
+
+        self.var_shot_description = StringVar()
+        self.shot_description_entry = Entry(self.shot_description_line, textvariable = self.var_shot_description, state = "readonly", readonlybackground = self.main_color, relief = FLAT, bg = self.main_color, fg = self.text_color, width = 750, bd = 5, validate = "key", validatecommand = (self.register(self.validateDescriptionEntry), '%P'))
+        self.shot_description_entry.grid(row = 1, column = 1, sticky = N, pady = (0, 20), padx = 100)
+
         ## SHOT STATE ##
         self.shot_state_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
-        self.shot_state_line.grid(row = 1, column = 0, columnspan = 7, sticky = W + E, pady = 10)
+        self.shot_state_line.grid(row = 2, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
         self.shot_state_line.columnconfigure(1, pad = 10, minsize = 100)
@@ -335,7 +351,7 @@ class SuperPipe(Frame):
 
         ## PICTURES ##
         self.pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
-        self.pictures_shot.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
+        self.pictures_shot.grid(row = 3, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
         self.pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
         self.pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
@@ -361,7 +377,7 @@ class SuperPipe(Frame):
 
         ## SHOT VERSION ACTIONS ##
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
-        self.shot_actions_line.grid(row = 3, column = 0, columnspan = 7, sticky = W + E, pady = 10)
+        self.shot_actions_line.grid(row = 4, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_actions_line.columnconfigure(0, pad = 10)
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
@@ -374,7 +390,7 @@ class SuperPipe(Frame):
 
         ## SHOT VERSION INFOS ##
         self.shot_version_management_line = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
-        self.shot_version_management_line.grid(row = 4, column = 0, columnspan = 7, sticky = W + E, pady = 10)
+        self.shot_version_management_line.grid(row = 5, column = 0, columnspan = 7, sticky = W + E, pady = 10)
 
         self.shot_version_management_line.columnconfigure(0, pad = 10)
         self.shot_version_management_line.columnconfigure(1, pad = 10, weight = 1)
@@ -390,7 +406,7 @@ class SuperPipe(Frame):
 
         ## PATHS ##
         self.shot_paths_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
-        self.shot_paths_line.grid(row = 5, column = 0, columnspan = 7, sticky = W + E, pady = 10, padx = 20)
+        self.shot_paths_line.grid(row = 6, column = 0, columnspan = 7, sticky = W + E, pady = 10, padx = 20)
 
         self.shot_paths_line.columnconfigure(0, pad = 10, weight = 1)
 
@@ -876,6 +892,14 @@ class SuperPipe(Frame):
             self.priority_shot_menu.grid(self.priority_shot_menu.pi)
             self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
+            shot_description = Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 6)
+            if shot_description:
+                self.var_shot_description.set(shot_description)
+            else:
+                self.var_shot_description.set("")
+
+            self.shot_description_entry.config(state = NORMAL)
+
             if shot.isSet():
                 self.set_shot_button.grid_forget()
                 self.frame_range_entry.grid(self.frame_range_entry.pi)
@@ -1243,18 +1267,23 @@ class SuperPipe(Frame):
         shots = self.current_project.getShotList()
 
         for shot in shots:
-            self.shot_list.insert(shot[0], shot[1])
+            if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
+                self.shot_list.insert(shot[0], shot[1])
 
-            cur_shot = Shot(self.current_project.getDirectory(), shot[1])
+                cur_shot = Shot(self.current_project.getDirectory(), shot[1])
 
-            if cur_shot.isDone():
-                self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
-            elif cur_shot.getPriority() == "Urgent":
-                self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
-            elif cur_shot.getPriority() == "High":
-                self.shot_list.itemconfig(shot[0] - 1, bg = "#EFB462", selectbackground = "#997646")
-            elif cur_shot.getPriority() == "Medium":
-                self.shot_list.itemconfig(shot[0] - 1, bg = "#F4E255", selectbackground = "#9B9145")
+                if cur_shot.isDone():
+                    self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
+                elif cur_shot.getPriority() == "Urgent":
+                    self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
+                elif cur_shot.getPriority() == "High":
+                    self.shot_list.itemconfig(shot[0] - 1, bg = "#EFB462", selectbackground = "#997646")
+                elif cur_shot.getPriority() == "Medium":
+                    self.shot_list.itemconfig(shot[0] - 1, bg = "#F4E255", selectbackground = "#9B9145")
+
+            else:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The shot " + shot[1] + " has a problem !", padding = 20)
+                self.wait_window(dialog().top)
             
     def updateAssetListView(self):
         for child in self.asset_list.get_children("character"):
@@ -1270,25 +1299,30 @@ class SuperPipe(Frame):
 
         for asset in assets:
             if asset[0] != "backup":
-                cur_asset = Asset(self.current_project.getDirectory(), asset[1], asset[0])
+                print(self.current_project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe")
+                if path.isdir(self.current_project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
+                    cur_asset = Asset(self.current_project.getDirectory(), asset[1], asset[0])
 
-                asset_subfolders = asset[1].split("/")
+                    asset_subfolders = asset[1].split("/")
 
-                for i in range(len(asset_subfolders)):
-                    if not self.asset_list.exists(asset_subfolders[i].lower()):
-                        if i > 0:
-                            self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
+                    for i in range(len(asset_subfolders)):
+                        if not self.asset_list.exists(asset_subfolders[i].lower()):
+                            if i > 0:
+                                self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
 
-                if cur_asset.isDone():
-                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
-                elif cur_asset.getPriority() == "Urgent":
-                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("urgent"))
-                elif cur_asset.getPriority() == "High":
-                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("high"))
-                elif cur_asset.getPriority() == "Medium":
-                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("medium"))
+                    if cur_asset.isDone():
+                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
+                    elif cur_asset.getPriority() == "Urgent":
+                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("urgent"))
+                    elif cur_asset.getPriority() == "High":
+                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("high"))
+                    elif cur_asset.getPriority() == "Medium":
+                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("medium"))
+                    else:
+                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0])
                 else:
-                    self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0])
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The asset \"" + asset[0] + "\" has a problem !", padding = 20)
+                    self.wait_window(dialog().top)
 
     def updateVersionListView(self, shot = None, asset = None):
         self.version_list.delete(0, END)
@@ -1484,6 +1518,12 @@ class SuperPipe(Frame):
             self.bell()
 
         return valid
+
+    def validateDescriptionEntry(self, P):
+        if self.current_project:
+            Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", P, 6)
+
+        return True
 
     def customButtonCommand(self):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):

@@ -44,7 +44,7 @@ global proc shelf_Superpipe () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Save the scene by incrementation it and put a screenshot into the Superpipe software" 
+        -annotation "Save the scene by incrementing it and put a screenshot into the Superpipe software" 
         -enableBackground 0
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
