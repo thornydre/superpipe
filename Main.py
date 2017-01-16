@@ -822,7 +822,7 @@ class SuperPipe(Frame):
             shot_nb = self.current_project.createShot(sequence["seq"])
             self.updateShotListView()
             self.shot_list.select_set(shot_nb - 1)
-            self.shotlistCommand(None)
+            self.shotlistCommand()
 
     def addAssetCommand(self, e = None):
         asset = {"cat": None, "name" : None, "software" : None}
@@ -844,7 +844,7 @@ class SuperPipe(Frame):
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Asset already exists", "The asset \"" + asset["name"] + "\" already exists")
                 self.wait_window(dialog().top)
 
-    def shotlistCommand(self, e):
+    def shotlistCommand(self, e = None):
         if self.shot_list.size() != 0:
             selected_line = self.shot_list.curselection()[0]
             selected_shot = self.shot_list.get(selected_line)
@@ -1299,7 +1299,6 @@ class SuperPipe(Frame):
 
         for asset in assets:
             if asset[0] != "backup":
-                print(self.current_project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe")
                 if path.isdir(self.current_project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
                     cur_asset = Asset(self.current_project.getDirectory(), asset[1], asset[0])
 
@@ -1348,7 +1347,7 @@ class SuperPipe(Frame):
         self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
-        self.shotlistCommand(None)
+        self.shotlistCommand()
 
     def moveShotDownCommand(self):
         self.current_project.moveShotDown(self.current_project.getSelection().getShotName())
@@ -1357,7 +1356,7 @@ class SuperPipe(Frame):
         self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
-        self.shotlistCommand(None)
+        self.shotlistCommand()
 
     def toggleLastVersions(self):
         if self.current_project.getSelectionType() == "shot":
@@ -1484,7 +1483,7 @@ class SuperPipe(Frame):
         elif self.current_project.getSelection().getStep() == "Rendering":
             self.upgrade_shot_button.config(state = DISABLED)
 
-        self.shotlistCommand(None)
+        self.shotlistCommand()
 
     def downgradeShotCommand(self):
         yesno = {"result" : ""}
@@ -1501,7 +1500,7 @@ class SuperPipe(Frame):
             elif self.current_project.getSelection().getStep() == "Rendering":
                 self.upgrade_shot_button.config(state = DISABLED)
 
-            self.shotlistCommand(None)
+            self.shotlistCommand()
 
     def setShotFrameRangeCommand(self):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
