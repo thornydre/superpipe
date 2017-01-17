@@ -126,3 +126,18 @@ class Resources:
             for l in new_lines:
                 f.write(l)
         f.close()
+
+    def resizeImage(img, size_limit):
+        ori_width, ori_height = img.size
+
+        new_width = size_limit
+        new_height = size_limit
+
+        if ori_width > ori_height:
+            new_height = round(new_width / ori_width * ori_height)
+        elif ori_height > ori_width:
+            new_width = round(new_height / ori_height * ori_width)
+
+        resized_img = img.resize((new_width, new_height))
+
+        return resized_img

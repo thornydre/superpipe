@@ -295,18 +295,18 @@ class Shot:
         if self.step == "Blocking":
             copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
             if version != 0:
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.gif")
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.jpg")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + "_small.jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01_small.jpg")
         elif self.step == "Splining":
             copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
             if version != 0:
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.gif")
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.jpg")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + "_small.jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01_small.jpg")
         elif self.step == "Rendering":
             copyfile("src/set_up_file_shot.ma", self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
             if version != 0:
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.gif")
-                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.gif", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.gif")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.jpg")
+                copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + "_small.jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01_small.jpg")
 
     def downgrade(self):
         for file in listdir(self.shot_directory + "/scenes/"):

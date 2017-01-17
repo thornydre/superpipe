@@ -9,6 +9,7 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from os import path, mkdir
 from urllib.parse import urlsplit
+from PIL import Image, ImageTk 
 
 import NewShotDialog
 import NewAssetDialog
@@ -944,7 +945,7 @@ class SuperPipe(Frame):
                     self.upgrade_shot_button.config(state = DISABLED)
                     self.downgrade_shot_button.config(state = NORMAL)
 
-                pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".gif"
+                pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
 
                 selected_line = self.version_list.curselection()[0]
                 if self.current_project.getSelectionType() == "shot":
@@ -964,7 +965,7 @@ class SuperPipe(Frame):
                 self.var_selection_abc_path_label.set(temp_path.replace("/", "\\"))
 
                 if path.isfile(pict_path):
-                    pict = PhotoImage(file = pict_path)
+                    pict = ImageTk.PhotoImage(file = pict_path)
 
                     self.shot_gifdict[pict_path] = pict
 
@@ -1009,15 +1010,14 @@ class SuperPipe(Frame):
                             all_picts_path_array = []
 
                             for f in listdir(all_picts_path):
-                                if ".gif" in f:
-                                    if "small.gif" not in f:
-                                        all_picts_path_array.append(all_picts_path + f)
+                                if ".jpg" in f:
+                                    all_picts_path_array.append(all_picts_path + f)
 
                             if all_picts_path_array:
                                 prev_pict_path = max(all_picts_path_array, key = path.getmtime)
 
             if path.isfile(prev_pict_path):
-                pict = PhotoImage(file = prev_pict_path)
+                pict = ImageTk.PhotoImage(file = prev_pict_path)
 
                 self.shot_prev_gifdict[prev_pict_path] = pict
 
@@ -1090,10 +1090,10 @@ class SuperPipe(Frame):
                         self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
                         self.done_asset_button.grid(self.done_asset_button.pi)
 
-                        pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".gif"
+                        pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
 
                         if path.isfile(pict_path):
-                            pict = PhotoImage(file = pict_path)
+                            pict = ImageTk.PhotoImage(file = pict_path)
 
                             self.asset_gifdict[pict_path] = pict
 
@@ -1151,13 +1151,13 @@ class SuperPipe(Frame):
 
             self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + path.splitext(selected_version)[0] + ".gif"
+            pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + path.splitext(selected_version)[0] + ".jpg"
 
             if self.current_project.getSelectionType() == "shot":
                 self.var_shot_version_comment.set(self.current_project.getSelection().getComment(selected_version))
 
                 if path.isfile(pict_path):
-                    pict = PhotoImage(file = pict_path)
+                    pict = ImageTk.PhotoImage(file = pict_path)
 
                     self.shot_gifdict[pict_path] = pict
 
@@ -1171,7 +1171,7 @@ class SuperPipe(Frame):
                 self.var_asset_version_comment_label.set(self.current_project.getSelection().getComment(selected_version))
 
                 if path.isfile(pict_path):
-                    pict = PhotoImage(file = pict_path)
+                    pict = ImageTk.PhotoImage(file = pict_path)
 
                     self.asset_gifdict[pict_path] = pict
 
@@ -1446,20 +1446,23 @@ class SuperPipe(Frame):
                 all_picts_path_array = []
 
                 for f in listdir(all_picts_path):
-                    if "small.gif" in f:
-                        all_picts_path_array.append(all_picts_path + f)
+                    all_picts_path_array.append(all_picts_path + f)
 
                 cur_shot = Shot(self.current_project.getDirectory(), shot_dir)
 
                 if all_picts_path_array:
                     all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), max(all_picts_path_array, key = path.getmtime)])
                 else:
-                    all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.gif"])
+                    all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.jpg"])
 
         for nb, name, img in all_shots_preview:
-            shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.second_color, bd = 0, highlightthickness = 0)
+            shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.main_color, bd = 0, highlightthickness = 0)
 
-            pict = PhotoImage(file = img)
+            to_edit_pict = Image.open(img)
+
+            edited_pict = Resources.resizeImage(to_edit_pict, 256)
+
+            pict = ImageTk.PhotoImage(edited_pict)
 
             self.preview_gifdict[nb] = pict
 
