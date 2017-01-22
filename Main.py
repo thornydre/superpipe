@@ -9,7 +9,7 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from os import path, mkdir
 from urllib.parse import urlsplit
-from PIL import Image, ImageTk 
+from PIL import Image, ImageTk
 
 import NewShotDialog
 import NewAssetDialog
@@ -21,6 +21,7 @@ import YesNoDialog
 import OkDialog
 import subprocess
 import webbrowser
+import queue
 
 class SuperPipe(Frame):
     def __init__(self, parent):
@@ -55,6 +56,7 @@ class SuperPipe(Frame):
 
         self.maya_path = Resources.readLine("save/options.spi", 2)
         self.houdini_path = Resources.readLine("save/options.spi", 3)
+        self.blender_path = Resources.readLine("save/options.spi", 4)
 
         self.initUI()
 
@@ -110,7 +112,7 @@ class SuperPipe(Frame):
         menu_bar.add_cascade(label = "Edit", menu = menu_edit)
 
         self.menu_project = Menu(menu_bar, tearoff = 0)
-        self.menu_project.add_command(label = "Add Asset", state = DISABLED, command = self.addAssetCommand, accelerator = "Ctrl+A")
+        self.menu_project.add_command(label = "Add asset", state = DISABLED, command = self.addAssetCommand, accelerator = "Ctrl+A")
         self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand, accelerator = "Ctrl+S")
         self.menu_project.add_separator()
         self.menu_project.add_command(label = "Project settings", state = DISABLED, command = self.projectSettingsCommand)
@@ -591,7 +593,7 @@ class SuperPipe(Frame):
         self.shots_preview_list.columnconfigure(3, pad = 25, weight = 1)
         self.shots_preview_list.columnconfigure(4, pad = 25, weight = 1)
 
-        scrollbar = Scrollbar(self.main_area_preview, orient = "vertical", bd = 0, command = self.preview_canva_scroll.yview)
+        scrollbar = ttk.Scrollbar(self.main_area_preview, orient = "vertical", command = self.preview_canva_scroll.yview)
         self.preview_canva_scroll.configure(yscrollcommand = scrollbar.set)
 
         scrollbar.pack(side = "right", fill = "y")
@@ -814,16 +816,21 @@ class SuperPipe(Frame):
             self.updateVersionListView()
 
     def addShotCommand(self, e = None):
-        sequence = {"seq": 0}
+        if len(self.current_project.getShotList()) >= 99:
+            dialog = lambda: OkDialog.OkDialog(self.parent, "No more shots", "Sorry ! Superpipe does not handle more than 99 shots at the moment")
+            self.wait_window(dialog().top)
 
-        dialog = lambda: NewShotDialog.NewShotDialog(self.parent, self.current_project, (sequence, "seq"))
-        self.wait_window(dialog().top)
+        else:
+            sequence = {"seq": 0}
 
-        if sequence["seq"]:
-            shot_nb = self.current_project.createShot(sequence["seq"])
-            self.updateShotListView()
-            self.shot_list.select_set(shot_nb - 1)
-            self.shotlistCommand()
+            dialog = lambda: NewShotDialog.NewShotDialog(self.parent, self.current_project, (sequence, "seq"))
+            self.wait_window(dialog().top)
+
+            if sequence["seq"]:
+                shot_nb = self.current_project.createShot(sequence["seq"])
+                self.updateShotListView()
+                self.shot_list.select_set(shot_nb - 1)
+                self.shotlistCommand()
 
     def addAssetCommand(self, e = None):
         asset = {"cat": None, "name" : None, "software" : None}
@@ -1238,30 +1245,51 @@ class SuperPipe(Frame):
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
                 self.wait_window(dialog().top)
 
+        elif asset.getSoftware() == "blender":
+            if path.isfile(self.houdini_path):
+                if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                    blender_file = asset.getDirectory() + "/" + selected_asset_version
+                else:
+                    blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
+
+                subprocess.Popen("%s %s" % (self.blender_path, blender_file))
+            else:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
+                self.wait_window(dialog().top)
+
     def renameAssetCommand(self):
         asset_name = {"name" : None}
 
         dialog = lambda: RenameAssetDialog.RenameAssetDialog(self.parent, (asset_name, "name"))
         self.wait_window(dialog().top)
 
+        valid_name = True
+
         if asset_name["name"]:
+            for check_asset in self.current_project.getAssetList():
+                if asset_name["name"] == check_asset[0]:
+                    valid_name = False
+                    break
+
+        if valid_name:
             self.parent.config(cursor = "wait")
             self.parent.update()
 
             asset = self.current_project.getSelection()
-            if asset.renameAsset(asset_name["name"]):
-                self.current_project.updateAssetList()
-                self.updateAssetListView()
+            asset.renameAsset(asset_name["name"])
 
-                self.asset_list.selection_set(asset_name["name"])
-                self.asset_list.focus_set()
-                self.asset_list.focus(asset_name["name"])
-                self.assetListCommand(None)
-            else:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
-                self.wait_window(dialog().top)
-            
+            self.current_project.updateAssetList()
+            self.updateAssetListView()
+
+            self.asset_list.selection_set(asset_name["name"])
+            self.asset_list.focus_set()
+            self.asset_list.focus(asset_name["name"])
+            self.assetListCommand(None)
+
             self.parent.config(cursor = "")
+        else:
+            dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
+            self.wait_window(dialog().top)
 
     def updateShotListView(self):
         self.shot_list.delete(0, END)
@@ -1343,6 +1371,12 @@ class SuperPipe(Frame):
                     self.version_list.insert(END, asset_version[1])
 
     def moveShotUpCommand(self):
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
+        self.up_button.config(state = DISABLED)
+        self.down_button.config(state = DISABLED)
+
         self.current_project.moveShotUp(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] + 1
@@ -1351,7 +1385,18 @@ class SuperPipe(Frame):
 
         self.shotlistCommand()
 
+        self.up_button.config(state = NORMAL)
+        self.down_button.config(state = NORMAL)
+
+        self.parent.config(cursor = "")
+
     def moveShotDownCommand(self):
+        self.parent.config(cursor = "wait")
+        self.parent.update()
+
+        self.up_button.config(state = DISABLED)
+        self.down_button.config(state = DISABLED)
+
         self.current_project.moveShotDown(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] - 1
@@ -1359,6 +1404,11 @@ class SuperPipe(Frame):
         self.shot_list.select_set(new_selection)
 
         self.shotlistCommand()
+
+        self.up_button.config(state = NORMAL)
+        self.down_button.config(state = NORMAL)
+
+        self.parent.config(cursor = "")
 
     def toggleLastVersions(self):
         if self.current_project.getSelectionType() == "shot":
@@ -1426,6 +1476,7 @@ class SuperPipe(Frame):
         self.asset_list.focus(selected_asset)
 
     def shotsPreviewCommand(self):
+        start_time = time.time()
         self.parent.config(cursor = "wait")
         self.parent.update()
 
@@ -1478,6 +1529,8 @@ class SuperPipe(Frame):
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
 
         self.parent.config(cursor = "")
+
+        print("--- %s seconds ---" % (time.time() - start_time))
 
     def upgradeShotCommand(self):
         selected_shot = self.shot_list.curselection()[0]
@@ -1598,18 +1651,20 @@ class SuperPipe(Frame):
                 f.write("www.google.fr\n")
             f.close()
 
-        preferences = {"link" : None, "maya_path" : "", "houdini_path" : ""}
+        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path"))
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path"))
         self.wait_window(dialog().top)
 
-        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"]:
+        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"]:
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
+            self.blender_path = preferences["blender_path"]
 
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["link"], 1)
             Resources.writeAtLine("save/options.spi", preferences["maya_path"], 2)
             Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 3)
+            Resources.writeAtLine("save/options.spi", preferences["blender_path"], 4)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)

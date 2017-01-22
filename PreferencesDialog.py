@@ -69,24 +69,38 @@ class PreferencesDialog(object):
         houdini_path_button["command"] = lambda: self.houdiniPathEntry()
         houdini_path_button.grid(row = 3, column = 3, sticky = E)
 
+        ## BLENDER ##
+        label = Label(top_frame, text = "Path to Blender", bg = self.main_color, fg = self.text_color)
+        label.grid(row = 4, column = 0, columnspan = 4)
+
+        self.blender_var_text = StringVar()
+        self.blender_var_text.set(Resources.readLine("save/options.spi", 3))
+
+        self.blender_path_entry = Entry(top_frame, textvariable = self.blender_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
+        self.blender_path_entry.grid(row = 5, column = 0, columnspan = 2)
+
+        blender_path_button = Button(top_frame, text = "Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
+        blender_path_button["command"] = lambda: self.blenderPathEntry()
+        blender_path_button.grid(row = 5, column = 3, sticky = E)
+
         ## CUSTOM LINK ##
         label = Label(top_frame, text = "Edit custom link", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 4, column = 0, columnspan = 4)
+        label.grid(row = 6, column = 0, columnspan = 4)
 
         self.var_custom_link = StringVar()
         self.var_custom_link.set(Resources.readLine(project_options_path, 1))
 
         self.link_entry = Entry(top_frame, textvariable = self.var_custom_link, width = 75, relief = FLAT, bg = self.button_color2)
-        self.link_entry.grid(row = 5, column = 0, columnspan = 4, sticky = W + E)
+        self.link_entry.grid(row = 7, column = 0, columnspan = 4, sticky = W + E)
 
         ## SAVE/CANCEL ##
         save_button = Button(top_frame, text = "Save", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         save_button["command"] = lambda: self.saveEntry(dict_key)
-        save_button.grid(row = 6, column = 0, sticky = W, pady = (10, 0))
+        save_button.grid(row = 8, column = 0, sticky = W, pady = (10, 0))
 
         cancel_button = Button(top_frame, text = "Cancel", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         cancel_button["command"] = self.top.destroy
-        cancel_button.grid(row = 6, column = 3, sticky = E, pady = (10, 0))
+        cancel_button.grid(row = 8, column = 3, sticky = E, pady = (10, 0))
 
         self.top.bind("<Escape>", lambda event: self.top.destroy())
 
@@ -117,13 +131,23 @@ class PreferencesDialog(object):
 
         self.top.focus()
 
+    def blenderPathEntry(self):
+        blender_path = filedialog.askopenfilename(title = "Select Blender.exe",  filetypes = [("Blender","*Blender*.exe")])
+
+        if blender_path:
+            self.blender_var_text.set(blender_path)
+
+        self.top.focus()
+
     def saveEntry(self, dict_key):
+        custom_link = self.link_entry.get()
         maya_path = self.maya_path_entry.get()
         houdini_path = self.houdini_path_entry.get()
-        custom_link = self.link_entry.get()
-        if custom_link and maya_path and houdini_path:
-            d, key1, key2, key3 = dict_key
+        blender_path = self.blender_path_entry.get()
+        if custom_link and maya_path and houdini_path and blender_path:
+            d, key1, key2, key3, key4 = dict_key
             d[key1] = custom_link
             d[key2] = maya_path
             d[key3] = houdini_path
+            d[key4] = blender_path
             self.top.destroy()

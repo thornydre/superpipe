@@ -189,8 +189,6 @@ class Project:
 
         swap_shot.renameShot(shot_name_backup)
 
-        shot = Shot(self.directory, "s00p00")
-
         shot.renameShot(swap_shot_name_backup)
 
     def moveShotDown(self, shot_name):
@@ -204,23 +202,17 @@ class Project:
 
         swap_shot.renameShot(shot_name_backup)
 
-        shot = Shot(self.directory, "s00p00")
-
         shot.renameShot(swap_shot_name_backup)
 
     def createAsset(self, asset_name, second_path, software):
-        if path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
-            return False
-        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
-            return False
-        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
-            return False
-        elif path.isdir(self.directory + "/04_asset/" + second_path + "/" + asset_name):
-            return False
-        else:
-            asset = Asset(self.directory, second_path, asset_name, software)
-            self.asset_list.append((asset_name, second_path))
-            return True
+        for check_asset in self.asset_list:
+            if asset_name == check_asset[0]:
+                return False
+
+        asset = Asset(self.directory, second_path, asset_name, software)
+        self.asset_list.append((asset_name, second_path))
+
+        return True
 
     def removeAsset(self, asset_name, second_path):
         asset = Asset(self.directory, second_path, asset_name)

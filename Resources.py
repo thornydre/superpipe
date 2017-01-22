@@ -81,6 +81,8 @@ class Resources:
             return "maya"
         elif soft == 2:
             return "houdini"
+        elif soft == 3:
+            return "blender"
 
         return ""
 
