@@ -1476,7 +1476,6 @@ class SuperPipe(Frame):
         self.asset_list.focus(selected_asset)
 
     def shotsPreviewCommand(self):
-        start_time = time.time()
         self.parent.config(cursor = "wait")
         self.parent.update()
 
@@ -1499,7 +1498,8 @@ class SuperPipe(Frame):
                 all_picts_path_array = []
 
                 for f in listdir(all_picts_path):
-                    all_picts_path_array.append(all_picts_path + f)
+                    if path.splitext(f)[1] == ".jpg" or path.splitext(f)[1] == ".gif":
+                        all_picts_path_array.append(all_picts_path + f)
 
                 cur_shot = Shot(self.current_project.getDirectory(), shot_dir)
 
@@ -1529,8 +1529,6 @@ class SuperPipe(Frame):
             shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
 
         self.parent.config(cursor = "")
-
-        print("--- %s seconds ---" % (time.time() - start_time))
 
     def upgradeShotCommand(self):
         selected_shot = self.shot_list.curselection()[0]
