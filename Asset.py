@@ -187,7 +187,7 @@ class Asset:
 
     def setAsset(self):
         if self.software == "maya":
-            copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
+            copyfile("src/set_up_file_asset_maya_lookdev_renderman.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
             copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
             copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
         elif self.software == "houdini":
