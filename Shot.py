@@ -107,7 +107,7 @@ class Shot:
 
                 makedirs(self.shot_directory + "/video")
 
-        else:
+        elif Shot.validShot(self.shot_directory):
             if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
                 open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
@@ -133,6 +133,9 @@ class Shot:
                 self.software = shot_infos[4]
             else:
                 self.software = "maya"
+
+        else:
+            print("ERROR")
 
         if not path.isdir(self.postprod_directory):
             makedirs(self.postprod_directory)
@@ -338,3 +341,10 @@ class Shot:
             self.step = "Splining"
 
         Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
+
+    def validShot(dir_to_check = None):
+        if path.isdir(dir_to_check + "/superpipe"):
+            if path.isdir(dir_to_check + "/scenes"):
+                return True
+
+        return False

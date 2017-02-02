@@ -5,6 +5,7 @@ from NewProjectDialog import *
 from Shot import *
 from Project import *
 from Resources import *
+from UpdateShotsListThread import *
 from tkinter import *
 from tkinter import filedialog, ttk
 from os import path, mkdir
@@ -49,6 +50,8 @@ class SuperPipe(Frame):
 
         self.current_project = None
 
+        self.parent.protocol("WM_DELETE_WINDOW", self.exitCommand)
+
         if not path.isfile("save/options.spi"):
             with open("save/options.spi", "w") as f:
                 f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\n\n")
@@ -79,7 +82,9 @@ class SuperPipe(Frame):
                 self.menu_project.entryconfig(3, state = NORMAL)
                 self.menu_project.entryconfig(5, state = NORMAL)
 
-                self.updateShotListView()
+                self.shots_list_update_thread = UpdateShotsListThread(self.current_project, self.shot_list, self.parent)
+                self.shots_list_update_thread.start()
+
                 self.updateAssetListView()
 
         self.parent.config(cursor = "")
@@ -648,7 +653,10 @@ class SuperPipe(Frame):
             self.menu_project.entryconfig(3, state = NORMAL)
             self.menu_project.entryconfig(5, state = NORMAL)
 
-            self.updateShotListView()
+            self.shots_list_update_thread.stop()
+            self.shots_list_update_thread = UpdateShotsListThread(self.current_project, self.shot_list, self.parent)
+            self.shots_list_update_thread.start()
+
             self.updateAssetListView()
 
     def setProjectCommand(self, e = None):
@@ -679,7 +687,10 @@ class SuperPipe(Frame):
                     self.menu_project.entryconfig(3, state = NORMAL)
                     self.menu_project.entryconfig(5, state = NORMAL)
 
-                    self.updateShotListView()
+                    self.shots_list_update_thread.stop()
+                    self.shots_list_update_thread = UpdateShotsListThread(self.current_project, self.shot_list, self.parent)
+                    self.shots_list_update_thread.start()
+
                     self.updateAssetListView()
                 else:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "Set project", "\"" + directory + "\" is not a project folder")
@@ -780,8 +791,6 @@ class SuperPipe(Frame):
         if yesno["result"] == "yes":
             self.current_project.removeShot(selected_shot)
 
-            self.updateShotListView()
-
             self.clearMainFrame("shot")
 
             self.updateVersionListView()
@@ -821,6 +830,8 @@ class SuperPipe(Frame):
             self.wait_window(dialog().top)
 
         else:
+            self.shots_list_update_thread.stop()
+
             sequence = {"seq": 0}
 
             dialog = lambda: NewShotDialog.NewShotDialog(self.parent, self.current_project, (sequence, "seq"))
@@ -828,18 +839,20 @@ class SuperPipe(Frame):
 
             if sequence["seq"]:
                 shot_nb = self.current_project.createShot(sequence["seq"])
-                self.updateShotListView()
                 self.shot_list.select_set(shot_nb - 1)
                 self.shotlistCommand()
+
+            self.shots_list_update_thread = UpdateShotsListThread(self.current_project, self.shot_list, self.parent)
+            self.shots_list_update_thread.start()
 
     def addAssetCommand(self, e = None):
         asset = {"cat": None, "name" : None, "software" : None}
 
-        dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, (asset, "cat", "name", "software"))
+        dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, self.current_project, (asset, "cat", "name", "software"))
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"] and asset["software"]:
-            if self.current_project.createAsset(asset["name"], "/" + Resources.getCategoryName(asset["cat"]), Resources.getSoftwareName(asset["software"])):
+            if self.current_project.createAsset(asset["name"], asset["cat"], Resources.getSoftwareName(asset["software"])):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -1014,14 +1027,18 @@ class SuperPipe(Frame):
                         if int(shot_dir[-2:]) == prev_shot_nb:
                             all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
 
-                            all_picts_path_array = []
+                            if path.isdir(all_picts_path):
+                                all_picts_path_array = []
 
-                            for f in listdir(all_picts_path):
-                                if ".jpg" in f:
-                                    all_picts_path_array.append(all_picts_path + f)
+                                for f in listdir(all_picts_path):
+                                    if ".jpg" in f:
+                                        all_picts_path_array.append(all_picts_path + f)
 
-                            if all_picts_path_array:
-                                prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+                                if all_picts_path_array:
+                                    prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+
+                            else:
+                                mkdir(all_picts_path)
 
             if path.isfile(prev_pict_path):
                 pict = ImageTk.PhotoImage(file = prev_pict_path)
@@ -1290,30 +1307,6 @@ class SuperPipe(Frame):
         else:
             dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset_name["name"] + "\" already exists !")
             self.wait_window(dialog().top)
-
-    def updateShotListView(self):
-        self.shot_list.delete(0, END)
-
-        shots = self.current_project.getShotList()
-
-        for shot in shots:
-            if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
-                self.shot_list.insert(shot[0], shot[1])
-
-                cur_shot = Shot(self.current_project.getDirectory(), shot[1])
-
-                if cur_shot.isDone():
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
-                elif cur_shot.getPriority() == "Urgent":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
-                elif cur_shot.getPriority() == "High":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#EFB462", selectbackground = "#997646")
-                elif cur_shot.getPriority() == "Medium":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#F4E255", selectbackground = "#9B9145")
-
-            else:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The shot " + shot[1] + " has a problem !", padding = 20)
-                self.wait_window(dialog().top)
             
     def updateAssetListView(self):
         for child in self.asset_list.get_children("character"):
@@ -1380,7 +1373,6 @@ class SuperPipe(Frame):
         self.current_project.moveShotUp(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] + 1
-        self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
         self.shotlistCommand()
@@ -1400,7 +1392,6 @@ class SuperPipe(Frame):
         self.current_project.moveShotDown(self.current_project.getSelection().getShotName())
 
         new_selection = self.shot_list.curselection()[0] - 1
-        self.updateShotListView()
         self.shot_list.select_set(new_selection)
 
         self.shotlistCommand()
@@ -1422,7 +1413,6 @@ class SuperPipe(Frame):
     def toggleShotDone(self):
         selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().setDone(self.var_shot_done.get())
-        self.updateShotListView()
         self.shot_list.select_set(selected_shot)
 
     def toggleAssetModelingDone(self):
@@ -1464,7 +1454,6 @@ class SuperPipe(Frame):
     def priorityShotCommand(self, priority):
         selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().setPriority(priority)
-        self.updateShotListView()
         self.shot_list.select_set(selected_shot)
 
     def priorityAssetCommand(self, priority):
@@ -1690,6 +1679,10 @@ class SuperPipe(Frame):
 
     def wheelScrollCommand(self, e):
         self.preview_canva_scroll.yview_scroll(int(-1 * e.delta/120), "units")
+
+    def exitCommand(self):
+        self.shots_list_update_thread.stop()
+        self.parent.destroy()
 
 def main():
     root = Tk()
