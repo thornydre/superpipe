@@ -8,10 +8,8 @@ class ListsObserver(FileSystemEventHandler):
         self.shot_list = list_to_update
         self.path = path_to_oberve
 
-        print(self.path)
-
     def on_created(self, event):
-        return
+        print("created")
         # self.shot_list.delete(0, END)
 
         # shots = listdir(self.path)
@@ -20,7 +18,7 @@ class ListsObserver(FileSystemEventHandler):
         #     self.shot_list.insert(END, shot)
 
     def on_moved(self, event):
-        return
+        print("moved")
         # self.shot_list.delete(0, END)
 
         # shots = listdir(self.path)
@@ -29,7 +27,7 @@ class ListsObserver(FileSystemEventHandler):
         #     self.shot_list.insert(END, shot)
 
     def on_deleted(self, event):
-        return
+        print("deleted")
         # self.shot_list.delete(0, END)
 
         # shots = listdir(self.path)

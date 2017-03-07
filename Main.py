@@ -7,7 +7,6 @@ from NewProjectDialog import *
 from Shot import *
 from Project import *
 from Resources import *
-from UpdateShotsListThread import *
 from ListsObserver import *
 from tkinter import *
 from tkinter import filedialog, ttk
