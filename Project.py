@@ -110,8 +110,11 @@ class Project:
     def updateAssetList(self):
         self.asset_list = []
 
-        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset"):
-            if "superpipe" in sub_dirs:
+        exclude = ["superpipe"]
+
+        for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset", topdown = True):
+            if any([i in sub_dirs for i in exclude]):
+                sub_dirs[:] = []
                 if not "backup" in cur_dir:
                     self.asset_list.append((path.basename(cur_dir), path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset", "")))
 

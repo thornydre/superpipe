@@ -1,6 +1,8 @@
 #!/usr/bin/python3.5
 # -*-coding:Utf-8 -*
 
+#EXTERNAL LIBRARIES : pillow, watchdog
+
 from NewProjectDialog import *
 from Shot import *
 from Project import *
@@ -1283,10 +1285,13 @@ class SuperPipe(Frame):
         valid_name = True
 
         if asset_name["name"]:
-            for check_asset in self.current_project.getAssetList():
-                if asset_name["name"] == check_asset[0]:
-                    valid_name = False
-                    break
+            if asset_name["name"] == "superpipe":
+                valid_name = False
+            else:
+                for check_asset in self.current_project.getAssetList():
+                    if asset_name["name"] == check_asset[0]:
+                        valid_name = False
+                        break
 
         if valid_name:
             self.parent.config(cursor = "wait")
