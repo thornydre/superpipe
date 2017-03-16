@@ -261,8 +261,8 @@ class Asset:
 
     def getPlayblastsList(self):
         playblasts_list = []
-        for playblast_file in listdir(self.asset_directory + "/movies/"):
-            playblasts_list.append((path.getmtime(self.asset_directory + "/movies/" + playblast_file), playblast_file))
+        for playblast_file in listdir(self.directory + "/movies/"):
+            playblasts_list.append((path.getmtime(self.directory + "/movies/" + playblast_file), playblast_file))
 
         return sorted(playblasts_list, reverse = True)
 

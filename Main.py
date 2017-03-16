@@ -1101,48 +1101,49 @@ class SuperPipe(Frame):
                 self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
                 self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
 
-                if asset:
-                    if asset.isSet():
-                        self.set_asset_button.grid_forget()
-                        self.open_asset_button.grid(self.open_asset_button.pi)
-                        self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
+                if self.version_mode:
+                    if asset:
+                        if asset.isSet():
+                            self.set_asset_button.grid_forget()
+                            self.open_asset_button.grid(self.open_asset_button.pi)
+                            self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
-                        selected_line = self.version_list.curselection()[0]
-                        if asset.getSoftware() == "maya":
-                            temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
-                        elif asset.getSoftware() == "houdini":
-                            temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+                            selected_line = self.version_list.curselection()[0]
+                            if asset.getSoftware() == "maya":
+                                temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                            elif asset.getSoftware() == "houdini":
+                                temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
 
-                        self.var_selection_path_label.set(temp_path.replace("/", "\\"))
+                            self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-                        self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
-                        self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
-                        self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
-                        self.done_asset_button.grid(self.done_asset_button.pi)
+                            self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
+                            self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
+                            self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
+                            self.done_asset_button.grid(self.done_asset_button.pi)
 
-                        pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
+                            pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
 
-                        if path.isfile(pict_path):
-                            pict = ImageTk.PhotoImage(file = pict_path)
+                            if path.isfile(pict_path):
+                                pict = ImageTk.PhotoImage(file = pict_path)
 
-                            self.asset_gifdict[pict_path] = pict
+                                self.asset_gifdict[pict_path] = pict
 
-                            self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
-                            self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                            self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                                self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
+                                self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                                self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                            else:
+                                self.asset_pict_caneva.grid_forget()
+                                
                         else:
+                            self.set_asset_button.grid(self.set_asset_button.pi)
+                            self.open_asset_button.grid_forget()
+                            self.open_asset_folder_button.grid_forget()
+                            self.var_selection_path_label.set("")
                             self.asset_pict_caneva.grid_forget()
-                            
-                    else:
-                        self.set_asset_button.grid(self.set_asset_button.pi)
-                        self.open_asset_button.grid_forget()
-                        self.open_asset_folder_button.grid_forget()
-                        self.var_selection_path_label.set("")
-                        self.asset_pict_caneva.grid_forget()
-                        self.modeling_done_asset_button.grid_forget()
-                        self.rig_done_asset_button.grid_forget()
-                        self.lookdev_done_asset_button.grid_forget()
-                        self.done_asset_button.grid_forget()
+                            self.modeling_done_asset_button.grid_forget()
+                            self.rig_done_asset_button.grid_forget()
+                            self.lookdev_done_asset_button.grid_forget()
+                            self.done_asset_button.grid_forget()
 
             else:
                 self.var_asset_label.set("NO ASSET SELECTED")
@@ -1224,17 +1225,18 @@ class SuperPipe(Frame):
                 else:
                     maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
 
-                if path.isfile(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma"):
-                    Resources.removeStudentVersion(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma")
-
-                Resources.removeStudentVersion(maya_file)
                 maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
                 subprocess.Popen(maya_args)
             else:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
                 self.wait_window(dialog().top)
         else:
-            
+            if path.isfile(self.vlc_path):
+                playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
+                subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
+            else:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
+                self.wait_window(dialog().top)
 
     def openAssetCommand(self):
         selected_line = self.version_list.curselection()[0]
@@ -1242,42 +1244,46 @@ class SuperPipe(Frame):
 
         asset = self.current_project.getSelection()
 
-        if asset.getSoftware() == "maya":
-            if path.isfile(self.maya_path):
-                if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
-                    maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+        if self.version_mode:
+            if asset.getSoftware() == "maya":
+                if path.isfile(self.maya_path):
+                    if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
+                        maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+                    else:
+                        maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+
+                    maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
+                    subprocess.Popen(maya_args)
                 else:
-                    maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
+                    self.wait_window(dialog().top)
 
-                maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
-                subprocess.Popen(maya_args)
-            else:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-                self.wait_window(dialog().top)
+            elif asset.getSoftware() == "houdini":
+                if path.isfile(self.houdini_path):
+                    if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                        houdini_file = asset.getDirectory() + "/" + selected_asset_version
+                    else:
+                        houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
-        elif asset.getSoftware() == "houdini":
-            if path.isfile(self.houdini_path):
-                if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
-                    houdini_file = asset.getDirectory() + "/" + selected_asset_version
+                    subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
                 else:
-                    houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
+                    self.wait_window(dialog().top)
 
-                subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
-            else:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
-                self.wait_window(dialog().top)
+            elif asset.getSoftware() == "blender":
+                if path.isfile(self.houdini_path):
+                    if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                        blender_file = asset.getDirectory() + "/" + selected_asset_version
+                    else:
+                        blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
-        elif asset.getSoftware() == "blender":
-            if path.isfile(self.houdini_path):
-                if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
-                    blender_file = asset.getDirectory() + "/" + selected_asset_version
+                    subprocess.Popen("%s %s" % (self.blender_path, blender_file))
                 else:
-                    blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
-
-                subprocess.Popen("%s %s" % (self.blender_path, blender_file))
-            else:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
-                self.wait_window(dialog().top)
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
+                    self.wait_window(dialog().top)
+        else:
+            playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
+            subprocess.Popen("%s %s" % ("E:/Logiciels/VLC/vlc.exe", playblast_file.replace("/", "\\")))
 
     def renameAssetCommand(self):
         asset_name = {"name" : None}
@@ -1404,7 +1410,7 @@ class SuperPipe(Frame):
                         self.version_list.insert(END, asset_version[1])
 
             else:
-                asset_playblasts = shot.getPlayblastsList()
+                asset_playblasts = asset.getPlayblastsList()
 
                 if asset_playblasts:
                     for asset_playblast in asset_playblasts:
@@ -1625,6 +1631,8 @@ class SuperPipe(Frame):
         elif self.current_project.getSelectionType() == "asset":
             self.updateVersionListView(asset = self.current_project.getSelection())
 
+        self.version_list.select_set(0)
+
     def validateFrameRangeEntry(self, P, S):
         valid = S.isnumeric() and len(P) < 6
 
@@ -1708,20 +1716,22 @@ class SuperPipe(Frame):
                 f.write("www.google.fr\n")
             f.close()
 
-        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : ""}
+        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path"))
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path"))
         self.wait_window(dialog().top)
 
-        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"]:
+        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"]:
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
             self.blender_path = preferences["blender_path"]
+            self.vlc_path = preferences["vlc_path"]
 
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["link"], 1)
             Resources.writeAtLine("save/options.spi", preferences["maya_path"], 2)
             Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 3)
             Resources.writeAtLine("save/options.spi", preferences["blender_path"], 4)
+            Resources.writeAtLine("save/options.spi", preferences["vlc_path"], 5)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)
