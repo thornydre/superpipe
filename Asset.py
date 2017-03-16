@@ -225,22 +225,25 @@ class Asset:
         if self.software == "maya":
             for asset_file in listdir(self.directory + "/scenes/"):
                 if not "reference" in asset_file:
-                    if path.splitext(asset_file)[1] == ".ma":
-                        versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+                    if not asset_file[0] == "_":
+                        if path.splitext(asset_file)[1] == ".ma":
+                            versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/scenes/edits/"):
-                    if path.splitext(asset_file)[1] == ".ma":
-                        versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+                    if not asset_file[0] == "_":
+                        if path.splitext(asset_file)[1] == ".ma":
+                            versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         elif self.software == "houdini":
             for asset_file in listdir(self.directory + "/"):
-                if path.splitext(asset_file)[1] == ".hip":
+                print(asset_file)
+                if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
                     versions_list.append((path.getmtime(self.directory + "/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/backup/"):
-                    if path.splitext(asset_file)[1] == ".hip":
+                    if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
                         versions_list.append((path.getmtime(self.directory + "/backup/" + asset_file), asset_file))
 
         elif self.software == "blender":
@@ -255,6 +258,13 @@ class Asset:
                         versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)
+
+    def getPlayblastsList(self):
+        playblasts_list = []
+        for playblast_file in listdir(self.asset_directory + "/movies/"):
+            playblasts_list.append((path.getmtime(self.asset_directory + "/movies/" + playblast_file), playblast_file))
+
+        return sorted(playblasts_list, reverse = True)
 
     def renameAsset(self, new_name):
         new_dir = path.dirname(self.directory) + "/" + new_name

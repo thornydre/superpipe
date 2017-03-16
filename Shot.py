@@ -230,15 +230,24 @@ class Shot:
         versions_list = []
         for shot_file in listdir(self.shot_directory + "/scenes/"):
             if not "reference" in shot_file:
-                if path.splitext(shot_file)[1] == ".ma":
-                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+                if not shot_file[0] == "_":
+                    if path.splitext(shot_file)[1] == ".ma":
+                        versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
         if not last_only:
             for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
-                if path.splitext(shot_file)[1] == ".ma":
-                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+                if not shot_file[0] == "_":
+                    if path.splitext(shot_file)[1] == ".ma":
+                        versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
+
+    def getPlayblastsList(self):
+        playblasts_list = []
+        for playblast_file in listdir(self.shot_directory + "/movies/"):
+            playblasts_list.append((path.getmtime(self.shot_directory + "/movies/" + playblast_file), playblast_file))
+
+        return sorted(playblasts_list, reverse = True)
 
     def renameShot(self, new_name):
         new_dir = path.dirname(self.shot_directory) + "/" + new_name

@@ -52,6 +52,7 @@ class SuperPipe(Frame):
         self.parent.update()
 
         self.current_project = None
+        self.version_mode = True
 
         self.parent.protocol("WM_DELETE_WINDOW", self.exitCommand)
 
@@ -397,10 +398,10 @@ class SuperPipe(Frame):
         self.shot_actions_line.columnconfigure(1, pad = 10, weight = 1)
         self.shot_actions_line.columnconfigure(2, pad = 10)
 
-        self.open_shot_layout_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 19, height = 1, command = self.openShotCommand)
-        self.open_shot_layout_button.grid(row = 0, column = 1, sticky = N)
-        self.open_shot_layout_button.pi = self.open_shot_layout_button.grid_info()
-        self.open_shot_layout_button.grid_forget()
+        self.open_shot_button = Button(self.shot_actions_line, text = "Open selected version ", bg = self.button_color1, activebackground = self.over_button_color1, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 19, height = 1, command = self.openShotCommand)
+        self.open_shot_button.grid(row = 0, column = 1, sticky = N)
+        self.open_shot_button.pi = self.open_shot_button.grid_info()
+        self.open_shot_button.grid_forget()
 
         ## SHOT VERSION INFOS ##
         self.shot_version_management_line = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
@@ -623,7 +624,13 @@ class SuperPipe(Frame):
         right_side_bar = Frame(pw_main, bg = self.main_color)
 
         ## VERSIONS ##
-        versions_label = Label(right_side_bar, text = "Versions", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
+        self.toggle_versions_playblasts_button = Button(right_side_bar, text = "Show playblasts", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 19, height = 1, command = self.toggleVersionsPlayblastsCommand)
+        self.toggle_versions_playblasts_button.pack(pady = 10)
+
+        self.var_versions_label = StringVar()
+        self.var_versions_label.set("Versions")
+
+        versions_label = Label(right_side_bar, textvariable = self.var_versions_label, bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         versions_label.pack(fill = X, pady = 10)
 
         self.version_list = Listbox(right_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
@@ -734,7 +741,7 @@ class SuperPipe(Frame):
         self.set_shot_button.grid_forget()
         self.frame_range_entry.grid(self.frame_range_entry.pi)
         self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
-        self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+        self.open_shot_button.grid(self.open_shot_button.pi)
 
         self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -923,7 +930,7 @@ class SuperPipe(Frame):
                 self.set_shot_button.grid_forget()
                 self.frame_range_entry.grid(self.frame_range_entry.pi)
                 self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
-                self.open_shot_layout_button.grid(self.open_shot_layout_button.pi)
+                self.open_shot_button.grid(self.open_shot_button.pi)
 
                 self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
@@ -963,8 +970,6 @@ class SuperPipe(Frame):
                     self.upgrade_shot_button.config(state = DISABLED)
                     self.downgrade_shot_button.config(state = NORMAL)
 
-                pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
-
                 selected_line = self.version_list.curselection()[0]
                 if self.current_project.getSelectionType() == "shot":
                     temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
@@ -982,23 +987,26 @@ class SuperPipe(Frame):
 
                 self.var_selection_abc_path_label.set(temp_path.replace("/", "\\"))
 
-                if path.isfile(pict_path):
-                    pict = ImageTk.PhotoImage(file = pict_path)
+                if self.version_mode:
+                    pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
 
-                    self.shot_gifdict[pict_path] = pict
+                    if path.isfile(pict_path):
+                        pict = ImageTk.PhotoImage(file = pict_path)
 
-                    self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
-                    self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                    self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+                        self.shot_gifdict[pict_path] = pict
 
-                else:
-                    self.shot_pict_caneva.grid_forget()
+                        self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
+                        self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                        self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+
+                    else:
+                        self.shot_pict_caneva.grid_forget()
 
             else:
                 self.set_shot_button.grid(self.set_shot_button.pi)
                 self.frame_range_entry.grid_forget()
                 self.set_shot_frame_range_button.grid_forget()
-                self.open_shot_layout_button.grid_forget()
+                self.open_shot_button.grid_forget()
 
                 self.downgrade_shot_button.grid_forget()
 
@@ -1209,21 +1217,24 @@ class SuperPipe(Frame):
 
         shot = self.current_project.getSelection()
 
-        if path.isfile(self.maya_path):
-            if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
-                maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
+        if self.version_mode:
+            if path.isfile(self.maya_path):
+                if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
+                    maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
+                else:
+                    maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
+
+                if path.isfile(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma"):
+                    Resources.removeStudentVersion(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma")
+
+                Resources.removeStudentVersion(maya_file)
+                maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
+                subprocess.Popen(maya_args)
             else:
-                maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
-
-            if path.isfile(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma"):
-                Resources.removeStudentVersion(shot.getDirectory() + "/scenes/reference_" + shot.getShotName() + ".ma")
-
-            Resources.removeStudentVersion(maya_file)
-            maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
-            subprocess.Popen(maya_args)
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
+                self.wait_window(dialog().top)
         else:
-            dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-            self.wait_window(dialog().top)
+            
 
     def openAssetCommand(self):
         selected_line = self.version_list.curselection()[0]
@@ -1238,10 +1249,6 @@ class SuperPipe(Frame):
                 else:
                     maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
-                # if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
-                #     Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
-
-                # Resources.removeStudentVersion(maya_file)
                 maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
                 subprocess.Popen(maya_args)
             else:
@@ -1375,18 +1382,33 @@ class SuperPipe(Frame):
         self.version_list.delete(0, END)
 
         if shot:
-            shot_versions = shot.getVersionsList(self.var_check_show_last.get())
+            if self.version_mode:
+                shot_versions = shot.getVersionsList(self.var_check_show_last.get())
 
-            if shot_versions:
-                for shot_version in shot_versions:
-                    self.version_list.insert(END, shot_version[1])
+                if shot_versions:
+                    for shot_version in shot_versions:
+                        self.version_list.insert(END, shot_version[1])
+            else:
+                shot_playblasts = shot.getPlayblastsList()
+
+                if shot_playblasts:
+                    for shot_playblast in shot_playblasts:
+                        self.version_list.insert(END, shot_playblast[1])
 
         elif asset:
-            asset_versions = asset.getVersionsList(self.var_check_show_last.get())
+            if self.version_mode:
+                asset_versions = asset.getVersionsList(self.var_check_show_last.get())
 
-            if asset_versions:
-                for asset_version in asset_versions:
-                    self.version_list.insert(END, asset_version[1])
+                if asset_versions:
+                    for asset_version in asset_versions:
+                        self.version_list.insert(END, asset_version[1])
+
+            else:
+                asset_playblasts = shot.getPlayblastsList()
+
+                if asset_playblasts:
+                    for asset_playblast in asset_playblasts:
+                        self.version_list.insert(END, asset_playblast[1])
 
     def moveShotUpCommand(self):
         self.parent.config(cursor = "wait")
@@ -1584,6 +1606,25 @@ class SuperPipe(Frame):
 
     ###############################################################################################################
 
+    def toggleVersionsPlayblastsCommand(self):
+        self.version_mode = not self.version_mode
+
+        if self.version_mode:
+            self.toggle_versions_playblasts_button.config(text = "Show playblasts")
+            self.var_versions_label.set("Versions")
+            self.open_shot_button.config(text = "Open selected version")
+            self.open_asset_button.config(text = "Open selected version")
+        else:
+            self.toggle_versions_playblasts_button.config(text = "Show versions")
+            self.var_versions_label.set("Playblasts")
+            self.open_shot_button.config(text = "Open selected playblast")
+            self.open_asset_button.config(text = "Open selected playblast")
+
+        if self.current_project.getSelectionType() == "shot":
+            self.updateVersionListView(shot = self.current_project.getSelection())
+        elif self.current_project.getSelectionType() == "asset":
+            self.updateVersionListView(asset = self.current_project.getSelection())
+
     def validateFrameRangeEntry(self, P, S):
         valid = S.isnumeric() and len(P) < 6
 
@@ -1616,7 +1657,7 @@ class SuperPipe(Frame):
             self.set_shot_button.grid_forget()
             self.var_selection_path_label.set("")
             self.shot_pict_caneva.grid_forget()
-            self.open_shot_layout_button.grid_forget()
+            self.open_shot_button.grid_forget()
             self.open_shot_folder_button.grid_forget()
             self.priority_shot_menu.grid_forget()
             self.priority_shot_label.grid_forget()
