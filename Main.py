@@ -1238,10 +1238,10 @@ class SuperPipe(Frame):
                 else:
                     maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
-                if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
-                    Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
+                # if path.isfile(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma"):
+                #     Resources.removeStudentVersion(asset.getDirectory() + "/scenes/reference_" + asset.getAssetName() + ".ma")
 
-                Resources.removeStudentVersion(maya_file)
+                # Resources.removeStudentVersion(maya_file)
                 maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
                 subprocess.Popen(maya_args)
             else:
