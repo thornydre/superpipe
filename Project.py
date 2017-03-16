@@ -185,8 +185,13 @@ class Project:
         shot = Shot(self.directory, shot_name)
         shot_name_backup = shot.getShotName()
 
+        print(self.shot_list[shot.getShotNb()])
+
         swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb()][1])
         swap_shot_name_backup = swap_shot.getShotName()
+
+        print(shot_name)
+        print(swap_shot_name_backup)
 
         shot.renameShot("s00p00")
 
@@ -198,8 +203,13 @@ class Project:
         shot = Shot(self.directory, shot_name)
         shot_name_backup = shot.getShotName()
 
+        print(self.shot_list)
+
         swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb() - 2][1])
         swap_shot_name_backup = swap_shot.getShotName()
+
+        print(shot_name)
+        print(swap_shot_name_backup)
 
         shot.renameShot("s00p00")
 
