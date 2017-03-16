@@ -88,7 +88,7 @@ class SuperPipe(Frame):
                 self.updateShotListView()
                 self.updateAssetListView()
 
-        event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
+        event_handler = ListsObserver(self.current_project, self.shot_list, self.current_project.getDirectory() + "/05_shot/")
         self.observer = Observer()
         self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
         self.observer.start()
