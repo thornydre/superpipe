@@ -89,10 +89,11 @@ class SuperPipe(Frame):
                 self.updateShotListView()
                 self.updateAssetListView()
 
-        event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
-        self.observer = Observer()
-        self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
-        self.observer.start()
+        if self.current_project:
+            event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
+            self.observer = Observer()
+            self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
+            self.observer.start()
 
         self.parent.config(cursor = "")
 
@@ -1219,7 +1220,7 @@ class SuperPipe(Frame):
         shot = self.current_project.getSelection()
 
         if self.version_mode:
-            if path.isfile(self.maya_path):
+            try:
                 if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
                     maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
                 else:
@@ -1227,14 +1228,14 @@ class SuperPipe(Frame):
 
                 maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
                 subprocess.Popen(maya_args)
-            else:
+            except:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
                 self.wait_window(dialog().top)
         else:
-            if path.isfile(self.vlc_path):
+            try:
                 playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
                 subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
-            else:
+            except:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
                 self.wait_window(dialog().top)
 
@@ -1246,7 +1247,7 @@ class SuperPipe(Frame):
 
         if self.version_mode:
             if asset.getSoftware() == "maya":
-                if path.isfile(self.maya_path):
+                try:
                     if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
                         maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
                     else:
@@ -1254,36 +1255,40 @@ class SuperPipe(Frame):
 
                     maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
                     subprocess.Popen(maya_args)
-                else:
+                except:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
                     self.wait_window(dialog().top)
 
             elif asset.getSoftware() == "houdini":
-                if path.isfile(self.houdini_path):
+                try:
                     if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
                         houdini_file = asset.getDirectory() + "/" + selected_asset_version
                     else:
                         houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
                     subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
-                else:
+                except:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
                     self.wait_window(dialog().top)
 
             elif asset.getSoftware() == "blender":
-                if path.isfile(self.houdini_path):
+                try:
                     if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
                         blender_file = asset.getDirectory() + "/" + selected_asset_version
                     else:
                         blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
                     subprocess.Popen("%s %s" % (self.blender_path, blender_file))
-                else:
+                except:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
                     self.wait_window(dialog().top)
         else:
-            playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
-            subprocess.Popen("%s %s" % ("E:/Logiciels/VLC/vlc.exe", playblast_file.replace("/", "\\")))
+            try:
+                playblast_file = asset.getDirectory() + "/movies/" + selected_asset_version
+                subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
+            except:
+                dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
+                self.wait_window(dialog().top)
 
     def renameAssetCommand(self):
         asset_name = {"name" : None}

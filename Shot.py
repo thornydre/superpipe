@@ -245,7 +245,8 @@ class Shot:
     def getPlayblastsList(self):
         playblasts_list = []
         for playblast_file in listdir(self.shot_directory + "/movies/"):
-            playblasts_list.append((path.getmtime(self.shot_directory + "/movies/" + playblast_file), playblast_file))
+            if path.splitext(playblast_file)[1] in (".mov", ".avi"):
+                playblasts_list.append((path.getmtime(self.shot_directory + "/movies/" + playblast_file), playblast_file))
 
         return sorted(playblasts_list, reverse = True)
 
