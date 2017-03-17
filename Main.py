@@ -43,6 +43,10 @@ class SuperPipe(Frame):
         self.urgent_color = Resources.readLine("save/themes.spi", 13)
         self.high_color = Resources.readLine("save/themes.spi", 14)
         self.medium_color = Resources.readLine("save/themes.spi", 15)
+        self.done_select_color = Resources.readLine("save/themes.spi", 16)
+        self.urgent_select_color = Resources.readLine("save/themes.spi", 17)
+        self.high_select_color = Resources.readLine("save/themes.spi", 18)
+        self.medium_select_color = Resources.readLine("save/themes.spi", 19)
 
         Frame.__init__(self, parent, bg = self.main_color)
 
@@ -1164,7 +1168,7 @@ class SuperPipe(Frame):
                 self.done_asset_button.grid_forget()
 
     def versionlistCommand(self, e):
-        if self.version_list.size() != 0:
+        if self.version_list.size():
             self.open_asset_button.grid(self.open_asset_button.pi)
             self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
@@ -1214,81 +1218,83 @@ class SuperPipe(Frame):
                     self.asset_pict_caneva.grid_forget()
 
     def openShotCommand(self):
-        selected_line = self.version_list.curselection()[0]
-        selected_shot_version = self.version_list.get(selected_line)
+        if self.version_list.size(): 
+            selected_line = self.version_list.curselection()[0]
+            selected_shot_version = self.version_list.get(selected_line)
 
-        shot = self.current_project.getSelection()
+            shot = self.current_project.getSelection()
 
-        if self.version_mode:
-            try:
-                if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
-                    maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
-                else:
-                    maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
-
-                maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
-                subprocess.Popen(maya_args)
-            except:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-                self.wait_window(dialog().top)
-        else:
-            try:
-                playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
-                subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
-            except:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
-                self.wait_window(dialog().top)
-
-    def openAssetCommand(self):
-        selected_line = self.version_list.curselection()[0]
-        selected_asset_version = self.version_list.get(selected_line)
-
-        asset = self.current_project.getSelection()
-
-        if self.version_mode:
-            if asset.getSoftware() == "maya":
+            if self.version_mode:
                 try:
-                    if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
-                        maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+                    if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
+                        maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
                     else:
-                        maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+                        maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
 
-                    maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
+                    maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
                     subprocess.Popen(maya_args)
                 except:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
                     self.wait_window(dialog().top)
-
-            elif asset.getSoftware() == "houdini":
+            else:
                 try:
-                    if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
-                        houdini_file = asset.getDirectory() + "/" + selected_asset_version
-                    else:
-                        houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
-
-                    subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
+                    playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
+                    subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
                 except:
-                    dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
                     self.wait_window(dialog().top)
 
-            elif asset.getSoftware() == "blender":
-                try:
-                    if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
-                        blender_file = asset.getDirectory() + "/" + selected_asset_version
-                    else:
-                        blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
+    def openAssetCommand(self):
+        if self.version_list.size(): 
+            selected_line = self.version_list.curselection()[0]
+            selected_asset_version = self.version_list.get(selected_line)
 
-                    subprocess.Popen("%s %s" % (self.blender_path, blender_file))
+            asset = self.current_project.getSelection()
+
+            if self.version_mode:
+                if asset.getSoftware() == "maya":
+                    try:
+                        if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
+                            maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
+                        else:
+                            maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+
+                        maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
+                        subprocess.Popen(maya_args)
+                    except:
+                        dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
+                        self.wait_window(dialog().top)
+
+                elif asset.getSoftware() == "houdini":
+                    try:
+                        if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                            houdini_file = asset.getDirectory() + "/" + selected_asset_version
+                        else:
+                            houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
+
+                        subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
+                    except:
+                        dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
+                        self.wait_window(dialog().top)
+
+                elif asset.getSoftware() == "blender":
+                    try:
+                        if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
+                            blender_file = asset.getDirectory() + "/" + selected_asset_version
+                        else:
+                            blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
+
+                        subprocess.Popen("%s %s" % (self.blender_path, blender_file))
+                    except:
+                        dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
+                        self.wait_window(dialog().top)
+            else:
+                try:
+                    playblast_file = asset.getDirectory() + "/movies/" + selected_asset_version
+                    subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
                 except:
-                    dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
+                    dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
                     self.wait_window(dialog().top)
-        else:
-            try:
-                playblast_file = asset.getDirectory() + "/movies/" + selected_asset_version
-                subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
-            except:
-                dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
-                self.wait_window(dialog().top)
 
     def renameAssetCommand(self):
         asset_name = {"name" : None}
@@ -1339,13 +1345,13 @@ class SuperPipe(Frame):
                 cur_shot = Shot(self.current_project.getDirectory(), shot[1])
 
                 if cur_shot.isDone():
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#89C17F", selectbackground = "#466341")
+                    self.shot_list.itemconfig(shot[0] - 1, bg = self.done_color, selectbackground = self.done_select_color)
                 elif cur_shot.getPriority() == "Urgent":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#E55252", selectbackground = "#822121")
+                    self.shot_list.itemconfig(shot[0] - 1, bg = self.urgent_color, selectbackground = self.urgent_select_color)
                 elif cur_shot.getPriority() == "High":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#EFB462", selectbackground = "#997646")
+                    self.shot_list.itemconfig(shot[0] - 1, bg = self.high_color, selectbackground = self.high_select_color)
                 elif cur_shot.getPriority() == "Medium":
-                    self.shot_list.itemconfig(shot[0] - 1, bg = "#F4E255", selectbackground = "#9B9145")
+                    self.shot_list.itemconfig(shot[0] - 1, bg = self.medium_color, selectbackground = self.medium_select_color)
 
             else:
                 dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The shot " + shot[1] + " has a problem !", padding = 20)
