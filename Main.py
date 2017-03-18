@@ -29,24 +29,30 @@ import queue
 
 class SuperPipe(Frame):
     def __init__(self, parent):
+        if not path.isfile("save/options.spi"):
+            with open("save/options.spi", "w") as f:
+                f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\ntheme_default\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
+            f.close()
+
         ## THEME COLORS ##
-        self.main_color = Resources.readLine("save/themes.spi", 1)
-        self.second_color = Resources.readLine("save/themes.spi", 2)
-        self.list_color = Resources.readLine("save/themes.spi", 3)
-        self.button_color1 = Resources.readLine("save/themes.spi", 4)
-        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
-        self.button_color2 = Resources.readLine("save/themes.spi", 6)
-        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
-        self.separator_color = Resources.readLine("save/themes.spi", 8)
-        self.text_color = Resources.readLine("save/themes.spi", 9)
-        self.done_color = Resources.readLine("save/themes.spi", 12)
-        self.urgent_color = Resources.readLine("save/themes.spi", 13)
-        self.high_color = Resources.readLine("save/themes.spi", 14)
-        self.medium_color = Resources.readLine("save/themes.spi", 15)
-        self.done_select_color = Resources.readLine("save/themes.spi", 16)
-        self.urgent_select_color = Resources.readLine("save/themes.spi", 17)
-        self.high_select_color = Resources.readLine("save/themes.spi", 18)
-        self.medium_select_color = Resources.readLine("save/themes.spi", 19)
+        self.theme = Resources.readLine("save/options.spi", 2)
+        self.main_color = Resources.readLine("save/themes/" + self.theme + ".spi", 1)
+        self.second_color = Resources.readLine("save/themes/" + self.theme + ".spi", 2)
+        self.list_color = Resources.readLine("save/themes/" + self.theme + ".spi", 3)
+        self.button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 5)
+        self.button_color2 = Resources.readLine("save/themes/" + self.theme + ".spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes/" + self.theme + ".spi", 7)
+        self.separator_color = Resources.readLine("save/themes/" + self.theme + ".spi", 8)
+        self.text_color = Resources.readLine("save/themes/" + self.theme + ".spi", 9)
+        self.done_color = Resources.readLine("save/themes/" + self.theme + ".spi", 12)
+        self.urgent_color = Resources.readLine("save/themes/" + self.theme + ".spi", 13)
+        self.high_color = Resources.readLine("save/themes/" + self.theme + ".spi", 14)
+        self.medium_color = Resources.readLine("save/themes/" + self.theme + ".spi", 15)
+        self.done_select_color = Resources.readLine("save/themes/" + self.theme + ".spi", 16)
+        self.urgent_select_color = Resources.readLine("save/themes/" + self.theme + ".spi", 17)
+        self.high_select_color = Resources.readLine("save/themes/" + self.theme + ".spi", 18)
+        self.medium_select_color = Resources.readLine("save/themes/" + self.theme + ".spi", 19)
 
         Frame.__init__(self, parent, bg = self.main_color)
 
@@ -60,14 +66,10 @@ class SuperPipe(Frame):
 
         self.parent.protocol("WM_DELETE_WINDOW", self.exitCommand)
 
-        if not path.isfile("save/options.spi"):
-            with open("save/options.spi", "w") as f:
-                f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\n\n")
-            f.close()
-
-        self.maya_path = Resources.readLine("save/options.spi", 2)
-        self.houdini_path = Resources.readLine("save/options.spi", 3)
-        self.blender_path = Resources.readLine("save/options.spi", 4)
+        self.maya_path = Resources.readLine("save/options.spi", 3)
+        self.houdini_path = Resources.readLine("save/options.spi", 4)
+        self.blender_path = Resources.readLine("save/options.spi", 5)
+        self.vlc_path = Resources.readLine("save/options.spi", 6)
 
         self.initUI()
 
@@ -215,10 +217,23 @@ class SuperPipe(Frame):
 
         main_area.columnconfigure(0, weight = 1)
 
-         ## // SHOTS MAIN FRAME \\ ##
+        ## // NO PROJECT MAIN FRAME \\##
+        self.main_area_no_project = Frame(main_area, bg = self.main_color, bd = 0)
+        self.main_area_no_project.grid(row = 0, column = 0, sticky = N + S + W + E)
+        self.main_area_no_project.pi = self.main_area_no_project.grid_info()
+
+        self.var_shot_nb_label = StringVar()
+        self.var_shot_nb_label.set("NO SHOT SELECTED")
+        no_project_label = Label(self.main_area_no_project, text = "PLEASE SET AN EXISTING PROJECT, OR CREATE A NEW ONE", bg = self.main_color, fg = self.text_color, height = 1, justify = CENTER, font = "Helvetica 15 bold")
+        no_project_label.pack(expand = True, fill = BOTH, side = BOTTOM)
+
+        ###############################################################################################################
+
+        ## // SHOTS MAIN FRAME \\ ##
         self.main_area_shot = Frame(main_area, bg = self.main_color, bd = 0)
         self.main_area_shot.grid(row = 0, column = 0, sticky = N + S + W + E)
         self.main_area_shot.pi = self.main_area_shot.grid_info()
+        self.main_area_shot.grid_forget()
 
         self.main_area_shot.columnconfigure(0, pad = 10, minsize = 40)
         self.main_area_shot.columnconfigure(1, pad = 10)
@@ -1063,109 +1078,110 @@ class SuperPipe(Frame):
                 self.shot_prev_pict_caneva.grid_forget()
 
     def assetListCommand(self, e):
-        if self.asset_list.focus():
-            self.main_area_asset.grid(self.main_area_asset.pi)
-            self.main_area_shot.grid_forget()
-            self.main_area_preview.grid_forget()
+        if self.current_project:
+            if self.asset_list.focus():
+                self.main_area_asset.grid(self.main_area_asset.pi)
+                self.main_area_shot.grid_forget()
+                self.main_area_preview.grid_forget()
 
-            self.shot_list.selection_clear(0, END)
+                self.shot_list.selection_clear(0, END)
 
-            categories = ["character", "fx", "props", "set"]
+                categories = ["character", "fx", "props", "set"]
 
-            if not self.asset_list.get_children(self.asset_list.focus()) and not self.asset_list.focus() in categories:
-                selected_asset = self.asset_list.focus()
+                if not self.asset_list.get_children(self.asset_list.focus()) and not self.asset_list.focus() in categories:
+                    selected_asset = self.asset_list.focus()
 
-                cur_item = selected_asset
-                path_array = []
+                    cur_item = selected_asset
+                    path_array = []
 
-                is_parent = True
+                    is_parent = True
 
-                while is_parent:
-                    if self.asset_list.parent(cur_item):
-                        cur_item = self.asset_list.parent(cur_item)
-                        path_array.insert(0, cur_item)
-                    else:
-                        is_parent = False
-
-                self.current_project.setSelection(asset_name = selected_asset, second_path = "/" + "/".join(path_array))
-                asset = self.current_project.getSelection()
-
-                self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
-                self.delete_asset_button.grid(self.delete_asset_button.pi)
-                self.rename_asset_button.grid(self.rename_asset_button.pi)
-
-                self.priority_asset_label.grid(self.priority_asset_label.pi)
-                self.priority_asset_menu.grid(self.priority_asset_menu.pi)
-
-                self.updateVersionListView(asset = asset)
-                self.version_list.select_set(0)
-
-                self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
-                self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
-                self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 3)))
-                self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
-                self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
-
-                if self.version_mode:
-                    if asset:
-                        if asset.isSet():
-                            self.set_asset_button.grid_forget()
-                            self.open_asset_button.grid(self.open_asset_button.pi)
-                            self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
-
-                            selected_line = self.version_list.curselection()[0]
-                            if asset.getSoftware() == "maya":
-                                temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
-                            elif asset.getSoftware() == "houdini":
-                                temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
-
-                            self.var_selection_path_label.set(temp_path.replace("/", "\\"))
-
-                            self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
-                            self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
-                            self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
-                            self.done_asset_button.grid(self.done_asset_button.pi)
-
-                            pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
-
-                            if path.isfile(pict_path):
-                                pict = ImageTk.PhotoImage(file = pict_path)
-
-                                self.asset_gifdict[pict_path] = pict
-
-                                self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
-                                self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                                self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
-                            else:
-                                self.asset_pict_caneva.grid_forget()
-                                
+                    while is_parent:
+                        if self.asset_list.parent(cur_item):
+                            cur_item = self.asset_list.parent(cur_item)
+                            path_array.insert(0, cur_item)
                         else:
-                            self.set_asset_button.grid(self.set_asset_button.pi)
-                            self.open_asset_button.grid_forget()
-                            self.open_asset_folder_button.grid_forget()
-                            self.var_selection_path_label.set("")
-                            self.asset_pict_caneva.grid_forget()
-                            self.modeling_done_asset_button.grid_forget()
-                            self.rig_done_asset_button.grid_forget()
-                            self.lookdev_done_asset_button.grid_forget()
-                            self.done_asset_button.grid_forget()
+                            is_parent = False
 
-            else:
-                self.var_asset_label.set("NO ASSET SELECTED")
-                self.var_selection_path_label.set("")
-                self.delete_asset_button.grid_forget()
-                self.rename_asset_button.grid_forget()
-                self.set_asset_button.grid_forget()
-                self.open_asset_button.grid_forget()
-                self.open_asset_folder_button.grid_forget()
-                self.version_list.delete(0, END)
-                self.asset_pict_caneva.grid_forget()
-                self.priority_asset_label.grid_forget()
-                self.priority_asset_menu.grid_forget()
-                self.modeling_done_asset_button.grid_forget()
-                self.rig_done_asset_button.grid_forget()
-                self.lookdev_done_asset_button.grid_forget()
-                self.done_asset_button.grid_forget()
+                    self.current_project.setSelection(asset_name = selected_asset, second_path = "/" + "/".join(path_array))
+                    asset = self.current_project.getSelection()
+
+                    self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
+                    self.delete_asset_button.grid(self.delete_asset_button.pi)
+                    self.rename_asset_button.grid(self.rename_asset_button.pi)
+
+                    self.priority_asset_label.grid(self.priority_asset_label.pi)
+                    self.priority_asset_menu.grid(self.priority_asset_menu.pi)
+
+                    self.updateVersionListView(asset = asset)
+                    self.version_list.select_set(0)
+
+                    self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
+                    self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
+                    self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 3)))
+                    self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
+                    self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
+
+                    if self.version_mode:
+                        if asset:
+                            if asset.isSet():
+                                self.set_asset_button.grid_forget()
+                                self.open_asset_button.grid(self.open_asset_button.pi)
+                                self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
+
+                                selected_line = self.version_list.curselection()[0]
+                                if asset.getSoftware() == "maya":
+                                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                                elif asset.getSoftware() == "houdini":
+                                    temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+
+                                self.var_selection_path_label.set(temp_path.replace("/", "\\"))
+
+                                self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
+                                self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
+                                self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
+                                self.done_asset_button.grid(self.done_asset_button.pi)
+
+                                pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
+
+                                if path.isfile(pict_path):
+                                    pict = ImageTk.PhotoImage(file = pict_path)
+
+                                    self.asset_gifdict[pict_path] = pict
+
+                                    self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
+                                    self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                                    self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                                else:
+                                    self.asset_pict_caneva.grid_forget()
+                                    
+                            else:
+                                self.set_asset_button.grid(self.set_asset_button.pi)
+                                self.open_asset_button.grid_forget()
+                                self.open_asset_folder_button.grid_forget()
+                                self.var_selection_path_label.set("")
+                                self.asset_pict_caneva.grid_forget()
+                                self.modeling_done_asset_button.grid_forget()
+                                self.rig_done_asset_button.grid_forget()
+                                self.lookdev_done_asset_button.grid_forget()
+                                self.done_asset_button.grid_forget()
+
+                else:
+                    self.var_asset_label.set("NO ASSET SELECTED")
+                    self.var_selection_path_label.set("")
+                    self.delete_asset_button.grid_forget()
+                    self.rename_asset_button.grid_forget()
+                    self.set_asset_button.grid_forget()
+                    self.open_asset_button.grid_forget()
+                    self.open_asset_folder_button.grid_forget()
+                    self.version_list.delete(0, END)
+                    self.asset_pict_caneva.grid_forget()
+                    self.priority_asset_label.grid_forget()
+                    self.priority_asset_menu.grid_forget()
+                    self.modeling_done_asset_button.grid_forget()
+                    self.rig_done_asset_button.grid_forget()
+                    self.lookdev_done_asset_button.grid_forget()
+                    self.done_asset_button.grid_forget()
 
     def versionlistCommand(self, e):
         if self.version_list.size():
@@ -1727,22 +1743,24 @@ class SuperPipe(Frame):
                 f.write("www.google.fr\n")
             f.close()
 
-        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : ""}
+        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : "", "theme" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path"))
+        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
         self.wait_window(dialog().top)
 
-        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"]:
+        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"] and preferences["theme"]:
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
             self.blender_path = preferences["blender_path"]
             self.vlc_path = preferences["vlc_path"]
+            self.theme = preferences["theme"]
 
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["link"], 1)
-            Resources.writeAtLine("save/options.spi", preferences["maya_path"], 2)
-            Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 3)
-            Resources.writeAtLine("save/options.spi", preferences["blender_path"], 4)
-            Resources.writeAtLine("save/options.spi", preferences["vlc_path"], 5)
+            Resources.writeAtLine("save/options.spi", preferences["theme"], 2)
+            Resources.writeAtLine("save/options.spi", preferences["maya_path"], 3)
+            Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 4)
+            Resources.writeAtLine("save/options.spi", preferences["blender_path"], 5)
+            Resources.writeAtLine("save/options.spi", preferences["vlc_path"], 6)
 
     def about(self):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)

@@ -9,12 +9,13 @@ from os import listdir
 class ProjectSettingsDialog(object):
     def __init__(self, parent, project, dict_key = None):
         ## THEME COLORS ##
-        self.main_color = Resources.readLine("save/themes.spi", 1)
-        self.button_color1 = Resources.readLine("save/themes.spi", 4)
-        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
-        self.button_color2 = Resources.readLine("save/themes.spi", 6)
-        self.over_button_color2 = Resources.readLine("save/themes.spi", 7)
-        self.text_color = Resources.readLine("save/themes.spi", 9)
+        self.theme = Resources.readLine("save/options.spi", 2)
+        self.main_color = Resources.readLine("save/themes/" + self.theme + ".spi", 1)
+        self.button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 5)
+        self.button_color2 = Resources.readLine("save/themes/" + self.theme + ".spi", 6)
+        self.over_button_color2 = Resources.readLine("save/themes/" + self.theme + ".spi", 7)
+        self.text_color = Resources.readLine("save/themes/" + self.theme + ".spi", 9)
 
         self.root = parent
         self.top = Toplevel(self.root)
