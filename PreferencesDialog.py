@@ -201,7 +201,7 @@ class PreferencesDialog(object):
         houdini_path = self.houdini_path_entry.get()
         blender_path = self.blender_path_entry.get()
         vlc_path = self.vlc_path_entry.get()
-        theme = path.splitext(self.themes_list)[self.rb_theme.get()])[0]
+        theme = path.splitext(self.themes_list[self.rb_theme.get()])[0]
         if custom_link and maya_path and houdini_path and blender_path and vlc_path and theme:
             d, key1, key2, key3, key4, key5, key6 = dict_key
             d[key1] = custom_link
