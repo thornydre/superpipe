@@ -14,6 +14,7 @@ from os import path, mkdir
 from urllib.parse import urlsplit
 from PIL import Image, ImageTk
 from watchdog.observers import Observer
+from CustomSlider import *
 
 import NewShotDialog
 import NewAssetDialog
@@ -332,7 +333,7 @@ class SuperPipe(Frame):
         self.shot_state_line.columnconfigure(0, pad = 10, minsize = 75)
         self.shot_state_line.columnconfigure(1, pad = 10, minsize = 100)
         self.shot_state_line.columnconfigure(2, pad = 50)
-        self.shot_state_line.columnconfigure(7, pad = 50)
+        self.shot_state_line.columnconfigure(4, pad = 50)
 
         self.priority_shot_label = Label(self.shot_state_line, text = "Priority : ", bg = self.main_color, fg = self.text_color, height = 1, anchor = NW, font = "Helvetica 9 bold")
         self.priority_shot_label.grid(row = 0, column = 0, sticky = E)
@@ -353,34 +354,20 @@ class SuperPipe(Frame):
         self.downgrade_shot_button.pi = self.downgrade_shot_button.grid_info()
         self.downgrade_shot_button.grid_forget()
 
-        self.layout_label = Label(self.shot_state_line, text = "Layout", bg = "#66CEFF", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
-        self.layout_label.grid(row = 0, column = 3)
-        self.layout_label.pi = self.layout_label.grid_info()
-        self.layout_label.grid_forget()
-        
-        self.blocking_label = Label(self.shot_state_line, text = "Blocking", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
-        self.blocking_label.grid(row = 0, column = 4)
-        self.blocking_label.pi = self.blocking_label.grid_info()
-        self.blocking_label.grid_forget()
-        
-        self.splining_label = Label(self.shot_state_line, text = "Splining", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
-        self.splining_label.grid(row = 0, column = 5)
-        self.splining_label.pi = self.splining_label.grid_info()
-        self.splining_label.grid_forget()
-
-        self.rendering_label = Label(self.shot_state_line, text = "Rendering", bg = "#999999", height = 1, anchor = NW, font = "Helvetica 9 bold", pady = 5, padx = 15)
-        self.rendering_label.grid(row = 0, column = 6)
-        self.rendering_label.pi = self.rendering_label.grid_info()
-        self.rendering_label.grid_forget()
+        self.step_slider = CustomSlider(self.shot_state_line, width = 500, height = 20, steps = ("Layout", "Blocking", "Splining", "Rendering"), bg = self.button_color2, fg = self.button_color1, txt = self.text_color, grid = self.separator_color)
+        self.step_slider.grid(row = 0, column = 3)
+        self.step_slider.pi = self.step_slider.grid_info()
+        self.step_slider.grid_forget()
+        self.step_slider.bind("<ButtonRelease-1>", self.customSliderCommand)
 
         self.upgrade_shot_button = Button(self.shot_state_line, text = "Upgrade shot", bg = self.button_color2, activebackground = self.over_button_color2, activeforeground = self.text_color, fg = self.text_color, bd = 0, width = 13, height = 1, command = self.upgradeShotCommand)
-        self.upgrade_shot_button.grid(row = 0, column = 7)
+        self.upgrade_shot_button.grid(row = 0, column = 4)
         self.upgrade_shot_button.pi = self.upgrade_shot_button.grid_info()
         self.upgrade_shot_button.grid_forget()
 
         self.var_shot_done = IntVar()
         self.done_shot_button = Checkbutton(self.shot_state_line, text = "Shot done", variable = self.var_shot_done, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDone)
-        self.done_shot_button.grid(row = 0, column = 8)
+        self.done_shot_button.grid(row = 0, column = 5)
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
@@ -954,10 +941,14 @@ class SuperPipe(Frame):
 
                 self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
-                self.layout_label.grid(self.layout_label.pi)
-                self.blocking_label.grid(self.blocking_label.pi)
-                self.splining_label.grid(self.splining_label.pi)
-                self.rendering_label.grid(self.rendering_label.pi)
+                self.step_slider.setCurrentStep(shot.getStep())
+                if shot.isDone():
+                    self.step_slider.setPercentage(100)
+                    self.step_slider.setActive(active = False)
+                else:
+                    self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
+                    self.step_slider.setActive(active = True)
+                self.step_slider.grid(self.step_slider.pi)
 
                 self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
                 self.done_shot_button.grid(self.done_shot_button.pi)
@@ -966,27 +957,15 @@ class SuperPipe(Frame):
                 self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
 
                 if shot.getStep() == "Layout":
-                    self.blocking_label.config(bg = "#999999")
-                    self.splining_label.config(bg = "#999999")
-                    self.rendering_label.config(bg = "#999999")
                     self.upgrade_shot_button.config(state = NORMAL)
                     self.downgrade_shot_button.config(state = DISABLED)
                 elif shot.getStep() == "Blocking":
-                    self.blocking_label.config(bg = "#66CEFF")
-                    self.splining_label.config(bg = "#999999")
-                    self.rendering_label.config(bg = "#999999")
                     self.upgrade_shot_button.config(state = NORMAL)
                     self.downgrade_shot_button.config(state = NORMAL)
                 elif shot.getStep() == "Splining":
-                    self.blocking_label.config(bg = "#66CEFF")
-                    self.splining_label.config(bg = "#66CEFF")
-                    self.rendering_label.config(bg = "#999999")
                     self.upgrade_shot_button.config(state = NORMAL)
                     self.downgrade_shot_button.config(state = NORMAL)
                 elif shot.getStep() == "Rendering":
-                    self.blocking_label.config(bg = "#66CEFF")
-                    self.splining_label.config(bg = "#66CEFF")
-                    self.rendering_label.config(bg = "#66CEFF")
                     self.upgrade_shot_button.config(state = DISABLED)
                     self.downgrade_shot_button.config(state = NORMAL)
 
@@ -1030,10 +1009,11 @@ class SuperPipe(Frame):
 
                 self.downgrade_shot_button.grid_forget()
 
-                self.layout_label.grid_forget()
-                self.blocking_label.grid_forget()
-                self.splining_label.grid_forget()
-                self.rendering_label.grid_forget()
+                self.step_slider.grid_forget()
+                # self.layout_label.grid_forget()
+                # self.blocking_label.grid_forget()
+                # self.splining_label.grid_forget()
+                # self.rendering_label.grid_forget()
 
                 self.upgrade_shot_button.grid_forget()
                 self.done_shot_button.grid_forget()
@@ -1447,6 +1427,8 @@ class SuperPipe(Frame):
         self.parent.config(cursor = "wait")
         self.parent.update()
 
+        loc = self.shot_list.yview()[0]
+
         self.up_button.config(state = DISABLED)
         self.down_button.config(state = DISABLED)
 
@@ -1461,11 +1443,15 @@ class SuperPipe(Frame):
         self.up_button.config(state = NORMAL)
         self.down_button.config(state = NORMAL)
 
+        self.shot_list.yview_moveto(loc)
+
         self.parent.config(cursor = "")
 
     def moveShotDownCommand(self):
         self.parent.config(cursor = "wait")
         self.parent.update()
+
+        loc = self.shot_list.yview()[0]
 
         self.up_button.config(state = DISABLED)
         self.down_button.config(state = DISABLED)
@@ -1481,6 +1467,8 @@ class SuperPipe(Frame):
         self.up_button.config(state = NORMAL)
         self.down_button.config(state = NORMAL)
 
+        self.shot_list.yview_moveto(loc)
+
         self.parent.config(cursor = "")
 
     def toggleLastVersions(self):
@@ -1493,10 +1481,15 @@ class SuperPipe(Frame):
         self.version_list.select_set(0)
 
     def toggleShotDone(self):
+        loc = self.shot_list.yview()[0]
         selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().setDone(self.var_shot_done.get())
+        if self.var_shot_done.get():
+            self.step_slider.setPercentage(100)
+        self.step_slider.setActive(not self.var_shot_done.get())
         self.updateShotListView()
         self.shot_list.select_set(selected_shot)
+        self.shot_list.yview_moveto(loc)
 
     def toggleAssetModelingDone(self):
         selected_asset = self.asset_list.focus()
@@ -1535,10 +1528,12 @@ class SuperPipe(Frame):
         self.asset_list.see(selected_asset)
 
     def priorityShotCommand(self, priority):
+        loc = self.shot_list.yview()[0]
         selected_shot = self.shot_list.curselection()[0]
         self.current_project.getSelection().setPriority(priority)
         self.updateShotListView()
         self.shot_list.select_set(selected_shot)
+        self.shot_list.yview_moveto(loc)
 
     def priorityAssetCommand(self, priority):
         selected_asset = self.asset_list.focus()
@@ -1673,6 +1668,9 @@ class SuperPipe(Frame):
             Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", P, 6)
 
         return True
+
+    def customSliderCommand(self, e):
+        Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", str(self.step_slider.getPercentage()), 7)
 
     def customButtonCommand(self):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
