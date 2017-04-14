@@ -11,6 +11,7 @@ from tkinter import messagebox
 from Resources import *
 
 import NewProjectDialog
+import re
 
 class Project:
     def __init__(self, directory):
@@ -103,7 +104,7 @@ class Project:
     def updateShotList(self):
         self.shot_list = []
         for shot_name in listdir(self.directory + "/05_shot/"):
-            if shot_name != "backup":
+            if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_name):
                 shot = Shot(self.directory, shot_name)
                 self.shot_list.append((shot.getShotNb(), shot.getShotName()))
 
