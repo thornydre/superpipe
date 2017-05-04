@@ -97,6 +97,7 @@ class SuperPipe(Frame):
                 self.updateAssetListView()
 
         if self.current_project:
+            self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
             event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
             self.observer = Observer()
             self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
@@ -219,14 +220,14 @@ class SuperPipe(Frame):
         main_area.columnconfigure(0, weight = 1)
 
         ## // NO PROJECT MAIN FRAME \\##
-        self.main_area_no_project = Frame(main_area, bg = self.main_color, bd = 0)
-        self.main_area_no_project.grid(row = 0, column = 0, sticky = N + S + W + E)
-        self.main_area_no_project.pi = self.main_area_no_project.grid_info()
+        self.main_area_home_page = Frame(main_area, bg = self.main_color, bd = 0)
+        self.main_area_home_page.grid(row = 0, column = 0, sticky = N + S + W + E)
+        self.main_area_home_page.pi = self.main_area_home_page.grid_info()
 
-        self.var_shot_nb_label = StringVar()
-        self.var_shot_nb_label.set("NO SHOT SELECTED")
-        no_project_label = Label(self.main_area_no_project, text = "PLEASE SET AN EXISTING PROJECT, OR CREATE A NEW ONE", bg = self.main_color, fg = self.text_color, height = 1, justify = CENTER, font = "Helvetica 15 bold")
-        no_project_label.pack(expand = True, fill = BOTH, side = BOTTOM)
+        self.var_home_page_title = StringVar()
+        self.var_home_page_title.set("PLEASE SET AN EXISTING PROJECT, OR CREATE A NEW ONE")
+        home_page_label = Label(self.main_area_home_page, textvariable = self.var_home_page_title, bg = self.main_color, fg = self.text_color, height = 1, justify = CENTER, font = "Helvetica 15 bold")
+        home_page_label.pack(expand = True, fill = BOTH, side = BOTTOM)
 
         ###############################################################################################################
 
@@ -756,6 +757,9 @@ class SuperPipe(Frame):
                     self.menu_project.entryconfig(1, state = NORMAL)
                     self.menu_project.entryconfig(3, state = NORMAL)
                     self.menu_project.entryconfig(5, state = NORMAL)
+
+
+                    self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
 
                     self.updateShotListView()
                     self.updateAssetListView()

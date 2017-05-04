@@ -122,6 +122,9 @@ class Project:
     def getDirectory(self):
         return self.directory
 
+    def getName(self):
+        return self.directory.split("/")[-1]
+
     def getSequenceNumber(self):
         return self.sequence_number
 
