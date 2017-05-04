@@ -637,8 +637,61 @@ class SuperPipe(Frame):
         self.var_versions_label = StringVar()
         self.var_versions_label.set("Versions")
 
-        versions_label = Label(right_side_bar, textvariable = self.var_versions_label, bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
-        versions_label.pack(fill = X, pady = 10)
+        versions_label = Label(right_side_bar, textvariable = self.var_versions_label, bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold", width = 200)
+        versions_label.pack(fill = NONE, pady = 10)
+
+        display_buttons = Frame(right_side_bar, bg = self.main_color)
+        display_buttons.pack(fill = X)
+
+        self.asset_display_buttons = Frame(display_buttons, bg = self.main_color)
+        self.asset_display_buttons.pack(fill = X, pady = 10, padx = 20)
+        self.asset_display_buttons.pi = self.asset_display_buttons.pack_info()
+
+        self.asset_display_buttons.columnconfigure(0, weight = 1)
+        self.asset_display_buttons.columnconfigure(1, weight = 1)
+
+        self.var_asset_display_modeling = IntVar()
+        self.display_modeling_asset_button = Checkbutton(self.asset_display_buttons, text = "Display modeling", variable = self.var_asset_display_modeling, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDisplay)
+        self.display_modeling_asset_button.grid(row = 0, column = 0, sticky = W)
+        self.display_modeling_asset_button.select()
+
+        self.var_asset_display_rigging = IntVar()
+        self.display_rigging_asset_button = Checkbutton(self.asset_display_buttons, text = "Display rigging", variable = self.var_asset_display_rigging, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDisplay)
+        self.display_rigging_asset_button.grid(row = 0, column = 1, sticky = W)
+        self.display_rigging_asset_button.select()
+
+        self.var_asset_display_lookdev = IntVar()
+        self.display_lookdev_asset_button = Checkbutton(self.asset_display_buttons, text = "Display lookdev", variable = self.var_asset_display_lookdev, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDisplay)
+        self.display_lookdev_asset_button.grid(row = 1, column = 0, sticky = W)
+        self.display_lookdev_asset_button.select()
+
+        self.shot_display_buttons = Frame(display_buttons, bg = self.main_color)
+        self.shot_display_buttons.pack(fill = X, pady = 10, padx = 20)
+        self.shot_display_buttons.pi = self.shot_display_buttons.pack_info()
+        self.shot_display_buttons.pack_forget()
+
+        self.shot_display_buttons.columnconfigure(0, weight = 1)
+        self.shot_display_buttons.columnconfigure(1, weight = 1)
+
+        self.var_asset_display_layout = IntVar()
+        self.display_layout_asset_button = Checkbutton(self.shot_display_buttons, text = "Display layout", variable = self.var_asset_display_layout, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_layout_asset_button.grid(row = 0, column = 0, sticky = W)
+        self.display_layout_asset_button.select()
+
+        self.var_asset_display_blocking = IntVar()
+        self.display_blocking_asset_button = Checkbutton(self.shot_display_buttons, text = "Display blocking", variable = self.var_asset_display_blocking, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_blocking_asset_button.grid(row = 0, column = 1, sticky = W)
+        self.display_blocking_asset_button.select()
+
+        self.var_asset_display_splinning = IntVar()
+        self.display_splinning_asset_button = Checkbutton(self.shot_display_buttons, text = "Display splinning", variable = self.var_asset_display_splinning, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_splinning_asset_button.grid(row = 1, column = 0, sticky = W)
+        self.display_splinning_asset_button.select()
+
+        self.var_asset_display_rendering = IntVar()
+        self.display_rendering_asset_button = Checkbutton(self.shot_display_buttons, text = "Display rendering", variable = self.var_asset_display_rendering, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_rendering_asset_button.grid(row = 1, column = 1, sticky = W)
+        self.display_rendering_asset_button.select()
 
         self.version_list = Listbox(right_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
         self.version_list.pack(fill = X, pady = 10)
@@ -646,7 +699,7 @@ class SuperPipe(Frame):
 
         pw_main.add(right_side_bar)
         pw_main.update()
-        pw_main.sash_place(1, 1650, 0)
+        pw_main.sash_place(1, 1550, 0)
 
     def newProjectCommand(self, e = None):
         directory = {"dir":""}
@@ -1029,7 +1082,7 @@ class SuperPipe(Frame):
 
             if prev_shot_nb > 0:
                 for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-                    if shot_dir != "backup":
+                    if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
                         if int(shot_dir[-2:]) == prev_shot_nb:
                             all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
 
@@ -1338,6 +1391,8 @@ class SuperPipe(Frame):
             if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
                 self.shot_list.insert(shot[0], shot[1])
 
+                print(shot[0], shot[1])
+
                 cur_shot = Shot(self.current_project.getDirectory(), shot[1])
 
                 if cur_shot.isDone():
@@ -1396,11 +1451,15 @@ class SuperPipe(Frame):
 
         if shot:
             if self.version_mode:
-                shot_versions = shot.getVersionsList(self.var_check_show_last.get())
+                shot_versions = shot.getVersionsList(self.var_check_show_last.get(), self.var_asset_display_layout.get(), self.var_asset_display_blocking.get(), self.var_asset_display_splinning.get(), self.var_asset_display_rendering.get())
 
                 if shot_versions:
                     for shot_version in shot_versions:
                         self.version_list.insert(END, shot_version[1])
+
+                self.asset_display_buttons.pack_forget()
+                self.shot_display_buttons.pack(self.shot_display_buttons.pi)
+
             else:
                 shot_playblasts = shot.getPlayblastsList()
 
@@ -1410,11 +1469,14 @@ class SuperPipe(Frame):
 
         elif asset:
             if self.version_mode:
-                asset_versions = asset.getVersionsList(self.var_check_show_last.get())
+                asset_versions = asset.getVersionsList(self.var_check_show_last.get(), self.var_asset_display_modeling.get(), self.var_asset_display_rigging.get(), self.var_asset_display_lookdev.get())
 
                 if asset_versions:
                     for asset_version in asset_versions:
                         self.version_list.insert(END, asset_version[1])
+
+                self.shot_display_buttons.pack_forget()
+                self.asset_display_buttons.pack(self.asset_display_buttons.pi)
 
             else:
                 asset_playblasts = asset.getPlayblastsList()
@@ -1560,7 +1622,7 @@ class SuperPipe(Frame):
         all_shots_preview = []
 
         for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-            if shot_dir != "backup":
+            if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
                 all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
 
                 all_picts_path_array = []
@@ -1633,6 +1695,12 @@ class SuperPipe(Frame):
         subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     ###############################################################################################################
+
+    def toggleAssetDisplay(self):
+        self.updateVersionListView(asset = self.current_project.getSelection())
+
+    def toggleShotDisplay(self):
+        self.updateVersionListView(shot = self.current_project.getSelection())
 
     def toggleVersionsPlayblastsCommand(self):
         self.version_mode = not self.version_mode

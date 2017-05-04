@@ -11,6 +11,7 @@ import time
 class Asset:
     def __init__(self, directory = None, second_path = None, asset_name = None, software = None):
         self.asset_name = asset_name
+        print(self.asset_name)
         self.project_dir = directory
         self.second_path = second_path
         self.directory = directory + "/04_asset" + self.second_path + "/" + self.asset_name
@@ -72,7 +73,7 @@ class Asset:
                 makedirs(self.directory + "/sound")
                 
                 makedirs(self.directory + "/sourceimages")
-                makedirs(self.directory + "/sourceimages/3dPatinTextures")
+                makedirs(self.directory + "/sourceimages/3dPaintTextures")
                 makedirs(self.directory + "/sourceimages/edits")
                 makedirs(self.directory + "/sourceimages/environement")
                 makedirs(self.directory + "/sourceimages/imagePlane")
@@ -219,25 +220,36 @@ class Asset:
         copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[1] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.directory)
 
-    def getVersionsList(self, last_only):
+    def getVersionsList(self, last_only, modeling, rigging, lookdev):
         versions_list = []
+
+        display = []
+        if modeling:
+            display.append("modeling")
+        if rigging:
+            display.append("rigging")
+        if lookdev:
+            display.append("lookdev")
 
         if self.software == "maya":
             for asset_file in listdir(self.directory + "/scenes/"):
                 if not "reference" in asset_file:
                     if not asset_file[0] == "_":
                         if path.splitext(asset_file)[1] == ".ma":
-                            versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+                            for disp in display:
+                                if disp in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/scenes/edits/"):
                     if not asset_file[0] == "_":
                         if path.splitext(asset_file)[1] == ".ma":
-                            versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+                            for disp in display:
+                                if disp in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         elif self.software == "houdini":
             for asset_file in listdir(self.directory + "/"):
-                print(asset_file)
                 if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
                     versions_list.append((path.getmtime(self.directory + "/" + asset_file), asset_file))
 
