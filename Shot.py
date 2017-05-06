@@ -109,7 +109,7 @@ class Shot:
                     makedirs(self.shot_directory + "/video")
 
             else:
-                print("ERROR1")
+                print("ERROR1 : " + self.shot_name)
 
         elif Shot.validShot(self.shot_directory):
             if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
@@ -139,7 +139,7 @@ class Shot:
                 self.software = "maya"
 
         else:
-            print("ERROR2")
+            print("ERROR2 : " + self.shot_name)
 
         if not path.isdir(self.postprod_directory):
             makedirs(self.postprod_directory)

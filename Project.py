@@ -226,6 +226,15 @@ class Project:
         asset.deleteAsset()
         self.updateAssetList()
 
+    def filterAssetList(self, filter_str):
+        filtered_asset_list = []
+
+        for asset in self.asset_list:
+            if re.search(filter_str, asset[0]):
+                filtered_asset_list.append(asset[0])
+
+        return filtered_asset_list
+
     def cleanBackups(self):
         rmtree(self.directory + "/05_shot/backup")
         makedirs(self.directory + "/05_shot/backup")

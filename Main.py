@@ -178,6 +178,10 @@ class SuperPipe(Frame):
         asset_label = Label(top_left_side_bar, text = "Assets", bg = self.main_color, fg = self.text_color, font = "Helvetica 10 bold")
         asset_label.pack(fill = X, pady = 10)
 
+        self.var_asset_filter = StringVar()
+        self.asset_filter_entry = Entry(top_left_side_bar, textvariable = self.var_asset_filter, relief = FLAT, bg = self.list_color, fg = self.text_color, width = 50, bd = 5, validate = "key", validatecommand = (self.register(self.validateAssetFilterEntry), '%P'))
+        self.asset_filter_entry.pack(fill = X, pady = (0, 10), padx = 20)
+
         self.asset_list = ttk.Treeview(top_left_side_bar, height = 16, show = "tree", selectmode = "none")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.asset_list.tag_configure("done", background = self.done_color)
@@ -972,7 +976,7 @@ class SuperPipe(Frame):
             self.current_project.setSelection(shot_name = selected_shot)
             shot = self.current_project.getSelection()
 
-            if path.isdir(shot.getDirectory()):
+            if Shot.validShot(shot.getDirectory()):
                 self.updateVersionListView(shot = shot)
                 self.version_list.select_set(0)
 
@@ -1091,18 +1095,19 @@ class SuperPipe(Frame):
                             if int(shot_dir[-2:]) == prev_shot_nb:
                                 all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
 
-                                if path.isdir(all_picts_path):
-                                    all_picts_path_array = []
+                                if Shot.validShot(self.current_project.getDirectory() + "/05_shot/" + shot_dir):
+                                    if path.isdir(all_picts_path):
+                                        all_picts_path_array = []
 
-                                    for f in listdir(all_picts_path):
-                                        if ".jpg" in f:
-                                            all_picts_path_array.append(all_picts_path + f)
+                                        for f in listdir(all_picts_path):
+                                            if ".jpg" in f:
+                                                all_picts_path_array.append(all_picts_path + f)
 
-                                    if all_picts_path_array:
-                                        prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+                                        if all_picts_path_array:
+                                            prev_pict_path = max(all_picts_path_array, key = path.getmtime)
 
-                                else:
-                                    mkdir(all_picts_path)
+                                    else:
+                                        mkdir(all_picts_path)
 
                 if path.isfile(prev_pict_path):
                     pict = ImageTk.PhotoImage(file = prev_pict_path)
@@ -1752,6 +1757,30 @@ class SuperPipe(Frame):
     def validateDescriptionEntry(self, P):
         if self.current_project:
             Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", P, 6)
+
+        return True
+
+    def validateAssetFilterEntry(self, P):
+        print(P)
+        if P:
+            filtered_asset_list = self.current_project.filterAssetList(P)
+
+            for item in self.asset_list.get_children(""):
+                self.asset_list.delete(item)
+
+            for filtered_asset in filtered_asset_list:
+                self.asset_list.insert("", END, filtered_asset.lower(), text = filtered_asset.lower())
+
+        else:
+            for item in self.asset_list.get_children(""):
+                self.asset_list.delete(item)
+
+            self.asset_list.insert("", 1, "character", text = "CHARACTER")
+            self.asset_list.insert("", 2, "fx", text = "FX")
+            self.asset_list.insert("", 3, "props", text = "PROPS")
+            self.asset_list.insert("", 4, "set", text = "SET")
+
+            self.updateAssetListView()
 
         return True
 
