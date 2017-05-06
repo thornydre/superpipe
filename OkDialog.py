@@ -7,10 +7,11 @@ from tkinter import *
 class OkDialog(object):
     def __init__(self, parent, window_name, message, padding = 10):
         ## THEME COLORS ##
-        self.main_color = Resources.readLine("save/themes.spi", 1)
-        self.button_color1 = Resources.readLine("save/themes.spi", 4)
-        self.over_button_color1 = Resources.readLine("save/themes.spi", 5)
-        self.text_color = Resources.readLine("save/themes.spi", 9)
+        self.theme = Resources.readLine("save/options.spi", 2)
+        self.main_color = Resources.readLine("save/themes/" + self.theme + ".spi", 1)
+        self.button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 4)
+        self.over_button_color1 = Resources.readLine("save/themes/" + self.theme + ".spi", 5)
+        self.text_color = Resources.readLine("save/themes/" + self.theme + ".spi", 9)
 
         self.root = parent
         self.top = Toplevel(self.root)

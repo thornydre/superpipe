@@ -972,147 +972,152 @@ class SuperPipe(Frame):
             self.current_project.setSelection(shot_name = selected_shot)
             shot = self.current_project.getSelection()
 
-            self.updateVersionListView(shot = shot)
-            self.version_list.select_set(0)
+            if path.isdir(shot.getDirectory()):
+                self.updateVersionListView(shot = shot)
+                self.version_list.select_set(0)
 
-            self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 1)))
-            self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 2))
+                self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 1)))
+                self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 2))
 
-            self.priority_shot_label.grid(self.priority_shot_label.pi)
-            self.priority_shot_menu.grid(self.priority_shot_menu.pi)
-            self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
+                self.priority_shot_label.grid(self.priority_shot_label.pi)
+                self.priority_shot_menu.grid(self.priority_shot_menu.pi)
+                self.open_shot_folder_button.grid(self.open_shot_folder_button.pi)
 
-            shot_description = Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 6)
-            if shot_description:
-                self.var_shot_description.set(shot_description)
-            else:
-                self.var_shot_description.set("")
-
-            self.shot_description_entry.config(state = NORMAL)
-
-            if shot.isSet():
-                self.set_shot_button.grid_forget()
-                self.frame_range_entry.grid(self.frame_range_entry.pi)
-                self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
-                self.open_shot_button.grid(self.open_shot_button.pi)
-
-                self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
-
-                self.step_slider.setCurrentStep(shot.getStep())
-                if shot.isDone():
-                    self.step_slider.setPercentage(100)
-                    self.step_slider.setActive(active = False)
+                shot_description = Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 6)
+                if shot_description:
+                    self.var_shot_description.set(shot_description)
                 else:
-                    self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
-                    self.step_slider.setActive(active = True)
-                self.step_slider.grid(self.step_slider.pi)
+                    self.var_shot_description.set("")
 
-                self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
-                self.done_shot_button.grid(self.done_shot_button.pi)
+                self.shot_description_entry.config(state = NORMAL)
 
-                self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
-                self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
+                if shot.isSet():
+                    self.set_shot_button.grid_forget()
+                    self.frame_range_entry.grid(self.frame_range_entry.pi)
+                    self.set_shot_frame_range_button.grid(self.set_shot_frame_range_button.pi)
+                    self.open_shot_button.grid(self.open_shot_button.pi)
 
-                if shot.getStep() == "Layout":
-                    self.upgrade_shot_button.config(state = NORMAL)
-                    self.downgrade_shot_button.config(state = DISABLED)
-                elif shot.getStep() == "Blocking":
-                    self.upgrade_shot_button.config(state = NORMAL)
-                    self.downgrade_shot_button.config(state = NORMAL)
-                elif shot.getStep() == "Splining":
-                    self.upgrade_shot_button.config(state = NORMAL)
-                    self.downgrade_shot_button.config(state = NORMAL)
-                elif shot.getStep() == "Rendering":
-                    self.upgrade_shot_button.config(state = DISABLED)
-                    self.downgrade_shot_button.config(state = NORMAL)
+                    self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
-                selected_line = self.version_list.curselection()[0]
-                if self.current_project.getSelectionType() == "shot":
-                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
-                elif self.current_project.getSelection().getSoftware() == "maya":
-                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
-                elif self.current_project.getSelection().getSoftware() == "houdini":
-                    temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
-
-                self.var_selection_path_label.set(temp_path.replace("/", "\\"))
-
-                temp_path = self.current_project.getSelection().getDirectory() + "/cache/alembic/" + path.splitext(self.version_list.get(selected_line))[0] + ".abc"
-
-                if not path.isfile(temp_path):
-                    temp_path = ""
-
-                self.var_selection_abc_path_label.set(temp_path.replace("/", "\\"))
-
-                if self.version_mode:
-                    pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
-
-                    if path.isfile(pict_path):
-                        pict = ImageTk.PhotoImage(file = pict_path)
-
-                        self.shot_gifdict[pict_path] = pict
-
-                        self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
-                        self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                        self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
-
+                    self.step_slider.setCurrentStep(shot.getStep())
+                    if shot.isDone():
+                        self.step_slider.setPercentage(100)
+                        self.step_slider.setActive(active = False)
                     else:
-                        self.shot_pict_caneva.grid_forget()
+                        self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
+                        self.step_slider.setActive(active = True)
+                    self.step_slider.grid(self.step_slider.pi)
+
+                    self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
+                    self.done_shot_button.grid(self.done_shot_button.pi)
+
+                    self.frame_range_entry.delete(0, len(self.frame_range_entry.get()))
+                    self.frame_range_entry.insert(0, self.current_project.getSelection().getFrameRange())
+
+                    if shot.getStep() == "Layout":
+                        self.upgrade_shot_button.config(state = NORMAL)
+                        self.downgrade_shot_button.config(state = DISABLED)
+                    elif shot.getStep() == "Blocking":
+                        self.upgrade_shot_button.config(state = NORMAL)
+                        self.downgrade_shot_button.config(state = NORMAL)
+                    elif shot.getStep() == "Splining":
+                        self.upgrade_shot_button.config(state = NORMAL)
+                        self.downgrade_shot_button.config(state = NORMAL)
+                    elif shot.getStep() == "Rendering":
+                        self.upgrade_shot_button.config(state = DISABLED)
+                        self.downgrade_shot_button.config(state = NORMAL)
+
+                    selected_line = self.version_list.curselection()[0]
+                    if self.current_project.getSelectionType() == "shot":
+                        temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                    elif self.current_project.getSelection().getSoftware() == "maya":
+                        temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                    elif self.current_project.getSelection().getSoftware() == "houdini":
+                        temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+
+                    self.var_selection_path_label.set(temp_path.replace("/", "\\"))
+
+                    temp_path = self.current_project.getSelection().getDirectory() + "/cache/alembic/" + path.splitext(self.version_list.get(selected_line))[0] + ".abc"
+
+                    if not path.isfile(temp_path):
+                        temp_path = ""
+
+                    self.var_selection_abc_path_label.set(temp_path.replace("/", "\\"))
+
+                    if self.version_mode:
+                        pict_path = shot.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
+
+                        if path.isfile(pict_path):
+                            pict = ImageTk.PhotoImage(file = pict_path)
+
+                            self.shot_gifdict[pict_path] = pict
+
+                            self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
+                            self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                            self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+
+                        else:
+                            self.shot_pict_caneva.grid_forget()
+
+                else:
+                    self.set_shot_button.grid(self.set_shot_button.pi)
+                    self.frame_range_entry.grid_forget()
+                    self.set_shot_frame_range_button.grid_forget()
+                    self.open_shot_button.grid_forget()
+
+                    self.downgrade_shot_button.grid_forget()
+
+                    self.step_slider.grid_forget()
+                    # self.layout_label.grid_forget()
+                    # self.blocking_label.grid_forget()
+                    # self.splining_label.grid_forget()
+                    # self.rendering_label.grid_forget()
+
+                    self.upgrade_shot_button.grid_forget()
+                    self.done_shot_button.grid_forget()
+
+                    self.shot_pict_caneva.grid_forget()
+
+                    self.var_selection_path_label.set("")
+                    self.var_selection_abc_path_label.set("")
+
+                prev_pict_path = ""
+
+                prev_shot_nb = shot.getShotNb() - 1
+
+                if prev_shot_nb > 0:
+                    for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
+                        if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
+                            if int(shot_dir[-2:]) == prev_shot_nb:
+                                all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
+
+                                if path.isdir(all_picts_path):
+                                    all_picts_path_array = []
+
+                                    for f in listdir(all_picts_path):
+                                        if ".jpg" in f:
+                                            all_picts_path_array.append(all_picts_path + f)
+
+                                    if all_picts_path_array:
+                                        prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+
+                                else:
+                                    mkdir(all_picts_path)
+
+                if path.isfile(prev_pict_path):
+                    pict = ImageTk.PhotoImage(file = prev_pict_path)
+
+                    self.shot_prev_gifdict[prev_pict_path] = pict
+
+                    self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
+                    self.shot_prev_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                    self.shot_prev_pict_caneva.config(height = pict.height(), width = pict.width())
+                else:
+                    self.shot_prev_pict_caneva.grid_forget()
 
             else:
-                self.set_shot_button.grid(self.set_shot_button.pi)
-                self.frame_range_entry.grid_forget()
-                self.set_shot_frame_range_button.grid_forget()
-                self.open_shot_button.grid_forget()
-
-                self.downgrade_shot_button.grid_forget()
-
-                self.step_slider.grid_forget()
-                # self.layout_label.grid_forget()
-                # self.blocking_label.grid_forget()
-                # self.splining_label.grid_forget()
-                # self.rendering_label.grid_forget()
-
-                self.upgrade_shot_button.grid_forget()
-                self.done_shot_button.grid_forget()
-
-                self.shot_pict_caneva.grid_forget()
-
-                self.var_selection_path_label.set("")
-                self.var_selection_abc_path_label.set("")
-
-            prev_pict_path = ""
-
-            prev_shot_nb = shot.getShotNb() - 1
-
-            if prev_shot_nb > 0:
-                for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-                    if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
-                        if int(shot_dir[-2:]) == prev_shot_nb:
-                            all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
-
-                            if path.isdir(all_picts_path):
-                                all_picts_path_array = []
-
-                                for f in listdir(all_picts_path):
-                                    if ".jpg" in f:
-                                        all_picts_path_array.append(all_picts_path + f)
-
-                                if all_picts_path_array:
-                                    prev_pict_path = max(all_picts_path_array, key = path.getmtime)
-
-                            else:
-                                mkdir(all_picts_path)
-
-            if path.isfile(prev_pict_path):
-                pict = ImageTk.PhotoImage(file = prev_pict_path)
-
-                self.shot_prev_gifdict[prev_pict_path] = pict
-
-                self.shot_prev_pict_caneva.grid(self.shot_prev_pict_caneva.pi)
-                self.shot_prev_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                self.shot_prev_pict_caneva.config(height = pict.height(), width = pict.width())
-            else:
-                self.shot_prev_pict_caneva.grid_forget()
+                dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The shot \"" + shot.getShotName() + "\" is not available !")
+                self.wait_window(dialog().top)
 
     def assetListCommand(self, e):
         if self.current_project:
@@ -1143,65 +1148,70 @@ class SuperPipe(Frame):
                     self.current_project.setSelection(asset_name = selected_asset, second_path = "/" + "/".join(path_array))
                     asset = self.current_project.getSelection()
 
-                    self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
-                    self.delete_asset_button.grid(self.delete_asset_button.pi)
-                    self.rename_asset_button.grid(self.rename_asset_button.pi)
+                    if path.isdir(asset.getDirectory()):
+                        self.var_asset_label.set("ASSET " + self.asset_list.focus().upper())
+                        self.delete_asset_button.grid(self.delete_asset_button.pi)
+                        self.rename_asset_button.grid(self.rename_asset_button.pi)
 
-                    self.priority_asset_label.grid(self.priority_asset_label.pi)
-                    self.priority_asset_menu.grid(self.priority_asset_menu.pi)
+                        self.priority_asset_label.grid(self.priority_asset_label.pi)
+                        self.priority_asset_menu.grid(self.priority_asset_menu.pi)
 
-                    self.updateVersionListView(asset = asset)
-                    self.version_list.select_set(0)
+                        self.updateVersionListView(asset = asset)
+                        self.version_list.select_set(0)
 
-                    self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
-                    self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
-                    self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 3)))
-                    self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
-                    self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
+                        self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
+                        self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
+                        self.var_asset_rig_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 3)))
+                        self.var_asset_lookdev_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 4)))
+                        self.var_asset_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 5)))
 
-                    if self.version_mode:
-                        if asset:
-                            if asset.isSet():
-                                self.set_asset_button.grid_forget()
-                                self.open_asset_button.grid(self.open_asset_button.pi)
-                                self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
+                        if self.version_mode:
+                            if asset:
+                                if asset.isSet():
+                                    self.set_asset_button.grid_forget()
+                                    self.open_asset_button.grid(self.open_asset_button.pi)
+                                    self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
-                                selected_line = self.version_list.curselection()[0]
-                                if asset.getSoftware() == "maya":
-                                    temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
-                                elif asset.getSoftware() == "houdini":
-                                    temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
+                                    selected_line = self.version_list.curselection()[0]
+                                    if asset.getSoftware() == "maya":
+                                        temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
+                                    elif asset.getSoftware() == "houdini":
+                                        temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
 
-                                self.var_selection_path_label.set(temp_path.replace("/", "\\"))
+                                    self.var_selection_path_label.set(temp_path.replace("/", "\\"))
 
-                                self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
-                                self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
-                                self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
-                                self.done_asset_button.grid(self.done_asset_button.pi)
+                                    self.modeling_done_asset_button.grid(self.modeling_done_asset_button.pi)
+                                    self.rig_done_asset_button.grid(self.rig_done_asset_button.pi)
+                                    self.lookdev_done_asset_button.grid(self.lookdev_done_asset_button.pi)
+                                    self.done_asset_button.grid(self.done_asset_button.pi)
 
-                                pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
+                                    pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(self.version_list.get(self.version_list.curselection()[0]))[0] + ".jpg"
 
-                                if path.isfile(pict_path):
-                                    pict = ImageTk.PhotoImage(file = pict_path)
+                                    if path.isfile(pict_path):
+                                        pict = ImageTk.PhotoImage(file = pict_path)
 
-                                    self.asset_gifdict[pict_path] = pict
+                                        self.asset_gifdict[pict_path] = pict
 
-                                    self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
-                                    self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                                    self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                                        self.asset_pict_caneva.grid(self.asset_pict_caneva.pi)
+                                        self.asset_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                                        self.asset_pict_caneva.config(height = pict.height(), width = pict.width())
+                                    else:
+                                        self.asset_pict_caneva.grid_forget()
+                                        
                                 else:
+                                    self.set_asset_button.grid(self.set_asset_button.pi)
+                                    self.open_asset_button.grid_forget()
+                                    self.open_asset_folder_button.grid_forget()
+                                    self.var_selection_path_label.set("")
                                     self.asset_pict_caneva.grid_forget()
-                                    
-                            else:
-                                self.set_asset_button.grid(self.set_asset_button.pi)
-                                self.open_asset_button.grid_forget()
-                                self.open_asset_folder_button.grid_forget()
-                                self.var_selection_path_label.set("")
-                                self.asset_pict_caneva.grid_forget()
-                                self.modeling_done_asset_button.grid_forget()
-                                self.rig_done_asset_button.grid_forget()
-                                self.lookdev_done_asset_button.grid_forget()
-                                self.done_asset_button.grid_forget()
+                                    self.modeling_done_asset_button.grid_forget()
+                                    self.rig_done_asset_button.grid_forget()
+                                    self.lookdev_done_asset_button.grid_forget()
+                                    self.done_asset_button.grid_forget()
+
+                    else:
+                        dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The asset \"" + asset.getAssetName() + "\" is not available !")
+                        self.wait_window(dialog().top)
 
                 else:
                     self.var_asset_label.set("NO ASSET SELECTED")
@@ -1436,16 +1446,20 @@ class SuperPipe(Frame):
                             if i > 0:
                                 self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
 
-                    if cur_asset.isDone():
-                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
-                    elif cur_asset.getPriority() == "Urgent":
-                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("urgent"))
-                    elif cur_asset.getPriority() == "High":
-                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("high"))
-                    elif cur_asset.getPriority() == "Medium":
-                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("medium"))
+                    if self.asset_list.exists(asset[0]):
+                        dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The asset \"" + asset[1].upper() + "/" + asset[0] + "\" already exists !", padding = 20)
+                        self.wait_window(dialog().top)
                     else:
-                        self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0])
+                        if cur_asset.isDone():
+                            self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("done"))
+                        elif cur_asset.getPriority() == "Urgent":
+                            self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("urgent"))
+                        elif cur_asset.getPriority() == "High":
+                            self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("high"))
+                        elif cur_asset.getPriority() == "Medium":
+                            self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0], tags = ("medium"))
+                        else:
+                            self.asset_list.insert(asset_subfolders[-1].lower(), END, asset[0], text = asset[0])
                 else:
                     dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The asset \"" + asset[0] + "\" has a problem !", padding = 20)
                     self.wait_window(dialog().top)
