@@ -61,7 +61,7 @@ class NewAssetDialog(object):
         label = Label(top_frame, text = "Select asset category", bg = self.main_color, fg = self.text_color)
         label.grid(row = 3, column = 0, columnspan = 3)
 
-        self.categories_list = ttk.Treeview(top_frame, height = 5, show = "tree")
+        self.categories_list = ttk.Treeview(top_frame, height = 5, show = "tree", selectmode = "browse")
         ttk.Style().configure("Treeview", background = self.list_color)
         self.categories_list.insert("", 1, "character", text = "CHARACTER")
         self.categories_list.insert("", 2, "fx", text = "FX")

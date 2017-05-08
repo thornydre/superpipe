@@ -1410,8 +1410,6 @@ class SuperPipe(Frame):
             if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
                 self.shot_list.insert(shot[0], shot[1])
 
-                print(shot[0], shot[1])
-
                 cur_shot = Shot(self.current_project.getDirectory(), shot[1])
 
                 if cur_shot.isDone():
@@ -1761,7 +1759,6 @@ class SuperPipe(Frame):
         return True
 
     def validateAssetFilterEntry(self, P):
-        print(P)
         if P:
             filtered_asset_list = self.current_project.filterAssetList(P)
 

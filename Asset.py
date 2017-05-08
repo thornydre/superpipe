@@ -11,7 +11,6 @@ import time
 class Asset:
     def __init__(self, directory = None, second_path = None, asset_name = None, software = None):
         self.asset_name = asset_name
-        # print(self.asset_name)
         self.project_dir = directory
         self.second_path = second_path
         self.directory = directory + "/04_asset" + self.second_path + "/" + self.asset_name
