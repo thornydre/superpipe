@@ -230,7 +230,7 @@ class Asset:
         copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[1] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.directory)
 
-    def getVersionsList(self, last_only, modeling, rigging, lookdev):
+    def getVersionsList(self, last_only, modeling, rigging, lookdev, other):
         versions_list = []
 
         display = []
@@ -250,12 +250,20 @@ class Asset:
                                 if disp in asset_file:
                                     versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
+                            if other:
+                                if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+
             if not last_only:
                 for asset_file in listdir(self.directory + "/scenes/edits/"):
                     if not asset_file[0] == "_":
                         if path.splitext(asset_file)[1] == ".ma":
                             for disp in display:
                                 if disp in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+
+                            if other:
+                                if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
                                     versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         elif self.software == "houdini":

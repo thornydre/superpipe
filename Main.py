@@ -670,6 +670,11 @@ class SuperPipe(Frame):
         self.display_lookdev_asset_button.grid(row = 1, column = 0, sticky = W)
         self.display_lookdev_asset_button.select()
 
+        self.var_asset_display_other = IntVar()
+        self.display_other_asset_button = Checkbutton(self.asset_display_buttons, text = "Display other", variable = self.var_asset_display_other, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleAssetDisplay)
+        self.display_other_asset_button.grid(row = 1, column = 1, sticky = W)
+        self.display_other_asset_button.select()
+
         self.shot_display_buttons = Frame(display_buttons, bg = self.main_color)
         self.shot_display_buttons.pack(fill = X, pady = 10, padx = 20)
         self.shot_display_buttons.pi = self.shot_display_buttons.pack_info()
@@ -678,25 +683,30 @@ class SuperPipe(Frame):
         self.shot_display_buttons.columnconfigure(0, weight = 1)
         self.shot_display_buttons.columnconfigure(1, weight = 1)
 
-        self.var_asset_display_layout = IntVar()
-        self.display_layout_asset_button = Checkbutton(self.shot_display_buttons, text = "Display layout", variable = self.var_asset_display_layout, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
-        self.display_layout_asset_button.grid(row = 0, column = 0, sticky = W)
-        self.display_layout_asset_button.select()
+        self.var_shot_display_layout = IntVar()
+        self.display_layout_shot_button = Checkbutton(self.shot_display_buttons, text = "Display layout", variable = self.var_shot_display_layout, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_layout_shot_button.grid(row = 0, column = 0, sticky = W)
+        self.display_layout_shot_button.select()
 
-        self.var_asset_display_blocking = IntVar()
-        self.display_blocking_asset_button = Checkbutton(self.shot_display_buttons, text = "Display blocking", variable = self.var_asset_display_blocking, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
-        self.display_blocking_asset_button.grid(row = 0, column = 1, sticky = W)
-        self.display_blocking_asset_button.select()
+        self.var_shot_display_blocking = IntVar()
+        self.display_blocking_shot_button = Checkbutton(self.shot_display_buttons, text = "Display blocking", variable = self.var_shot_display_blocking, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_blocking_shot_button.grid(row = 0, column = 1, sticky = W)
+        self.display_blocking_shot_button.select()
 
-        self.var_asset_display_splinning = IntVar()
-        self.display_splinning_asset_button = Checkbutton(self.shot_display_buttons, text = "Display splinning", variable = self.var_asset_display_splinning, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
-        self.display_splinning_asset_button.grid(row = 1, column = 0, sticky = W)
-        self.display_splinning_asset_button.select()
+        self.var_shot_display_splining = IntVar()
+        self.display_splining_shot_button = Checkbutton(self.shot_display_buttons, text = "Display splining", variable = self.var_shot_display_splining, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_splining_shot_button.grid(row = 1, column = 0, sticky = W)
+        self.display_splining_shot_button.select()
 
-        self.var_asset_display_rendering = IntVar()
-        self.display_rendering_asset_button = Checkbutton(self.shot_display_buttons, text = "Display rendering", variable = self.var_asset_display_rendering, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
-        self.display_rendering_asset_button.grid(row = 1, column = 1, sticky = W)
-        self.display_rendering_asset_button.select()
+        self.var_shot_display_rendering = IntVar()
+        self.display_rendering_shot_button = Checkbutton(self.shot_display_buttons, text = "Display rendering", variable = self.var_shot_display_rendering, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_rendering_shot_button.grid(row = 1, column = 1, sticky = W)
+        self.display_rendering_shot_button.select()
+
+        self.var_shot_display_other = IntVar()
+        self.display_other_shot_button = Checkbutton(self.shot_display_buttons, text = "Display other", variable = self.var_shot_display_other, bg = self.main_color, activeforeground = self.text_color, fg = self.text_color, activebackground = self.main_color, selectcolor = self.second_color, command = self.toggleShotDisplay)
+        self.display_other_shot_button.grid(row = 2, column = 0, sticky = W)
+        self.display_other_shot_button.select()
 
         self.version_list = Listbox(right_side_bar, bg = self.list_color, selectbackground = self.second_color, bd = 0, highlightthickness = 0, width = 50, height = 70, exportselection = False)
         self.version_list.pack(fill = X, pady = 10)
@@ -1472,7 +1482,7 @@ class SuperPipe(Frame):
 
         if shot:
             if self.version_mode:
-                shot_versions = shot.getVersionsList(self.var_check_show_last.get(), self.var_asset_display_layout.get(), self.var_asset_display_blocking.get(), self.var_asset_display_splinning.get(), self.var_asset_display_rendering.get())
+                shot_versions = shot.getVersionsList(self.var_check_show_last.get(), self.var_shot_display_layout.get(), self.var_shot_display_blocking.get(), self.var_shot_display_splining.get(), self.var_shot_display_rendering.get(), self.var_shot_display_other.get())
 
                 if shot_versions:
                     for shot_version in shot_versions:
@@ -1490,7 +1500,7 @@ class SuperPipe(Frame):
 
         elif asset:
             if self.version_mode:
-                asset_versions = asset.getVersionsList(self.var_check_show_last.get(), self.var_asset_display_modeling.get(), self.var_asset_display_rigging.get(), self.var_asset_display_lookdev.get())
+                asset_versions = asset.getVersionsList(self.var_check_show_last.get(), self.var_asset_display_modeling.get(), self.var_asset_display_rigging.get(), self.var_asset_display_lookdev.get(), self.var_asset_display_other.get())
 
                 if asset_versions:
                     for asset_version in asset_versions:

@@ -230,7 +230,7 @@ class Shot:
         copytree(self.shot_directory, self.shot_directory +"/../backup/" + self.shot_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
         rmtree(self.shot_directory)
 
-    def getVersionsList(self, last_only, layout, blocking, splinning, rendering):
+    def getVersionsList(self, last_only, layout, blocking, splining, rendering, other):
         if not path.isdir(self.shot_directory + "/scenes/"):
             return []
 
@@ -241,8 +241,8 @@ class Shot:
             display.append("layout")
         if blocking:
             display.append("blocking")
-        if splinning:
-            display.append("splinning")
+        if splining:
+            display.append("splining")
         if rendering:
             display.append("rendering")
 
@@ -254,12 +254,22 @@ class Shot:
                             if disp in shot_file:
                                 versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
+                        if other:
+                            if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
+                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+
         if not last_only:
             for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
                 if shot_file[0] != "_":
                     if path.splitext(shot_file)[1] == ".ma":
+                        not_set = True
                         for disp in display:
                             if disp in shot_file:
+                                not_set = False
+                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+
+                        if other:
+                            if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
                                 versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
