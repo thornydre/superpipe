@@ -12,10 +12,11 @@ from tkinter import *
 from tkinter import filedialog, ttk
 from os import path, mkdir
 from urllib.parse import urlsplit
-from PIL import Image, ImageTk
-from watchdog.observers import Observer
+from PIL import ImageTk
+# from watchdog.observers import Observer
 from CustomSlider import *
 
+import PIL
 import NewShotDialog
 import NewAssetDialog
 import RenameAssetDialog
@@ -26,7 +27,7 @@ import YesNoDialog
 import OkDialog
 import subprocess
 import webbrowser
-import queue
+# import queue
 
 class SuperPipe(Frame):
     def __init__(self, parent):
@@ -98,10 +99,10 @@ class SuperPipe(Frame):
 
         if self.current_project:
             self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
-            event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
-            self.observer = Observer()
-            self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
-            self.observer.start()
+            # event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
+            # self.observer = Observer()
+            # self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
+            # self.observer.start()
 
         self.parent.config(cursor = "")
 
@@ -376,9 +377,10 @@ class SuperPipe(Frame):
         self.done_shot_button.pi = self.done_shot_button.grid_info()
         self.done_shot_button.grid_forget()
 
-        ## PICTURES ##
+        ## SHOT PICTURES ##
         self.pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
         self.pictures_shot.grid(row = 3, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
+        self.pictures_shot.pi = self.pictures_shot.grid_info()
 
         self.pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
         self.pictures_shot.columnconfigure(1, weight = 1, minsize = 550)
@@ -401,6 +403,23 @@ class SuperPipe(Frame):
         self.shot_pict_caneva.pi = self.shot_pict_caneva.grid_info()
         self.shot_pict_caneva.grid_forget()
         self.shot_gifdict = {}
+
+        ## SHOT PLAYBLAST PICTURES ##
+        self.playblast_pictures_shot = Frame(self.main_area_shot, bg = self.second_color, bd = 0)
+        self.playblast_pictures_shot.grid(row = 3, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
+        self.playblast_pictures_shot.pi = self.playblast_pictures_shot.grid_info()
+        self.playblast_pictures_shot.grid_forget()
+
+        self.playblast_pictures_shot.columnconfigure(0, weight = 1, minsize = 550)
+
+        playblast_pict_label = Label(self.playblast_pictures_shot, text = "This playblast", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
+        playblast_pict_label.grid(row = 0, column = 0, pady = 10)
+
+        self.shot_playblast_pict_caneva = Canvas(self.playblast_pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
+        self.shot_playblast_pict_caneva.grid(row = 1, column = 0, pady = 20)
+        self.shot_playblast_pict_caneva.pi = self.shot_playblast_pict_caneva.grid_info()
+        self.shot_playblast_pict_caneva.grid_forget()
+        self.shot_playblast_gifdict = {}
 
         ## SHOT VERSION ACTIONS ##
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
@@ -543,7 +562,22 @@ class SuperPipe(Frame):
         self.done_asset_button.pi = self.done_asset_button.grid_info()
         self.done_asset_button.grid_forget()
 
-        ## PICTURES ##
+        ## ASSET PICTURES ##
+        pictures_asset = Frame(self.main_area_asset, bg = self.second_color, bd = 0)
+        pictures_asset.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
+
+        pictures_asset.columnconfigure(0, weight = 1, minsize = 550)
+
+        pict_label = Label(pictures_asset, text = "This asset", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
+        pict_label.grid(row = 0, column = 0, pady = 10)
+
+        self.asset_pict_caneva = Canvas(pictures_asset, bg = self.second_color, bd = 0, highlightthickness = 0)
+        self.asset_pict_caneva.grid(row = 1, column = 0, pady = 20)
+        self.asset_pict_caneva.pi = self.asset_pict_caneva.grid_info()
+        self.asset_pict_caneva.grid_forget()
+        self.asset_gifdict = {}
+
+        ## ASSET PLAYBLAST PICTURES ##
         pictures_asset = Frame(self.main_area_asset, bg = self.second_color, bd = 0)
         pictures_asset.grid(row = 2, column = 0, columnspan = 7, sticky = N + S + W + E, pady = 20)
 
@@ -989,6 +1023,7 @@ class SuperPipe(Frame):
             if Shot.validShot(shot.getDirectory()):
                 self.updateVersionListView(shot = shot)
                 self.version_list.select_set(0)
+                self.var_shot_version_comment.set(self.current_project.getSelection().getComment(self.version_list.get(0)))
 
                 self.var_shot_done.set(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 1)))
                 self.var_shot_priority.set(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 2))
@@ -1173,6 +1208,7 @@ class SuperPipe(Frame):
 
                         self.updateVersionListView(asset = asset)
                         self.version_list.select_set(0)
+                        self.var_asset_version_comment_label.set(self.current_project.getSelection().getComment(self.version_list.get(0)))
 
                         self.var_asset_priority.set(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 1))
                         self.var_asset_modeling_done.set(int(Resources.readLine(asset.getDirectory() + "/superpipe/asset_data.spi", 2)))
@@ -1672,7 +1708,7 @@ class SuperPipe(Frame):
         for nb, name, img in all_shots_preview:
             shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.main_color, bd = 0, highlightthickness = 0)
 
-            to_edit_pict = Image.open(img)
+            to_edit_pict = PIL.Image.open(img)
 
             edited_pict = Resources.resizeImage(to_edit_pict, 256)
 
@@ -1741,11 +1777,15 @@ class SuperPipe(Frame):
             self.var_versions_label.set("Versions")
             self.open_shot_button.config(text = "Open selected version")
             self.open_asset_button.config(text = "Open selected version")
+            self.playblast_pictures_shot.grid_forget()
+            self.pictures_shot.grid(self.pictures_shot.pi)
         else:
             self.toggle_versions_playblasts_button.config(text = "Show versions")
             self.var_versions_label.set("Playblasts")
             self.open_shot_button.config(text = "Open selected playblast")
             self.open_asset_button.config(text = "Open selected playblast")
+            self.playblast_pictures_shot.grid(self.playblast_pictures_shot.pi)
+            self.pictures_shot.grid_forget()
 
         if self.current_project.getSelectionType() == "shot":
             self.updateVersionListView(shot = self.current_project.getSelection())
