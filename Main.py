@@ -15,6 +15,7 @@ from urllib.parse import urlsplit
 from PIL import ImageTk
 # from watchdog.observers import Observer
 from CustomSlider import *
+from CustomVideoPlayer import *
 
 import PIL
 import NewShotDialog
@@ -415,11 +416,8 @@ class SuperPipe(Frame):
         playblast_pict_label = Label(self.playblast_pictures_shot, text = "This playblast", bg = self.second_color, fg = self.text_color, height = 1, anchor = N, font = "Helvetica 11")
         playblast_pict_label.grid(row = 0, column = 0, pady = 10)
 
-        self.shot_playblast_pict_caneva = Canvas(self.playblast_pictures_shot, bg = self.second_color, bd = 0, highlightthickness = 0)
-        self.shot_playblast_pict_caneva.grid(row = 1, column = 0, pady = 20)
-        self.shot_playblast_pict_caneva.pi = self.shot_playblast_pict_caneva.grid_info()
-        self.shot_playblast_pict_caneva.grid_forget()
-        self.shot_playblast_gifdict = {}
+        self.playblast_player = CustomVideoPlayer(self.playblast_pictures_shot, "test.mov", 512, self.list_color)
+        self.playblast_player.grid(row = 1, column = 0, pady = 20)
 
         ## SHOT VERSION ACTIONS ##
         self.shot_actions_line = Frame(self.main_area_shot, bg = self.main_color, bd = 0)
@@ -1108,6 +1106,14 @@ class SuperPipe(Frame):
                         else:
                             self.shot_pict_caneva.grid_forget()
 
+                    else:
+                        selected_line = self.version_list.curselection()[0]
+                        selected_shot_version = self.version_list.get(selected_line)
+
+                        playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
+
+                        self.playblast_player.updateVideo(playblast_file)
+
                 else:
                     self.set_shot_button.grid(self.set_shot_button.pi)
                     self.frame_range_entry.grid_forget()
@@ -1304,18 +1310,28 @@ class SuperPipe(Frame):
             pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + path.splitext(selected_version)[0] + ".jpg"
 
             if self.current_project.getSelectionType() == "shot":
-                self.var_shot_version_comment.set(self.current_project.getSelection().getComment(selected_version))
+                if self.version_mode:
+                    self.var_shot_version_comment.set(self.current_project.getSelection().getComment(selected_version))
 
-                if path.isfile(pict_path):
-                    pict = ImageTk.PhotoImage(file = pict_path)
+                    if path.isfile(pict_path):
+                        pict = ImageTk.PhotoImage(file = pict_path)
 
-                    self.shot_gifdict[pict_path] = pict
+                        self.shot_gifdict[pict_path] = pict
 
-                    self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
-                    self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
-                    self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+                        self.shot_pict_caneva.grid(self.shot_pict_caneva.pi)
+                        self.shot_pict_caneva.create_image(0, 0, anchor = N + W, image = pict)
+                        self.shot_pict_caneva.config(height = pict.height(), width = pict.width())
+                    else:
+                        self.shot_pict_caneva.grid_forget()
                 else:
-                    self.shot_pict_caneva.grid_forget()
+                    shot = self.current_project.getSelection()
+
+                    selected_line = self.version_list.curselection()[0]
+                    selected_shot_version = self.version_list.get(selected_line)
+
+                    playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
+
+                    self.playblast_player.updateVideo(playblast_file)
 
             elif self.current_project.getSelectionType() == "asset":
                 self.var_asset_version_comment_label.set(self.current_project.getSelection().getComment(selected_version))
