@@ -50,4 +50,5 @@ options.spi
 *.pyc
 *.pyw
 test.py
+licenses
 build

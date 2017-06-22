@@ -95,6 +95,7 @@ class CustomSlider(Canvas):
 
     def previousStep(self):
         self.current_step -= 1
+
         self.delete("all")
         self.create_rectangle(0, 0, self.width/self.steps * self.current_step - self.width/self.steps + 1, self.height, fill = self.fg_color, width = 0)
         self.percentage = int((self.width/self.steps * self.current_step - self.width/self.steps) / self.width * 100)
