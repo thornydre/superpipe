@@ -16,6 +16,10 @@ from PIL import ImageTk
 # from watchdog.observers import Observer
 from CustomSlider import *
 from CustomVideoPlayer import *
+try:
+    from SuperLicenseManager import *
+except:
+    print("No license version")
 
 import PIL
 import NewShotDialog
@@ -32,6 +36,12 @@ import webbrowser
 
 class SuperPipe(Frame):
     def __init__(self, parent):
+        try:
+            license_manager = SuperLicenseManager()
+            valid_license = license_manager.checkLicense()
+        except:
+            valid_license = False
+
         if not path.isfile("save/options.spi"):
             with open("save/options.spi", "w") as f:
                 f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\ntheme_default\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
@@ -106,6 +116,10 @@ class SuperPipe(Frame):
             # self.observer.start()
 
         self.parent.config(cursor = "")
+
+        if not valid_license:
+            dialog = lambda: OkDialog.OkDialog(self.parent, "License error", "Do you have license ? Or it may be expired :(")
+            self.wait_window(dialog().top)
 
     def initUI(self):
         self.parent["bg"] = self.main_color
@@ -1748,8 +1762,6 @@ class SuperPipe(Frame):
         elif self.current_project.getSelection().getStep() == "Rendering":
             self.upgrade_shot_button.config(state = DISABLED)
 
-        self.step_slider.nextStep()
-
         self.shotlistCommand()
 
     def downgradeShotCommand(self):
@@ -1767,15 +1779,13 @@ class SuperPipe(Frame):
             elif self.current_project.getSelection().getStep() == "Rendering":
                 self.upgrade_shot_button.config(state = DISABLED)
 
-            self.step_slider.previousStep()
-
             self.shotlistCommand()
 
     def setShotFrameRangeCommand(self):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
     def openFolderCommand(self):
-        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
+        subprocess.Popen("%s, \"%s\"" % ("explorer /root, /idlist", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     ###############################################################################################################
 
