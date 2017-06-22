@@ -1,6 +1,7 @@
 #!/usr/bin/python3.5
 # -*-coding:Utf-8 -*
 
+#EXTERNAL LIBRARIES : pillow, watchdog, numpy, opencv
 
 from NewProjectDialog import *
 from Shot import *
