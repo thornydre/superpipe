@@ -178,6 +178,9 @@ class Asset:
                 all_comments = f.read()
             f.close()
 
+            if all_comments == "":
+                return "No comment"
+
             comment_list = all_comments.split("\n---\n")
 
             i = 1

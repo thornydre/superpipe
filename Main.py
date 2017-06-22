@@ -1,7 +1,6 @@
 #!/usr/bin/python3.5
 # -*-coding:Utf-8 -*
 
-#EXTERNAL LIBRARIES : pillow, watchdog
 
 from NewProjectDialog import *
 from Shot import *
@@ -1123,10 +1122,6 @@ class SuperPipe(Frame):
                     self.downgrade_shot_button.grid_forget()
 
                     self.step_slider.grid_forget()
-                    # self.layout_label.grid_forget()
-                    # self.blocking_label.grid_forget()
-                    # self.splining_label.grid_forget()
-                    # self.rendering_label.grid_forget()
 
                     self.upgrade_shot_button.grid_forget()
                     self.done_shot_button.grid_forget()
@@ -1752,6 +1747,8 @@ class SuperPipe(Frame):
         elif self.current_project.getSelection().getStep() == "Rendering":
             self.upgrade_shot_button.config(state = DISABLED)
 
+        self.step_slider.nextStep()
+
         self.shotlistCommand()
 
     def downgradeShotCommand(self):
@@ -1768,6 +1765,8 @@ class SuperPipe(Frame):
                 self.downgrade_shot_button.config(state = DISABLED)
             elif self.current_project.getSelection().getStep() == "Rendering":
                 self.upgrade_shot_button.config(state = DISABLED)
+
+            self.step_slider.previousStep()
 
             self.shotlistCommand()
 
