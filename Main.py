@@ -1785,7 +1785,7 @@ class SuperPipe(Frame):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
     def openFolderCommand(self):
-        subprocess.Popen("%s, \"%s\"" % ("explorer /root, /idlist", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
+        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     ###############################################################################################################
 
