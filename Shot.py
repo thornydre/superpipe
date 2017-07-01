@@ -178,13 +178,19 @@ class Shot:
 
             comment_list = all_comments.split("\n---\n")
 
-            i = 1
+            if comment_list[0]:
+                i = 1
 
-            for comment in comment_list:
-                if comment == version_file:
-                    return comment_list[i]
+                for comment in comment_list:
+                    if comment == version_file:
+                        if comment_list[i]:
+                            return comment_list[i]
+                        else:
+                            return "No comment"
 
-                i += 1
+                    i += 1
+            else:
+                return "No comment"
 
         return "No comment"
 

@@ -16,11 +16,6 @@ from PIL import ImageTk
 # from watchdog.observers import Observer
 from CustomSlider import *
 from CustomVideoPlayer import *
-try:
-    from SuperLicenseManager import *
-except:
-    print("No license version")
-
 import PIL
 import NewShotDialog
 import NewAssetDialog
@@ -33,6 +28,13 @@ import OkDialog
 import subprocess
 import webbrowser
 # import queue
+
+try:
+    from SuperLicenseManager import *
+    from licensed_content.StatisticsView import *
+except Exception as e:
+    print("No license version")
+    print(str(e))
 
 class SuperPipe(Frame):
     def __init__(self, parent):
@@ -103,13 +105,15 @@ class SuperPipe(Frame):
                 self.menu_project.entryconfig(0, state = NORMAL)
                 self.menu_project.entryconfig(1, state = NORMAL)
                 self.menu_project.entryconfig(3, state = NORMAL)
-                self.menu_project.entryconfig(5, state = NORMAL)
+                self.menu_project.entryconfig(4, state = NORMAL)
+                self.menu_project.entryconfig(6, state = NORMAL)
 
                 self.updateShotListView()
                 self.updateAssetListView()
 
         if self.current_project:
             self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
+            self.statistics_view.set(self.current_project)
             # event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
             # self.observer = Observer()
             # self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
@@ -132,6 +136,7 @@ class SuperPipe(Frame):
         self.parent.bind("<Control-p>", self.preferencesCommand)
         self.parent.bind("<Control-a>", self.addAssetCommand)
         self.parent.bind("<Control-s>", self.addShotCommand)
+        self.parent.bind("<s>", self.projectStatisticsCommand)
 
         menu_bar = Menu(self.parent)
 
@@ -153,6 +158,7 @@ class SuperPipe(Frame):
         self.menu_project.add_command(label = "Add shot", state = DISABLED, command = self.addShotCommand, accelerator = "Ctrl+S")
         self.menu_project.add_separator()
         self.menu_project.add_command(label = "Project settings", state = DISABLED, command = self.projectSettingsCommand)
+        self.menu_project.add_command(label = "Project statistics", state = DISABLED, command = self.projectStatisticsCommand)
         self.menu_project.add_separator()
         self.menu_project.add_command(label = "Clean backups", state = DISABLED, command = self.cleanBackupsCommand)
         menu_bar.add_cascade(label = "Project", menu = self.menu_project)
@@ -679,6 +685,13 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
+        self.statistics_view = StatisticsView(main_area)
+        self.statistics_view.grid(row = 0, column = 0, sticky = N + S + W + E)
+        self.statistics_view.pi = self.statistics_view.grid_info()
+        self.statistics_view.grid_forget()
+
+        ###############################################################################################################
+
         right_side_bar = Frame(pw_main, bg = self.main_color)
 
         ## VERSIONS ##
@@ -869,10 +882,8 @@ class SuperPipe(Frame):
 
         self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
-        self.layout_label.grid(self.layout_label.pi)
-        self.blocking_label.grid(self.blocking_label.pi)
-        self.splining_label.grid(self.splining_label.pi)
-        self.rendering_label.grid(self.rendering_label.pi)
+        self.step_slider.setCurrentStep("Layout")
+        self.step_slider.grid(self.step_slider.pi)
 
         self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
         self.done_shot_button.grid(self.done_shot_button.pi)
@@ -1024,6 +1035,7 @@ class SuperPipe(Frame):
             self.main_area_shot.grid(self.main_area_shot.pi)
             self.main_area_asset.grid_forget()
             self.main_area_preview.grid_forget()
+            self.statistics_view.grid_forget()
 
             self.asset_list.selection_remove(self.asset_list.focus())
 
@@ -1191,6 +1203,7 @@ class SuperPipe(Frame):
                 self.main_area_asset.grid(self.main_area_asset.pi)
                 self.main_area_shot.grid_forget()
                 self.main_area_preview.grid_forget()
+                self.statistics_view.grid_forget()
 
                 self.shot_list.selection_clear(0, END)
 
@@ -1702,10 +1715,10 @@ class SuperPipe(Frame):
         self.parent.config(cursor = "wait")
         self.parent.update()
 
+        self.main_area_preview.grid(self.main_area_preview.pi)
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
-
-        self.main_area_preview.grid(self.main_area_preview.pi)
+        self.statistics_view.grid_forget()
 
         self.asset_list.selection_remove(self.asset_list.focus())
         self.shot_list.selection_clear(0, END)
@@ -1764,6 +1777,8 @@ class SuperPipe(Frame):
 
         self.shotlistCommand()
 
+        self.step_slider.nextStep()
+
     def downgradeShotCommand(self):
         yesno = {"result" : ""}
 
@@ -1781,11 +1796,13 @@ class SuperPipe(Frame):
 
             self.shotlistCommand()
 
+            self.step_slider.previousStep()
+
     def setShotFrameRangeCommand(self):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
 
     def openFolderCommand(self):
-        subprocess.Popen("%s, \"%s\"" % ("explorer /root", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
+        subprocess.Popen("%s, \"%s\"" % ("explorer /root /idlist", self.current_project.getSelection().getDirectory().replace("/", "\\") + "\\"))
 
     ###############################################################################################################
 
@@ -1883,10 +1900,7 @@ class SuperPipe(Frame):
             self.priority_shot_menu.grid_forget()
             self.priority_shot_label.grid_forget()
             self.downgrade_shot_button.grid_forget()
-            self.layout_label.grid_forget()
-            self.blocking_label.grid_forget()
-            self.splining_label.grid_forget()
-            self.rendering_label.grid_forget()
+            self.step_slider.grid_forget()
             self.upgrade_shot_button.grid_forget()
             self.done_shot_button.grid_forget()
         elif type == "asset":
@@ -1922,6 +1936,13 @@ class SuperPipe(Frame):
 
         if settings["res"]:            
             self.current_project.setResolution(settings["res"])
+
+    def projectStatisticsCommand(self, e = None):
+        self.statistics_view.update()
+        self.statistics_view.grid(self.statistics_view.pi)
+        self.main_area_asset.grid_forget()
+        self.main_area_shot.grid_forget()
+        self.main_area_preview.grid_forget()
 
     def preferencesCommand(self, e = None):
         if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
