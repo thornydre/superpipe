@@ -334,9 +334,12 @@ class Shot:
         for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
                 tmp_version_str = path.splitext(file)[0][-2:]
-                if int(tmp_version_str) > version:
-                    version = int(tmp_version_str)
-                    version_str = tmp_version_str
+                try:
+                    if int(tmp_version_str) > version:
+                        version = int(tmp_version_str)
+                        version_str = tmp_version_str
+                except:
+                    print("IMPOSSIBLE TO CONVERT " + tmp_version_str + " INTO AN INTEGER")
 
         if self.step == "Layout":
             self.step = "Blocking"
