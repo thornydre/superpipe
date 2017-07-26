@@ -40,9 +40,9 @@ class SuperPipe(Frame):
     def __init__(self, parent):
         try:
             license_manager = SuperLicenseManager()
-            valid_license = license_manager.checkLicense()
+            self.valid_license = license_manager.checkLicense()
         except:
-            valid_license = False
+            self.valid_license = False
 
         if not path.isfile("save/options.spi"):
             with open("save/options.spi", "w") as f:
@@ -113,7 +113,7 @@ class SuperPipe(Frame):
 
         if self.current_project:
             self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
-            if valid_license:
+            if self.valid_license:
                 self.statistics_view.set(self.current_project)
             # event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
             # self.observer = Observer()
@@ -122,7 +122,7 @@ class SuperPipe(Frame):
 
         self.parent.config(cursor = "")
 
-        if not valid_license:
+        if not self.valid_license:
             dialog = lambda: OkDialog.OkDialog(self.parent, "License error", "Do you have license ? Or it may be expired :(")
             self.wait_window(dialog().top)
 
@@ -686,7 +686,7 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        if valid_license:
+        if self.valid_license:
             self.statistics_view = StatisticsView(main_area)
             self.statistics_view.grid(row = 0, column = 0, sticky = N + S + W + E)
             self.statistics_view.pi = self.statistics_view.grid_info()
@@ -1037,7 +1037,7 @@ class SuperPipe(Frame):
             self.main_area_shot.grid(self.main_area_shot.pi)
             self.main_area_asset.grid_forget()
             self.main_area_preview.grid_forget()
-            if valid_license:
+            if self.valid_license:
                 self.statistics_view.grid_forget()
 
             self.asset_list.selection_remove(self.asset_list.focus())
@@ -1206,7 +1206,7 @@ class SuperPipe(Frame):
                 self.main_area_asset.grid(self.main_area_asset.pi)
                 self.main_area_shot.grid_forget()
                 self.main_area_preview.grid_forget()
-                if valid_license:
+                if self.valid_license:
                     self.statistics_view.grid_forget()
 
                 self.shot_list.selection_clear(0, END)
@@ -1722,7 +1722,7 @@ class SuperPipe(Frame):
         self.main_area_preview.grid(self.main_area_preview.pi)
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
-        if valid_license:
+        if self.valid_license:
             self.statistics_view.grid_forget()
 
         self.asset_list.selection_remove(self.asset_list.focus())
