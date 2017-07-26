@@ -1859,7 +1859,16 @@ class SuperPipe(Frame):
                 self.asset_list.delete(item)
 
             for filtered_asset in filtered_asset_list:
-                self.asset_list.insert("", END, filtered_asset.lower(), text = filtered_asset.lower())
+                asset_subfolders = filtered_asset[1].split("/")
+
+                for i in range(len(asset_subfolders)):
+                    if not self.asset_list.exists(asset_subfolders[i].lower()):
+                        if i > 0:
+                            self.asset_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
+
+                self.asset_list.insert(asset_subfolders[-1].lower(), END, filtered_asset[0], text = filtered_asset[0])
+
+                self.asset_list.see(filtered_asset[0])
 
         else:
             for item in self.asset_list.get_children(""):

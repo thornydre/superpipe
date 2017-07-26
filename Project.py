@@ -231,7 +231,7 @@ class Project:
 
         for asset in self.asset_list:
             if re.search(filter_str, asset[0]):
-                filtered_asset_list.append(asset[0])
+                filtered_asset_list.append(asset)
 
         return filtered_asset_list
 
