@@ -113,8 +113,10 @@ class SuperPipe(Frame):
 
         if self.current_project:
             self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
-            if self.valid_license:
+            try:
                 self.statistics_view.set(self.current_project)
+            except:
+                print("IMPORT ERROR")
             # event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
             # self.observer = Observer()
             # self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
@@ -686,11 +688,13 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        if self.valid_license:
+        try:
             self.statistics_view = StatisticsView(main_area)
             self.statistics_view.grid(row = 0, column = 0, sticky = N + S + W + E)
             self.statistics_view.pi = self.statistics_view.grid_info()
             self.statistics_view.grid_forget()
+        except:
+            print("LICENSE ERROR")
 
         ###############################################################################################################
 
