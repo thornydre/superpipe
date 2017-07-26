@@ -29,12 +29,16 @@ import subprocess
 import webbrowser
 # import queue
 
+valid_licensed_content = True
+
 try:
     from SuperLicenseManager import *
     from licensed_content.StatisticsView import *
 except Exception as e:
-    print("No license version")
+    print("No licensed content")
     print(str(e))
+    valid_licensed_content = False
+
 
 class SuperPipe(Frame):
     def __init__(self, parent):
@@ -105,7 +109,8 @@ class SuperPipe(Frame):
                 self.menu_project.entryconfig(0, state = NORMAL)
                 self.menu_project.entryconfig(1, state = NORMAL)
                 self.menu_project.entryconfig(3, state = NORMAL)
-                self.menu_project.entryconfig(4, state = NORMAL)
+                if valid_licensed_content:
+                    self.menu_project.entryconfig(4, state = DISABLED)
                 self.menu_project.entryconfig(6, state = NORMAL)
 
                 self.updateShotListView()
@@ -139,7 +144,8 @@ class SuperPipe(Frame):
         self.parent.bind("<Control-p>", self.preferencesCommand)
         self.parent.bind("<Control-a>", self.addAssetCommand)
         self.parent.bind("<Control-s>", self.addShotCommand)
-        self.parent.bind("<s>", self.projectStatisticsCommand)
+        if valid_licensed_content:
+            self.parent.bind("<s>", self.projectStatisticsCommand)
 
         menu_bar = Menu(self.parent)
 
@@ -694,7 +700,7 @@ class SuperPipe(Frame):
             self.statistics_view.pi = self.statistics_view.grid_info()
             self.statistics_view.grid_forget()
         except:
-            print("LICENSE ERROR")
+            print("IMPORT ERROR")
 
         ###############################################################################################################
 
@@ -1041,8 +1047,10 @@ class SuperPipe(Frame):
             self.main_area_shot.grid(self.main_area_shot.pi)
             self.main_area_asset.grid_forget()
             self.main_area_preview.grid_forget()
-            if self.valid_license:
+            try:
                 self.statistics_view.grid_forget()
+            except:
+                print("IMPORT ERROR")
 
             self.asset_list.selection_remove(self.asset_list.focus())
 
@@ -1210,8 +1218,10 @@ class SuperPipe(Frame):
                 self.main_area_asset.grid(self.main_area_asset.pi)
                 self.main_area_shot.grid_forget()
                 self.main_area_preview.grid_forget()
-                if self.valid_license:
+                try:
                     self.statistics_view.grid_forget()
+                except:
+                    print("IMPORT ERROR")
 
                 self.shot_list.selection_clear(0, END)
 
@@ -1726,8 +1736,10 @@ class SuperPipe(Frame):
         self.main_area_preview.grid(self.main_area_preview.pi)
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
-        if self.valid_license:
+        try:
             self.statistics_view.grid_forget()
+        except:
+            print("IMPORT ERROR")
 
         self.asset_list.selection_remove(self.asset_list.focus())
         self.shot_list.selection_clear(0, END)
