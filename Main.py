@@ -810,7 +810,9 @@ class SuperPipe(Frame):
             self.menu_project.entryconfig(0, state = NORMAL)
             self.menu_project.entryconfig(1, state = NORMAL)
             self.menu_project.entryconfig(3, state = NORMAL)
-            self.menu_project.entryconfig(5, state = NORMAL)
+            if valid_licensed_content:
+                self.menu_project.entryconfig(4, state = DISABLED)
+            self.menu_project.entryconfig(6, state = NORMAL)
 
             self.updateShotListView()
             self.updateAssetListView()
@@ -841,7 +843,9 @@ class SuperPipe(Frame):
                     self.menu_project.entryconfig(0, state = NORMAL)
                     self.menu_project.entryconfig(1, state = NORMAL)
                     self.menu_project.entryconfig(3, state = NORMAL)
-                    self.menu_project.entryconfig(5, state = NORMAL)
+                    if valid_licensed_content:
+                        self.menu_project.entryconfig(4, state = DISABLED)
+                    self.menu_project.entryconfig(6, state = NORMAL)
 
 
                     self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
