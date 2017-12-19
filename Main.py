@@ -1192,7 +1192,7 @@ class SuperPipe(Frame):
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The shot \"" + shot.getShotName() + "\" is not available !")
                 self.wait_window(dialog().top)
 
-    def assetListCommand(self, e):
+    def assetListCommand(self, event):
         if self.current_project:
             if self.asset_list.focus():
                 self.main_area_asset.grid(self.main_area_asset.pi)
@@ -1305,7 +1305,7 @@ class SuperPipe(Frame):
                     self.lookdev_done_asset_button.grid_forget()
                     self.done_asset_button.grid_forget()
 
-    def versionlistCommand(self, e):
+    def versionlistCommand(self, event):
         if self.version_list.size():
             self.open_asset_button.grid(self.open_asset_button.pi)
             self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
@@ -1983,7 +1983,7 @@ class SuperPipe(Frame):
         dialog = lambda: OkDialog.OkDialog(self.parent, "Credits", "Super Pipe\nPipeline manager\n(C) Lucas Boutrot", padding = 20)
         self.wait_window(dialog().top)
 
-    def refresh(self, e):
+    def refresh(self, event):
         if self.version_list.curselection():
             selected_version = self.version_list.curselection()[0]
             
@@ -1996,14 +1996,14 @@ class SuperPipe(Frame):
 
             self.versionlistCommand(None)
 
-    def frameRangeReturnClick(self, e):
+    def frameRangeReturnClick(self, event):
         self.setShotFrameRangeCommand()
         self.set_shot_frame_range_button.focus_set()
 
-    def scrollCommand(self, e):
+    def scrollCommand(self, event):
         self.preview_canva_scroll.configure(scrollregion = self.preview_canva_scroll.bbox("all"), width = 2000, height = self.parent.winfo_height())
 
-    def wheelScrollCommand(self, e):
+    def wheelScrollCommand(self, event):
         self.preview_canva_scroll.yview_scroll(int(-1 * e.delta/120), "units")
 
     def exitCommand(self):

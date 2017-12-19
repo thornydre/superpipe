@@ -337,6 +337,7 @@ class StatisticsView(Frame):
         else:
             self.done_shots_text.set(str(done_shots) + " done shots (" + str(round(done_shots / len(self.project.getShotList()) * 100)) + "%)")
 
+    def statisticsMenuCommand(self, event):
         self.stats_dict = {}
         for shot in self.project.getShotList():
             shot_stats = []
