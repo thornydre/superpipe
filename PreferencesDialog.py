@@ -107,13 +107,20 @@ class PreferencesDialog(object):
         vlc_path_button.grid(row = 7, column = 1, sticky = E)
 
         ## CUSTOM LINK ##
-        label = Label(softwares_frame, text = "Edit custom link", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 8, column = 0, columnspan = 2)
+        if project_options_path:
+            label = Label(softwares_frame, text = "Edit custom link", bg = self.main_color, fg = self.text_color)
+            label.grid(row = 8, column = 0, columnspan = 2)
 
-        self.var_custom_link = StringVar()
-        self.var_custom_link.set(Resources.readLine(project_options_path, 1))
+            self.var_custom_link = StringVar()
+            self.var_custom_link.set(Resources.readLine(project_options_path, 1))
 
-        self.link_entry = Entry(softwares_frame, textvariable = self.var_custom_link, width = 75, relief = FLAT, bg = self.button_color2)
+            self.link_entry = Entry(softwares_frame, textvariable = self.var_custom_link, width = 75, relief = FLAT, bg = self.button_color2)
+        else:
+            label = Label(softwares_frame, text = "Edit custom link", bg = self.main_color, fg = self.disabled_text_color)
+            label.grid(row = 8, column = 0, columnspan = 2)
+            
+            self.link_entry = Entry(softwares_frame, textvariable = "Set a project to access to this option", state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
+
         self.link_entry.grid(row = 9, column = 0, columnspan = 2, sticky = W + E)
 
         ## // THEME \\ ##

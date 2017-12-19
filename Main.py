@@ -17,6 +17,7 @@ from PIL import ImageTk
 from CustomSlider import *
 from CustomVideoPlayer import *
 import PIL
+from StatisticsView import *
 import NewShotDialog
 import NewAssetDialog
 import RenameAssetDialog
@@ -29,25 +30,8 @@ import subprocess
 import webbrowser
 # import queue
 
-valid_licensed_content = True
-
-try:
-    from SuperLicenseManager import *
-    from licensed_content.StatisticsView import *
-except Exception as e:
-    print("No licensed content")
-    print(str(e))
-    valid_licensed_content = False
-
-
 class SuperPipe(Frame):
     def __init__(self, parent):
-        try:
-            license_manager = SuperLicenseManager()
-            self.valid_license = license_manager.checkLicense()
-        except:
-            self.valid_license = False
-
         if not path.isfile("save/options.spi"):
             with open("save/options.spi", "w") as f:
                 f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\ntheme_default\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
@@ -109,7 +93,9 @@ class SuperPipe(Frame):
                 self.menu_project.entryconfig(0, state = NORMAL)
                 self.menu_project.entryconfig(1, state = NORMAL)
                 self.menu_project.entryconfig(3, state = NORMAL)
-                if valid_licensed_content:
+                if self.current_project.getShotList():
+                    self.menu_project.entryconfig(4, state = NORMAL)
+                else:
                     self.menu_project.entryconfig(4, state = DISABLED)
                 self.menu_project.entryconfig(6, state = NORMAL)
 
@@ -118,20 +104,13 @@ class SuperPipe(Frame):
 
         if self.current_project:
             self.var_home_page_title.set("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
-            try:
-                self.statistics_view.set(self.current_project)
-            except:
-                print("IMPORT ERROR")
+            self.statistics_view.set(self.current_project)
             # event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
             # self.observer = Observer()
             # self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
             # self.observer.start()
 
         self.parent.config(cursor = "")
-
-        if not self.valid_license:
-            dialog = lambda: OkDialog.OkDialog(self.parent, "License error", "Do you have license ? Or it may be expired :(")
-            self.wait_window(dialog().top)
 
     def initUI(self):
         self.parent["bg"] = self.main_color
@@ -144,8 +123,7 @@ class SuperPipe(Frame):
         self.parent.bind("<Control-p>", self.preferencesCommand)
         self.parent.bind("<Control-a>", self.addAssetCommand)
         self.parent.bind("<Control-s>", self.addShotCommand)
-        if valid_licensed_content:
-            self.parent.bind("<s>", self.projectStatisticsCommand)
+        self.parent.bind("<s>", self.projectStatisticsCommand)
 
         menu_bar = Menu(self.parent)
 
@@ -694,13 +672,10 @@ class SuperPipe(Frame):
 
         ###############################################################################################################
 
-        try:
-            self.statistics_view = StatisticsView(main_area)
-            self.statistics_view.grid(row = 0, column = 0, sticky = N + S + W + E)
-            self.statistics_view.pi = self.statistics_view.grid_info()
-            self.statistics_view.grid_forget()
-        except:
-            print("IMPORT ERROR")
+        self.statistics_view = StatisticsView(main_area)
+        self.statistics_view.grid(row = 0, column = 0, sticky = N + S + W + E)
+        self.statistics_view.pi = self.statistics_view.grid_info()
+        self.statistics_view.grid_forget()
 
         ###############################################################################################################
 
@@ -787,7 +762,7 @@ class SuperPipe(Frame):
         pw_main.update()
         pw_main.sash_place(1, 1550, 0)
 
-    def newProjectCommand(self, e = None):
+    def newProjectCommand(self, event = None):
         directory = {"dir":""}
 
         dialog = lambda: NewProjectDialog.NewProjectDialog(self.parent, (directory, "dir"))
@@ -810,14 +785,13 @@ class SuperPipe(Frame):
             self.menu_project.entryconfig(0, state = NORMAL)
             self.menu_project.entryconfig(1, state = NORMAL)
             self.menu_project.entryconfig(3, state = NORMAL)
-            if valid_licensed_content:
-                self.menu_project.entryconfig(4, state = DISABLED)
+            self.menu_project.entryconfig(4, state = DISABLED)
             self.menu_project.entryconfig(6, state = NORMAL)
 
             self.updateShotListView()
             self.updateAssetListView()
 
-    def setProjectCommand(self, e = None):
+    def setProjectCommand(self, event = None):
         directory = filedialog.askdirectory(title = "New project", mustexist  = False)
 
         self.parent.config(cursor = "wait")
@@ -843,7 +817,9 @@ class SuperPipe(Frame):
                     self.menu_project.entryconfig(0, state = NORMAL)
                     self.menu_project.entryconfig(1, state = NORMAL)
                     self.menu_project.entryconfig(3, state = NORMAL)
-                    if valid_licensed_content:
+                    if self.current_project.getShotList():
+                        self.menu_project.entryconfig(4, state = NORMAL)
+                    else:
                         self.menu_project.entryconfig(4, state = DISABLED)
                     self.menu_project.entryconfig(6, state = NORMAL)
 
@@ -984,7 +960,9 @@ class SuperPipe(Frame):
 
             self.updateVersionListView()
 
-    def addShotCommand(self, e = None):
+    def addShotCommand(self, event = None):
+        self.menu_project.entryconfig(4, state = NORMAL)
+
         if len(self.current_project.getShotList()) >= 99:
             dialog = lambda: OkDialog.OkDialog(self.parent, "No more shots", "Sorry ! Superpipe does not handle more than 99 shots at the moment")
             self.wait_window(dialog().top)
@@ -1001,7 +979,7 @@ class SuperPipe(Frame):
                 self.shot_list.select_set(shot_nb - 1)
                 self.shotlistCommand()
 
-    def addAssetCommand(self, e = None):
+    def addAssetCommand(self, event = None):
         asset = {"cat": None, "name" : None, "software" : None}
 
         dialog = lambda: NewAssetDialog.NewAssetDialog(self.parent, self.current_project, (asset, "cat", "name", "software"))
@@ -1021,7 +999,7 @@ class SuperPipe(Frame):
                 dialog = lambda: OkDialog.OkDialog(self.parent, "Asset already exists", "The asset \"" + asset["name"] + "\" already exists")
                 self.wait_window(dialog().top)
 
-    def shotlistCommand(self, e = None):
+    def shotlistCommand(self, event = None):
         if self.shot_list.size() != 0:
             selected_line = self.shot_list.curselection()[0]
             selected_shot = self.shot_list.get(selected_line)
@@ -1051,10 +1029,7 @@ class SuperPipe(Frame):
             self.main_area_shot.grid(self.main_area_shot.pi)
             self.main_area_asset.grid_forget()
             self.main_area_preview.grid_forget()
-            try:
-                self.statistics_view.grid_forget()
-            except:
-                print("IMPORT ERROR")
+            self.statistics_view.grid_forget()
 
             self.asset_list.selection_remove(self.asset_list.focus())
 
@@ -1091,14 +1066,15 @@ class SuperPipe(Frame):
 
                     self.downgrade_shot_button.grid(self.downgrade_shot_button.pi)
 
-                    self.step_slider.setCurrentStep(shot.getStep())
-                    if shot.isDone():
-                        self.step_slider.setPercentage(100)
-                        self.step_slider.setActive(active = False)
-                    else:
-                        self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
-                        self.step_slider.setActive(active = True)
-                    self.step_slider.grid(self.step_slider.pi)
+                    if event:
+                        self.step_slider.setCurrentStep(shot.getStep())
+                        if shot.isDone():
+                            self.step_slider.setPercentage(100)
+                            self.step_slider.setActive(active = False)
+                        else:
+                            self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
+                            self.step_slider.setActive(active = True)
+                        self.step_slider.grid(self.step_slider.pi)
 
                     self.upgrade_shot_button.grid(self.upgrade_shot_button.pi)
                     self.done_shot_button.grid(self.done_shot_button.pi)
@@ -1222,10 +1198,7 @@ class SuperPipe(Frame):
                 self.main_area_asset.grid(self.main_area_asset.pi)
                 self.main_area_shot.grid_forget()
                 self.main_area_preview.grid_forget()
-                try:
-                    self.statistics_view.grid_forget()
-                except:
-                    print("IMPORT ERROR")
+                self.statistics_view.grid_forget()
 
                 self.shot_list.selection_clear(0, END)
 
@@ -1740,10 +1713,7 @@ class SuperPipe(Frame):
         self.main_area_preview.grid(self.main_area_preview.pi)
         self.main_area_shot.grid_forget()
         self.main_area_asset.grid_forget()
-        try:
-            self.statistics_view.grid_forget()
-        except:
-            print("IMPORT ERROR")
+        self.statistics_view.grid_forget()
 
         self.asset_list.selection_remove(self.asset_list.focus())
         self.shot_list.selection_clear(0, END)
@@ -1800,9 +1770,10 @@ class SuperPipe(Frame):
         elif self.current_project.getSelection().getStep() == "Rendering":
             self.upgrade_shot_button.config(state = DISABLED)
 
-        self.shotlistCommand()
-
         self.step_slider.nextStep()
+        self.customSliderCommand()
+
+        self.shotlistCommand()
 
     def downgradeShotCommand(self):
         yesno = {"result" : ""}
@@ -1819,9 +1790,10 @@ class SuperPipe(Frame):
             elif self.current_project.getSelection().getStep() == "Rendering":
                 self.upgrade_shot_button.config(state = DISABLED)
 
-            self.shotlistCommand()
-
             self.step_slider.previousStep()
+            self.customSliderCommand()
+
+            self.shotlistCommand()
 
     def setShotFrameRangeCommand(self):
         self.current_project.getSelection().setFrameRange(int(self.frame_range_entry.get()))
@@ -1908,7 +1880,7 @@ class SuperPipe(Frame):
 
         return True
 
-    def customSliderCommand(self, e):
+    def customSliderCommand(self, event = None):
         Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", str(self.step_slider.getPercentage()), 7)
 
     def customButtonCommand(self):
@@ -1971,22 +1943,26 @@ class SuperPipe(Frame):
         if settings["res"]:            
             self.current_project.setResolution(settings["res"])
 
-    def projectStatisticsCommand(self, e = None):
+    def projectStatisticsCommand(self, event = None):
         self.statistics_view.update()
         self.statistics_view.grid(self.statistics_view.pi)
         self.main_area_asset.grid_forget()
         self.main_area_shot.grid_forget()
         self.main_area_preview.grid_forget()
 
-    def preferencesCommand(self, e = None):
-        if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
-            with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
-                f.write("www.google.fr\n")
-            f.close()
+    def preferencesCommand(self, event = None):
+        if self.current_project:
+            if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
+                with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
+                    f.write("www.google.fr\n")
+                f.close()
 
         preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : "", "theme" : ""}
 
-        dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
+        if self.current_project:
+            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
+        else:
+            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, "", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
         self.wait_window(dialog().top)
 
         if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"] and preferences["theme"]:
