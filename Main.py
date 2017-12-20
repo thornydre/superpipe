@@ -1429,10 +1429,10 @@ class SuperPipe(Frame):
 
                 elif asset.getSoftware() == "blender":
                     try:
-                        if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
-                            blender_file = asset.getDirectory() + "/" + selected_asset_version
+                        if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
+                            blender_file = asset.getDirectory() + "/scenes/" + selected_asset_version
                         else:
-                            blender_file = asset.getDirectory() + "/backup/" + selected_asset_version
+                            blender_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
                         subprocess.Popen("%s %s" % (self.blender_path, blender_file))
                     except:

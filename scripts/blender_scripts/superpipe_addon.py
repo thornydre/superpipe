@@ -110,7 +110,7 @@ def superpipe_save():
             remove(directory + "../reference_" + file_name + ".blend")
         copyfile(directory + file_name + ".blend", directory + "../reference_" + path.splitext(file_name)[0][:-4] + ".blend")
     else:
-        if path.isfile(directory + "/eference_" + file_name + ".blend"):
+        if path.isfile(directory + "reference_" + file_name + ".blend"):
             remove(directory + "reference_" + file_name + ".blend")
         copyfile(directory + file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
 
@@ -145,9 +145,9 @@ def superpipe_incremental_save(comment):
     
     ## COMMENT ##
     if "edits" in directory:
-        versions_file = directory + "/../../superpipe/versions_data.spi"
+        versions_file = directory + "../../superpipe/versions_data.spi"
     else:
-        versions_file = directory + "/../superpipe/versions_data.spi"
+        versions_file = directory + "../superpipe/versions_data.spi"
 
     with open(versions_file, "r") as f:
         all_comments = f.read()
@@ -210,8 +210,9 @@ def superpipe_incremental_save(comment):
         bpy.ops.wm.save_as_mainfile(filepath = directory + "../" + new_file_name + ".blend")
         remove(directory + "../" + current_file_ext)
     else:
-        copyfile(current_file_ext, directory + "/edits/" + file_name + ".blend")
-        bpy.ops.wm.save_as_mainfile(filepath = directory + "/" + new_file_name + ".blend")
+        print(directory + "edits/" + file_name + ".blend")
+        copyfile(current_file_ext, directory + "edits/" + file_name + ".blend")
+        bpy.ops.wm.save_as_mainfile(filepath = directory + new_file_name + ".blend")
         remove(current_file_ext)
     
     ## CREATE REFERENCE ##
