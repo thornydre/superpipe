@@ -223,7 +223,7 @@ class Asset:
                     return True
 
         elif self.software == "blender":
-            for asset_file in listdir(self.directory):
+            for asset_file in listdir(self.directory + "/scenes/"):
                 if path.splitext(asset_file)[1] == ".blend":
                     return True
 

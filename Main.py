@@ -1320,6 +1320,8 @@ class SuperPipe(Frame):
                     temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
                 elif self.current_project.getSelection().getSoftware() == "houdini":
                     temp_path = self.current_project.getSelection().getDirectory() + "/" + selected_version
+                elif self.current_project.getSelection().getSoftware() == "blender":
+                    temp_path = self.current_project.getSelection().getDirectory() + "/" + selected_version
             else:
                 temp_path = self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version
 
