@@ -81,16 +81,6 @@ class Resources:
 
         return ""
 
-    def getSoftwareName(soft):
-        if soft == 1:
-            return "maya"
-        elif soft == 2:
-            return "houdini"
-        elif soft == 3:
-            return "blender"
-
-        return ""
-
     def makeShotName(shot_nb, sequence):
         if sequence < 10:
             seq_name = "s0" + str(sequence)

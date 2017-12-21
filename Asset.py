@@ -33,6 +33,8 @@ class Asset:
 
                 open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
+                print(self.software)
+
                 if self.software == "maya" or self.software == "blender":
                     makedirs(self.directory + "/assets")
                     
@@ -282,13 +284,27 @@ class Asset:
         elif self.software == "blender":
             for asset_file in listdir(self.directory + "/scenes/"):
                 if not "reference" in asset_file:
-                    if path.splitext(asset_file)[1] == ".blend":
-                        versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+                    if not asset_file[0] == "_":
+                        if path.splitext(asset_file)[1] == ".blend":
+                            for disp in display:
+                                if disp in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
+
+                            if other:
+                                if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/" + asset_file), asset_file))
 
             if not last_only:
                 for asset_file in listdir(self.directory + "/scenes/edits/"):
-                    if path.splitext(asset_file)[1] == ".blend":
-                        versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+                    if not asset_file[0] == "_":
+                        if path.splitext(asset_file)[1] == ".blend":
+                            for disp in display:
+                                if disp in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
+
+                            if other:
+                                if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
+                                    versions_list.append((path.getmtime(self.directory + "/scenes/edits/" + asset_file), asset_file))
 
         return sorted(versions_list, reverse = True)
 

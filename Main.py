@@ -986,7 +986,7 @@ class SuperPipe(Frame):
         self.wait_window(dialog().top)
 
         if asset["cat"] and asset["name"] and asset["software"]:
-            if self.current_project.createAsset(asset["name"], asset["cat"], Resources.getSoftwareName(asset["software"])):
+            if self.current_project.createAsset(asset["name"], asset["cat"], asset["software"]):
                 self.updateAssetListView()
 
                 self.asset_list.item(Resources.getCategoryName(asset["cat"]), open = True)
@@ -1248,7 +1248,7 @@ class SuperPipe(Frame):
                                     self.open_asset_folder_button.grid(self.open_asset_folder_button.pi)
 
                                     selected_line = self.version_list.curselection()[0]
-                                    if asset.getSoftware() == "maya":
+                                    if asset.getSoftware() == "maya" or asset.getSoftware() == "blender":
                                         temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + self.version_list.get(selected_line)
                                     elif asset.getSoftware() == "houdini":
                                         temp_path = self.current_project.getSelection().getDirectory() + "/" + self.version_list.get(selected_line)
@@ -1959,22 +1959,25 @@ class SuperPipe(Frame):
                     f.write("www.google.fr\n")
                 f.close()
 
-        preferences = {"link" : None, "maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : "", "theme" : ""}
+        preferences = {"maya_path" : "", "houdini_path" : "", "blender_path" : "", "vlc_path" : "", "default_software" : "", "link" : None, "theme" : ""}
 
         if self.current_project:
-            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
+            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, self.current_project.getDirectory() + "/project_option.spi", (preferences, "maya_path", "houdini_path", "blender_path", "vlc_path", "default_software", "link", "theme"))
         else:
-            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, "", (preferences, "link", "maya_path", "houdini_path", "blender_path", "vlc_path", "theme"))
+            dialog = lambda: PreferencesDialog.PreferencesDialog(self.parent, "", (preferences, "maya_path", "houdini_path", "blender_path", "vlc_path", "default_software", "link", "theme"))
         self.wait_window(dialog().top)
 
-        if preferences["link"] and preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"] and preferences["theme"]:
+        if preferences["maya_path"] and preferences["houdini_path"] and preferences["blender_path"] and preferences["vlc_path"] and preferences["default_software"] and preferences["link"] and preferences["theme"]:
             self.maya_path = preferences["maya_path"]
             self.houdini_path = preferences["houdini_path"]
             self.blender_path = preferences["blender_path"]
             self.vlc_path = preferences["vlc_path"]
             self.theme = preferences["theme"]
 
+            self.current_project.default_software = preferences["default_software"]
+            Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["default_software"], 4)
             Resources.writeAtLine(self.current_project.getDirectory() + "/project_option.spi", preferences["link"], 1)
+
             Resources.writeAtLine("save/options.spi", preferences["theme"], 2)
             Resources.writeAtLine("save/options.spi", preferences["maya_path"], 3)
             Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 4)

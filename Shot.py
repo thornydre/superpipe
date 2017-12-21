@@ -33,7 +33,7 @@ class Shot:
 
                 open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
-                if self.software == "maya":
+                if self.software == "maya" or self.software == "blender":
                     makedirs(self.shot_directory + "/assets")
                     
                     makedirs(self.shot_directory + "/autosave")
@@ -201,9 +201,11 @@ class Shot:
             return False
 
     def setShot(self, res):
-        copyfile("src/set_up_file_shot.ma", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
-
-        Resources.insertAtLine(self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+        if self.software == "maya":
+            copyfile("src/set_up_file_shot_maya.ma", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
+            Resources.insertAtLine(self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+        elif self.software == "blender":
+            copyfile("src/set_up_file_shot_blender.blend", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.blend")
 
     def setFrameRange(self, frame_range):
         self.frame_range = frame_range
@@ -226,9 +228,15 @@ class Shot:
                 Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 
     def isSet(self):
-        for shot_file in listdir(self.shot_directory + "/scenes/"):
-            if path.splitext(shot_file)[1] == ".ma":
-                return True
+        if self.software == "maya":
+            for shot_file in listdir(self.shot_directory + "/scenes/"):
+                if path.splitext(shot_file)[1] == ".ma":
+                    return True
+
+        elif self.software == "blender":
+            for shot_file in listdir(self.shot_directory + "/scenes/"):
+                if path.splitext(shot_file)[1] == ".blend":
+                    return True
 
         return False
 
@@ -252,31 +260,59 @@ class Shot:
         if rendering:
             display.append("rendering")
 
-        for shot_file in listdir(self.shot_directory + "/scenes/"):
-            if not "reference" in shot_file:
-                if shot_file[0] != "_":
-                    if path.splitext(shot_file)[1] == ".ma":
-                        for disp in display:
-                            if disp in shot_file:
-                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+        if self.software == "maya":
+            for shot_file in listdir(self.shot_directory + "/scenes/"):
+                if not "reference" in shot_file:
+                    if shot_file[0] != "_":
+                        if path.splitext(shot_file)[1] == ".ma":
+                            for disp in display:
+                                if disp in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
-                        if other:
-                            if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
-                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+                            if other:
+                                if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
 
-        if not last_only:
-            for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
-                if shot_file[0] != "_":
-                    if path.splitext(shot_file)[1] == ".ma":
-                        not_set = True
-                        for disp in display:
-                            if disp in shot_file:
-                                not_set = False
-                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+            if not last_only:
+                for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
+                    if shot_file[0] != "_":
+                        if path.splitext(shot_file)[1] == ".ma":
+                            not_set = True
+                            for disp in display:
+                                if disp in shot_file:
+                                    not_set = False
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
-                        if other:
-                            if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
-                                versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+                            if other:
+                                if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+
+        elif self.software == "blender":
+            for shot_file in listdir(self.shot_directory + "/scenes/"):
+                if not "reference" in shot_file:
+                    if shot_file[0] != "_":
+                        if path.splitext(shot_file)[1] == ".blend":
+                            for disp in display:
+                                if disp in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+
+                            if other:
+                                if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/" + shot_file), shot_file))
+
+            if not last_only:
+                for shot_file in listdir(self.shot_directory + "/scenes/edits/"):
+                    if shot_file[0] != "_":
+                        if path.splitext(shot_file)[1] == ".blend":
+                            not_set = True
+                            for disp in display:
+                                if disp in shot_file:
+                                    not_set = False
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
+
+                            if other:
+                                if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
+                                    versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
         return sorted(versions_list, reverse = True)
 
@@ -331,6 +367,11 @@ class Shot:
         version = 0
         version_str = ""
 
+        if self.software == "maya":
+            ext = ".ma"
+        elif self.software == "blender":
+            ext = ".blend"
+
         for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:
                 tmp_version_str = path.splitext(file)[0][-2:]
@@ -355,26 +396,31 @@ class Shot:
                 file_to_upgrade = file
 
         if self.step == "Blocking":
-            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01.ma")
+            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01" + ext)
             if version != 0:
                 copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.jpg")
         elif self.step == "Splining":
-            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01.ma")
+            copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01" + ext)
             if version != 0:
                 copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.jpg")
         elif self.step == "Rendering":
-            copyfile("src/set_up_file_shot.ma", self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01.ma")
+            copyfile("src/set_up_file_shot_" + self.software + ext, self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01" + ext)
             if version != 0:
                 copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.jpg")
 
     def downgrade(self):
+        if self.software == "maya":
+            ext = ".ma"
+        elif self.software == "blender":
+            ext = ".blend"
+
         for file in listdir(self.shot_directory + "/scenes/"):
             if self.step.lower() in file:
-                rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
         for file in listdir(self.shot_directory + "/scenes/edits/"):
             if self.step.lower() in file:
-                rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ".ma")
+                rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
         for file in listdir(self.shot_directory + "/images/screenshots/"):
             if self.step.lower() in file:

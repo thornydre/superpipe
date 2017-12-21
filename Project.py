@@ -25,6 +25,7 @@ class Project:
         self.res_x = 1920
         self.res_y = 1080
         self.valid = True
+        self.default_software = "maya"
 
         if not path.isdir(self.directory):
             makedirs(self.directory)
@@ -85,12 +86,16 @@ class Project:
             if not Resources.readLine(self.directory + "/project_option.spi", 3):
                 Resources.writeAtLine(self.directory + "/project_option.spi", str(self.sequence_number), 3)
 
+            if not Resources.readLine(self.directory + "/project_option.spi", 4):
+                Resources.writeAtLine(self.directory + "/project_option.spi", self.default_software, 4)
+
             res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
 
             self.res_x = res[0]
             self.res_y = res[1]
 
             self.sequence_number = int(Resources.readLine(self.directory + "/project_option.spi", 3))
+            self.default_software = Resources.readLine(self.directory + "/project_option.spi", 4)
 
         else:
             self.valid = False
@@ -145,7 +150,7 @@ class Project:
 
             shot_name = Resources.makeShotName(shot_nb, shot_sequence)
 
-            shot = Shot(self.directory, shot_name, software = "maya")
+            shot = Shot(self.directory, shot_name, software = self.default_software)
 
         else:
             shots_to_rename = []
@@ -163,7 +168,7 @@ class Project:
 
             shot_nb = shots_to_rename[-1][0]
 
-            shot = Shot(self.directory, Resources.makeShotName(shot_nb, shot_sequence), software = "maya")
+            shot = Shot(self.directory, Resources.makeShotName(shot_nb, shot_sequence), software = self.default_software)
 
         self.shot_list.append((shot.getShotNb(), shot.getShotName()))
 

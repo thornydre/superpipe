@@ -31,14 +31,13 @@ class PreferencesDialog(object):
 
         tabs_frame = ttk.Notebook(self.top, padding = 0)
 
-        ## // SOFTWARES \\ ##
+        ## // GENERAL PREFERENCES \\ ##
         softwares_frame = Frame(tabs_frame, borderwidth = 0, bg = self.main_color)
         softwares_frame.pack()
 
         softwares_frame.columnconfigure(0, pad = 5)
         softwares_frame.columnconfigure(1, pad = 5)
         softwares_frame.columnconfigure(2, pad = 5)
-        softwares_frame.columnconfigure(3, pad = 5)
         
         softwares_frame.rowconfigure(0, pad = 5)
         softwares_frame.rowconfigure(1, pad = 5)
@@ -49,79 +48,111 @@ class PreferencesDialog(object):
         softwares_frame.rowconfigure(6, pad = 5)
         softwares_frame.rowconfigure(7, pad = 5)
         softwares_frame.rowconfigure(8, pad = 5)
+        softwares_frame.rowconfigure(9, pad = 5)
+        softwares_frame.rowconfigure(10, pad = 5)
+
+        ## DEFAULT SOFTWARE ##
+        label = Label(softwares_frame, text = "Default software", bg = self.main_color, fg = self.text_color)
+        label.grid(row = 0, column = 0, columnspan = 2)
+
+        default_softwares_frame = Frame(softwares_frame, borderwidth = 0, bg = self.main_color)
+        default_softwares_frame.grid(row = 1, column = 0, columnspan = 2, sticky = W + E)
+
+        default_softwares_frame.columnconfigure(0, pad = 5, weight = 1)
+        default_softwares_frame.columnconfigure(1, pad = 5, weight = 1)
+        default_softwares_frame.columnconfigure(2, pad = 5, weight = 1)
+
+        default_softwares_frame.rowconfigure(0, pad = 0)
+
+        default_software = Resources.readLine(project_options_path, 4)
+
+        self.rb_default_software = IntVar()
+        self.softwares_list = ("maya", "blender")
+        i = 0
+
+        for software in self.softwares_list:
+            rb_default_software = Radiobutton(default_softwares_frame, text = software.upper(), variable = self.rb_default_software, value = i, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
+            rb_default_software.grid(row = 0, column = i)
+
+            if software == default_software:
+                rb_default_software.select()
+
+            i += 1
 
         ## MAYA ##
         label = Label(softwares_frame, text = "Path to Maya", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 0, column = 0, columnspan = 2)
+        label.grid(row = 2, column = 0, columnspan = 2)
 
         self.var_maya_text = StringVar()
         self.var_maya_text.set(Resources.readLine("save/options.spi", 3))
 
         self.maya_path_entry = Entry(softwares_frame, textvariable = self.var_maya_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
-        self.maya_path_entry.grid(row = 1, column = 0)
+        self.maya_path_entry.grid(row = 3, column = 0)
 
         maya_path_button = Button(softwares_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         maya_path_button["command"] = lambda: self.mayaPathEntry()
-        maya_path_button.grid(row = 1, column = 1, sticky = E)
+        maya_path_button.grid(row = 3, column = 1, sticky = E)
 
         ## HOUDINI ##
         label = Label(softwares_frame, text = "Path to Houdini", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 2, column = 0, columnspan = 2)
+        label.grid(row = 4, column = 0, columnspan = 2)
 
         self.houdini_var_text = StringVar()
         self.houdini_var_text.set(Resources.readLine("save/options.spi", 4))
 
         self.houdini_path_entry = Entry(softwares_frame, textvariable = self.houdini_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
-        self.houdini_path_entry.grid(row = 3, column = 0)
+        self.houdini_path_entry.grid(row = 5, column = 0)
 
         houdini_path_button = Button(softwares_frame, text ="Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         houdini_path_button["command"] = lambda: self.houdiniPathEntry()
-        houdini_path_button.grid(row = 3, column = 1, sticky = E)
+        houdini_path_button.grid(row = 5, column = 1, sticky = E)
 
         ## BLENDER ##
         label = Label(softwares_frame, text = "Path to Blender", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 4, column = 0, columnspan = 2)
+        label.grid(row = 6, column = 0, columnspan = 2)
 
         self.blender_var_text = StringVar()
         self.blender_var_text.set(Resources.readLine("save/options.spi", 5))
 
         self.blender_path_entry = Entry(softwares_frame, textvariable = self.blender_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
-        self.blender_path_entry.grid(row = 5, column = 0)
+        self.blender_path_entry.grid(row = 7, column = 0)
 
         blender_path_button = Button(softwares_frame, text = "Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         blender_path_button["command"] = lambda: self.blenderPathEntry()
-        blender_path_button.grid(row = 5, column = 1, sticky = E)
+        blender_path_button.grid(row = 7, column = 1, sticky = E)
 
         ## VLC ##
         label = Label(softwares_frame, text = "Path to VLC", bg = self.main_color, fg = self.text_color)
-        label.grid(row = 6, column = 0, columnspan = 2)
+        label.grid(row = 8, column = 0, columnspan = 2)
 
         self.vlc_var_text = StringVar()
         self.vlc_var_text.set(Resources.readLine("save/options.spi", 6))
 
         self.vlc_path_entry = Entry(softwares_frame, textvariable = self.vlc_var_text, state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
-        self.vlc_path_entry.grid(row = 7, column = 0)
+        self.vlc_path_entry.grid(row = 9, column = 0)
 
         vlc_path_button = Button(softwares_frame, text = "Browse", bg = self.button_color2, activebackground = self.over_button_color2, fg = self.text_color, activeforeground = self.text_color, bd = 0, width = 8, height = 1)
         vlc_path_button["command"] = lambda: self.vlcPathEntry()
-        vlc_path_button.grid(row = 7, column = 1, sticky = E)
+        vlc_path_button.grid(row = 9, column = 1, sticky = E)
 
         ## CUSTOM LINK ##
         if project_options_path:
             label = Label(softwares_frame, text = "Edit custom link", bg = self.main_color, fg = self.text_color)
-            label.grid(row = 8, column = 0, columnspan = 2)
+            label.grid(row = 10, column = 0, columnspan = 2)
 
-            self.var_custom_link = StringVar()
-            self.var_custom_link.set(Resources.readLine(project_options_path, 1))
+            var_custom_link = StringVar()
+            var_custom_link.set(Resources.readLine(project_options_path, 1))
 
-            self.link_entry = Entry(softwares_frame, textvariable = self.var_custom_link, width = 75, relief = FLAT, bg = self.button_color2)
+            self.link_entry = Entry(softwares_frame, textvariable = var_custom_link, width = 75, relief = FLAT, bg = self.button_color2)
         else:
             label = Label(softwares_frame, text = "Edit custom link", bg = self.main_color, fg = self.disabled_text_color)
-            label.grid(row = 8, column = 0, columnspan = 2)
+            label.grid(row = 10, column = 0, columnspan = 2)
             
             self.link_entry = Entry(softwares_frame, textvariable = "Set a project to access to this option", state = DISABLED, width = 75, relief = FLAT, disabledbackground = self.disabled_button_color2, disabledforeground = self.disabled_text_color)
 
-        self.link_entry.grid(row = 9, column = 0, columnspan = 2, sticky = W + E)
+        self.link_entry.grid(row = 11, column = 0, columnspan = 2, sticky = W + E)
+
+        ## // PROJECT PREFERENCES \\ ##
 
         ## // THEME \\ ##
         themes_frame = Frame(tabs_frame, borderwidth = 0, bg = self.main_color)
@@ -203,18 +234,20 @@ class PreferencesDialog(object):
         self.top.focus()
 
     def saveEntry(self, dict_key):
-        custom_link = self.link_entry.get()
         maya_path = self.maya_path_entry.get()
         houdini_path = self.houdini_path_entry.get()
         blender_path = self.blender_path_entry.get()
+        default_software = self.softwares_list[self.rb_default_software.get()]
+        custom_link = self.link_entry.get()
         vlc_path = self.vlc_path_entry.get()
         theme = path.splitext(self.themes_list[self.rb_theme.get()])[0]
-        if custom_link and maya_path and houdini_path and blender_path and vlc_path and theme:
-            d, key1, key2, key3, key4, key5, key6 = dict_key
-            d[key1] = custom_link
-            d[key2] = maya_path
-            d[key3] = houdini_path
-            d[key4] = blender_path
-            d[key5] = vlc_path
-            d[key6] = theme
+        if maya_path and houdini_path and blender_path and vlc_path and default_software and custom_link and theme:
+            d, key1, key2, key3, key4, key5, key6, key7 = dict_key
+            d[key1] = maya_path
+            d[key2] = houdini_path
+            d[key3] = blender_path
+            d[key4] = vlc_path
+            d[key5] = default_software
+            d[key6] = custom_link
+            d[key7] = theme
             self.top.destroy()

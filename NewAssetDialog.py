@@ -27,8 +27,6 @@ class NewAssetDialog(object):
 
         self.top.resizable(width = False, height = False)
 
-        self.project = project
-
         top_frame = Frame(self.top, borderwidth = 0, bg = self.main_color)
         top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
 
@@ -47,16 +45,28 @@ class NewAssetDialog(object):
         label.grid(row = 0, column = 0, columnspan = 3)
 
         self.rb_software = IntVar()
-        rb_software1 = Radiobutton(top_frame, text = "MAYA", variable = self.rb_software, value = 1, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
-        rb_software1.grid(row = 1, column = 0, sticky = W)
+        self.softwares_list = ("maya", "houdini", "blender")
+        i = 0
 
-        rb_software2 = Radiobutton(top_frame, text = "HOUDINI", variable = self.rb_software, value = 2, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
-        rb_software2.grid(row = 1, column = 1, sticky = W)
+        for software in self.softwares_list:
+            rb_software = Radiobutton(top_frame, text = software.upper(), variable = self.rb_software, value = i, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
+            rb_software.grid(row = int(i/2) + 1, column = i % 2, sticky = W)
 
-        rb_software2 = Radiobutton(top_frame, text = "BLENDER", variable = self.rb_software, value = 3, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
-        rb_software2.grid(row = 2, column = 0, sticky = W)
+            if software == project.default_software:
+                rb_software.select()
 
-        rb_software1.select()
+            i += 1
+
+        # rb_software1 = Radiobutton(top_frame, text = "MAYA", variable = self.rb_software, value = 1, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
+        # rb_software1.grid(row = 1, column = 0, sticky = W)
+
+        # rb_software2 = Radiobutton(top_frame, text = "HOUDINI", variable = self.rb_software, value = 2, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
+        # rb_software2.grid(row = 1, column = 1, sticky = W)
+
+        # rb_software3 = Radiobutton(top_frame, text = "BLENDER", variable = self.rb_software, value = 3, bg = self.main_color, activebackground = self.main_color, fg = self.text_color, activeforeground = self.text_color, selectcolor = self.second_color)
+        # rb_software3.grid(row = 2, column = 0, sticky = W)
+
+        # rb_software1.select()
 
         label = Label(top_frame, text = "Select asset category", bg = self.main_color, fg = self.text_color)
         label.grid(row = 3, column = 0, columnspan = 3)
@@ -69,12 +79,12 @@ class NewAssetDialog(object):
         self.categories_list.insert("", 4, "set", text = "SET")
         self.categories_list.grid(row = 4, column = 0, columnspan = 2)
 
-        assets = self.project.getAssetList()
+        assets = project.getAssetList()
 
         for asset in assets:
             if asset[0] != "backup":
-                if path.isdir(self.project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
-                    cur_asset = Asset(self.project.getDirectory(), asset[1], asset[0])
+                if path.isdir(project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
+                    cur_asset = Asset(project.getDirectory(), asset[1], asset[0])
 
                     asset_subfolders = asset[1].split("/")
 
@@ -117,6 +127,7 @@ class NewAssetDialog(object):
         self.top.focus()
 
     def submit(self, dict_key):
+        print(self.softwares_list[self.rb_software.get()])
         parent = self.categories_list.focus()
         category_list = []
 
@@ -132,7 +143,7 @@ class NewAssetDialog(object):
 
         name = self.name_entry.get()
         name = Resources.normString(name)
-        software = self.rb_software.get()
+        software = self.softwares_list[self.rb_software.get()]
         if category and name:
             d, key1, key2, key3 = dict_key
             d[key1] = category
