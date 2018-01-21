@@ -49,5 +49,5 @@ Temporary Items
 options.spi
 *.pyc
 *.pyw
-test.py
+*test*
 build

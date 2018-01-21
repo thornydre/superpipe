@@ -197,7 +197,7 @@ class Project:
 		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb()][1])
 		swap_shot_name_backup = swap_shot.getShotName()
 
-		shot.renameShot("s00p00")
+		shot.renameShot("s00p000")
 
 		swap_shot.renameShot(shot_name_backup)
 
@@ -210,7 +210,7 @@ class Project:
 		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb() - 2][1])
 		swap_shot_name_backup = swap_shot.getShotName()
 
-		shot.renameShot("s00p00")
+		shot.renameShot("s00p000")
 
 		swap_shot.renameShot(shot_name_backup)
 

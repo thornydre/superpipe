@@ -948,8 +948,8 @@ class SuperPipe(Frame):
 	def addShotCommand(self, event = None):
 		self.menu_project.entryconfig(4, state = NORMAL)
 
-		if len(self.current_project.getShotList()) >= 99:
-			dialog = lambda: OkDialog.OkDialog(self.parent, "No more shots", "Sorry ! Superpipe does not handle more than 99 shots at the moment")
+		if len(self.current_project.getShotList()) >= 999:
+			dialog = lambda: OkDialog.OkDialog(self.parent, "No more shots", "Sorry ! Superpipe does not handle more than 999 shots at the moment")
 			self.wait_window(dialog().top)
 
 		else:

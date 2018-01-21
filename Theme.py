@@ -6,7 +6,6 @@ from Resources import *
 class Theme():
 	def __init__(self, theme_name):
 		self.main_color = Resources.readLine("save/themes/" + theme_name + ".spi", 1)
-		self.timeline_color = Resources.readLine("save/themes/" + theme_name + ".spi", 2)
 		self.second_color = Resources.readLine("save/themes/" + theme_name + ".spi", 2)
 		self.list_color = Resources.readLine("save/themes/" + theme_name + ".spi", 3)
 		self.button_color1 = Resources.readLine("save/themes/" + theme_name + ".spi", 4)
@@ -15,6 +14,8 @@ class Theme():
 		self.over_button_color2 = Resources.readLine("save/themes/" + theme_name + ".spi", 7)
 		self.separator_color = Resources.readLine("save/themes/" + theme_name + ".spi", 8)
 		self.text_color = Resources.readLine("save/themes/" + theme_name + ".spi", 9)
+		self.disabled_button_color2 = Resources.readLine("save/themes/" + theme_name + ".spi", 10)
+		self.disabled_text_color = Resources.readLine("save/themes/" + theme_name + ".spi", 11)
 		self.done_color = Resources.readLine("save/themes/" + theme_name + ".spi", 12)
 		self.urgent_color = Resources.readLine("save/themes/" + theme_name + ".spi", 13)
 		self.high_color = Resources.readLine("save/themes/" + theme_name + ".spi", 14)

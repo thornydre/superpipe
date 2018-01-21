@@ -82,20 +82,13 @@ class Resources:
 		return ""
 
 	def makeShotName(shot_nb, sequence):
-		if sequence < 10:
-			seq_name = "s0" + str(sequence)
-		else:
-			seq_name = "s" + str(sequence)
-
-		if shot_nb < 10:
-			shot_name = "p0" + str(shot_nb)
-		else:
-			shot_name = "p" + str(shot_nb)
+		seq_name = "s" + str(sequence).zfill(2)
+		shot_name = "p" + str(shot_nb).zfill(3)
 
 		return seq_name + shot_name
 
 	def makeShotNbs(shot_name):
-		return (int(shot_name[-2:]), int(shot_name[1:3]))
+		return (int(shot_name[-3:]), int(shot_name[1:3]))
 
 	def removeStudentVersion(file):
 		with open(file, "r") as f:
