@@ -141,7 +141,7 @@ class SuperPipe(Frame):
 
 		self.parent.config(menu = menu_bar)
 
-		pw_main = PanedWindow(self.parent, orient="horizontal", height = 2000, bg = self.theme.separator_color, bd = 0, sashwidth = 5)
+		pw_main = PanedWindow(self.parent, orient = "horizontal", height = 2000, bg = self.theme.separator_color, bd = 0, sashwidth = 5)
 		pw_side_bar = PanedWindow(pw_main, orient = "vertical", width = 250, bg = self.theme.separator_color, bd = 0, sashwidth = 5)
 		main = Frame(pw_main, width = 400, height = 400, background = "black")
 		pw_side_bar_top = Frame(pw_side_bar, width = 200, height = 200, background = "gray")
@@ -1750,17 +1750,16 @@ class SuperPipe(Frame):
 
 	def upgradeShotCommand(self):
 		selected_shot = self.shot_list.curselection()[0]
-		self.current_project.getSelection().upgrade()
+		if self.current_project.getSelection().upgrade():
+			if self.current_project.getSelection().getStep() == "Layout":
+				self.downgrade_shot_button.config(state = DISABLED)
+			elif self.current_project.getSelection().getStep() == "Rendering":
+				self.upgrade_shot_button.config(state = DISABLED)
 
-		if self.current_project.getSelection().getStep() == "Layout":
-			self.downgrade_shot_button.config(state = DISABLED)
-		elif self.current_project.getSelection().getStep() == "Rendering":
-			self.upgrade_shot_button.config(state = DISABLED)
+			self.step_slider.nextStep()
+			self.customSliderCommand()
 
-		self.step_slider.nextStep()
-		self.customSliderCommand()
-
-		self.shotlistCommand()
+			self.shotlistCommand()
 
 	def downgradeShotCommand(self):
 		yesno = {"result" : ""}

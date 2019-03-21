@@ -382,31 +382,36 @@ class Shot:
 				except:
 					print("IMPOSSIBLE TO CONVERT " + tmp_version_str + " INTO AN INTEGER")
 
-		if self.step == "Layout":
-			self.step = "Blocking"
-		elif self.step == "Blocking":
-			self.step = "Splining"
-		elif self.step == "Splining":
-			self.step = "Rendering"
-
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
-
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if file[:6] == self.shot_name:
 				file_to_upgrade = file
 
-		if self.step == "Blocking":
-			copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01" + ext)
-			if version != 0:
-				copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.jpg")
-		elif self.step == "Splining":
-			copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01" + ext)
-			if version != 0:
-				copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.jpg")
-		elif self.step == "Rendering":
-			copyfile("src/set_up_file_shot_" + self.software + ext, self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01" + ext)
-			if version != 0:
-				copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.jpg")
+		if "file_to_upgrade" in locals():
+			if self.step == "Layout":
+				self.step = "Blocking"
+			elif self.step == "Blocking":
+				self.step = "Splining"
+			elif self.step == "Splining":
+				self.step = "Rendering"
+
+			Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
+
+			if self.step == "Blocking":
+				copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01" + ext)
+				if version != 0:
+					copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_01_layout_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v01.jpg")
+			elif self.step == "Splining":
+				copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_03_splining_v01" + ext)
+				if version != 0:
+					copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.jpg")
+			elif self.step == "Rendering":
+				copyfile("src/set_up_file_shot_" + self.software + ext, self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01" + ext)
+				if version != 0:
+					copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.jpg")
+			return True
+		else:
+			print("IMPOSSIBLE TO UPGRADE THIS FILE")
+			return False
 
 	def downgrade(self):
 		if self.software == "maya":

@@ -2,7 +2,7 @@ bl_info = {
     "name": "Superpipe Save",
     "author": "Lucas BOUTROT",
     "version": (1, 0),
-    "blender": (2, 79, 0),
+    "blender": (2, 80, 0),
     "location": "View3D > Tools > Superpipe",
     "description": "Save scene for Superpipe",
     "warning": "",
@@ -15,17 +15,17 @@ from os import path, remove, listdir, rename
 from shutil import copyfile
  
 ## CREATE UI ##
-class SuperpipePanel(bpy.types.Panel):
+class SUPERPIPE_PT_SuperpipePanel(bpy.types.Panel):
     bl_label = "Superpipe"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_category = "Superpipe"
     
     def draw(self, context):
         self.layout.operator("superpipe.save")
         self.layout.operator("superpipe.incremental_save")
 
-class CommentPopup(bpy.types.Operator):
+class SUPERPIPE_OT_CommentPopup(bpy.types.Operator):
     bl_idname = "superpipe.comment_popup"
     bl_label = "Superpipe"
 
@@ -225,19 +225,11 @@ def superpipe_incremental_save(comment):
             remove(directory + "reference_" + file_name + ".blend")
         copyfile(directory + new_file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
 
-## REGISRTATION ##
-def register():
-    bpy.utils.register_class(SuperpipePanel)
-    bpy.utils.register_class(CommentPopup)
-    bpy.utils.register_class(button_superpipe_save)
-    bpy.utils.register_class(button_superpipe_incremental_save)
 
-## UNREGISRTATION ##
-def unregister():
-    bpy.utils.unregister_class(SuperpipePanel)
-    bpy.utils.unregister_class(CommentPopup)
-    bpy.utils.unregister_class(button_superpipe_save)
-    bpy.utils.unregister_class(button_superpipe_incremental_save)
+## REGISRTATION / UNREGISRTATION ##
+classes = (SUPERPIPE_PT_SuperpipePanel, SUPERPIPE_OT_CommentPopup, button_superpipe_save, button_superpipe_incremental_save)
+
+register, unregister = bpy.utils.register_classes_factory(classes)
 
 
 if __name__ == "__main__":
