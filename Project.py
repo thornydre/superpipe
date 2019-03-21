@@ -1,5 +1,5 @@
-#!/usr/bin/python3.5
-# -*-coding:Utf-8 -*
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from Main import *
 from os import makedirs, listdir, path, rename, walk

@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/usr/bin/env python
 # -*-coding:Utf-8 -*
 
 from Main import *

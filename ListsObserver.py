@@ -1,5 +1,5 @@
-#!/usr/bin/python3.5
-# -*-coding:Utf-8 -*
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from watchdog.events import FileSystemEventHandler
 
