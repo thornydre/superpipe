@@ -36,7 +36,7 @@ class SuperPipe(Frame):
 	def __init__(self, parent):
 		if not path.isfile("save/options.spi"):
 			with open("save/options.spi", "w") as f:
-				f.write("C:/Program Files/Autodesk/Maya2017/bin/maya.exe\ntheme_default\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
+				f.write("\ntheme_default\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
 			f.close()
 
 		## THEME COLORS ##

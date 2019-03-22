@@ -57,7 +57,10 @@ class PreferencesDialog(object):
 
 		default_softwares_frame.rowconfigure(0, pad = 0)
 
-		default_software = Resources.readLine(project_options_path, 4)
+		default_software = "maya"
+
+		if project_options_path:
+			default_software = Resources.readLine(project_options_path, 4)
 
 		self.rb_default_software = IntVar()
 		self.softwares_list = ("maya", "blender")
