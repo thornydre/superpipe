@@ -1,10 +1,10 @@
 bl_info = {
-    "name": "Superpipe Save",
+    "name": "Superpipe Tools",
     "author": "Lucas BOUTROT",
-    "version": (1, 0),
-    "blender": (2, 80, 0),
+    "version": (1, 5),
+    "blender": (2, 90, 0),
     "location": "View3D > Tools > Superpipe",
-    "description": "Save scene for Superpipe",
+    "description": "Pipeline tools to work with Superpipe",
     "warning": "",
     "wiki_url": "",
     "category": "Superpipe",
@@ -24,6 +24,10 @@ class SUPERPIPE_PT_SuperpipePanel(bpy.types.Panel):
     def draw(self, context):
         self.layout.operator("superpipe.save")
         self.layout.operator("superpipe.incremental_save")
+        self.layout.operator("superpipe.import_asset")
+        self.layout.operator("superpipe.export_alembic")
+        self.layout.operator("superpipe.import_alembic")
+
 
 class SUPERPIPE_OT_CommentPopup(bpy.types.Operator):
     bl_idname = "superpipe.comment_popup"
@@ -34,6 +38,7 @@ class SUPERPIPE_OT_CommentPopup(bpy.types.Operator):
     def execute(self, context):
         superpipe_incremental_save(self.comment)
         return {"FINISHED"}
+
 
     def invoke(self, context, event):
         wm = context.window_manager
@@ -48,6 +53,7 @@ class button_superpipe_save(bpy.types.Operator):
         superpipe_save()
         return{"FINISHED"}
 
+
 class button_superpipe_incremental_save(bpy.types.Operator):
     bl_idname = "superpipe.incremental_save"
     bl_label = "Incremental Save"
@@ -55,6 +61,34 @@ class button_superpipe_incremental_save(bpy.types.Operator):
     def execute(self, context):
         bpy.ops.superpipe.comment_popup("INVOKE_DEFAULT")
         return{"FINISHED"}
+
+
+class button_superpipe_import_asset(bpy.types.Operator):
+    bl_idname = "superpipe.import_asset"
+    bl_label = "Import Asset"
+ 
+    def execute(self, context):
+        superpipe_import_asset()
+        return{"FINISHED"}
+
+
+class button_superpipe_export_alembic(bpy.types.Operator):
+    bl_idname = "superpipe.export_alembic"
+    bl_label = "Export Alembic"
+ 
+    def execute(self, context):
+        superpipe_export_alembic()
+        return{"FINISHED"}
+
+
+class button_superpipe_import_alembic(bpy.types.Operator):
+    bl_idname = "superpipe.import_alembic"
+    bl_label = "Import Alembic"
+ 
+    def execute(self, context):
+        superpipe_import_alembic()
+        return{"FINISHED"}
+
 
 ## COMMANDS ##
 def superpipe_save():
@@ -162,7 +196,7 @@ def superpipe_incremental_save(comment):
         comments_dict[version_name] = comments_list[i + 1]
         i += 2
 
-    comments_dict[new_file_name + ".ma"] = comment
+    comments_dict[new_file_name + ".blend"] = comment
 
     print(comments_dict)
 
@@ -186,8 +220,8 @@ def superpipe_incremental_save(comment):
     bpy.context.scene.render.resolution_x = new_width
     bpy.context.scene.render.resolution_y = new_height
     bpy.context.scene.render.resolution_percentage = 100
-    
     bpy.context.scene.render.image_settings.file_format = "JPEG"
+    
     if "edits" in directory:
         bpy.data.scenes["Scene"].render.filepath = directory + "../../images/screenshots/" + new_file_name + ".jpg"
     else:
@@ -226,8 +260,24 @@ def superpipe_incremental_save(comment):
         copyfile(directory + new_file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
 
 
+def superpipe_import_asset():
+    print("import asset")
+
+
+def superpipe_export_alembic():
+    path = bpy.data.filepath
+
+    for lib in bpy.data.libraries:
+        # for obj in libs.objects:
+        print("bpy.ops.wm.alembic_export")
+
+
+def superpipe_import_alembic():
+    print("import alembic")
+
+
 ## REGISRTATION / UNREGISRTATION ##
-classes = (SUPERPIPE_PT_SuperpipePanel, SUPERPIPE_OT_CommentPopup, button_superpipe_save, button_superpipe_incremental_save)
+classes = (SUPERPIPE_PT_SuperpipePanel, SUPERPIPE_OT_CommentPopup, button_superpipe_save, button_superpipe_incremental_save, button_superpipe_import_asset, button_superpipe_export_alembic, button_superpipe_import_alembic)
 
 register, unregister = bpy.utils.register_classes_factory(classes)
 

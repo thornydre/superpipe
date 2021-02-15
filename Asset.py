@@ -33,7 +33,7 @@ class Asset:
 
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
-				print(self.software)
+				# print(self.software)
 
 				if self.software == "maya" or self.software == "blender":
 					makedirs(self.directory + "/assets")
@@ -344,21 +344,21 @@ class Asset:
 					rename(new_dir + "/" + f, new_dir + "/" + f.replace(self.asset_name, new_name))
 
 	def setPriority(self, priority):
-		self.priority = priority
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", self.priority, 1)
+		self.priority = int(priority)
+		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.priority), 1)
 
 	def setModelingDone(self, modeling_done):
-		self.modeling_done = modeling_done
+		self.modeling_done = int(modeling_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.modeling_done), 2)
 
 	def setRigDone(self, rig_done):
-		self.rig_done = rig_done
+		self.rig_done = int(rig_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.rig_done), 3)
 
 	def setLookdevDone(self, lookdev_done):
-		self.lookdev_done = lookdev_done
+		self.lookdev_done = int(lookdev_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.lookdev_done), 4)
 
 	def setDone(self, done):
-		self.done = done
+		self.done = int(done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.done), 5)

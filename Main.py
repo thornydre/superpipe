@@ -1189,6 +1189,8 @@ class SuperPipe(Frame):
 
 				categories = ["character", "fx", "props", "set"]
 
+				print(self.asset_list.focus())
+
 				if not self.asset_list.get_children(self.asset_list.focus()) and not self.asset_list.focus() in categories:
 					selected_asset = self.asset_list.focus()
 
@@ -1360,17 +1362,30 @@ class SuperPipe(Frame):
 			shot = self.current_project.getSelection()
 
 			if self.version_mode:
-				try:
-					if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
-						maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
-					else:
-						maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
+				if shot.getSoftware() == "maya":
+					try:
+						if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
+							maya_file = shot.getDirectory() + "/scenes/" + selected_shot_version
+						else:
+							maya_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
 
-					maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
-					subprocess.Popen(maya_args)
-				except:
-					dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-					self.wait_window(dialog().top)
+						maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
+						subprocess.Popen(maya_args)
+					except:
+						dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
+						self.wait_window(dialog().top)
+
+				elif shot.getSoftware() == "blender":
+					try:
+						if path.isfile(shot.getDirectory() + "/scenes/" + selected_shot_version):
+							blender_file = shot.getDirectory() + "/scenes/" + selected_shot_version
+						else:
+							blender_file = shot.getDirectory() + "/scenes/edits/" + selected_shot_version
+
+						subprocess.Popen("%s %s" % (self.blender_path, blender_file))
+					except:
+						dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
+						self.wait_window(dialog().top)
 			else:
 				try:
 					playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version

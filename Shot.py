@@ -162,6 +162,9 @@ class Shot:
 	def getPriority(self):
 		return self.priority
 
+	def getSoftware(self):
+		return self.software
+
 	def getStep(self):
 		return self.step
 
@@ -218,6 +221,8 @@ class Shot:
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if path.splitext(file)[1] == ".ma":
 				Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
+			elif path.splitext(file)[1] == ".blend":
+				print("blender file")
 
 	def setResolution(self, res):
 		if path.isdir(self.shot_directory + "/scenes/.mayaSwatches"):
@@ -226,6 +231,8 @@ class Shot:
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if path.splitext(file)[1] == ".ma":
 				Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
+			elif path.splitext(file)[1] == ".blend":
+				print("blender file")
 
 	def isSet(self):
 		if self.software == "maya":
