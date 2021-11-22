@@ -14,7 +14,7 @@ class Asset:
 		self.project_dir = directory
 		self.second_path = second_path
 		self.directory = directory + "/04_asset" + self.second_path + "/" + self.asset_name
-		self.priority = "Low"
+		self.priority = 0
 		self.modeling_done = 0
 		self.rig_done = 0
 		self.lookdev_done = 0
@@ -28,7 +28,7 @@ class Asset:
 				makedirs(self.directory + "/superpipe")
 
 				with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
-						f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
+						f.write(str(self.priority) + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
 				f.close()
 
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
@@ -85,29 +85,17 @@ class Asset:
 
 				elif self.software == "houdini":
 					makedirs(self.directory + "/abc")
-
 					makedirs(self.directory + "/audio")
-
 					makedirs(self.directory + "/backup")
-
 					makedirs(self.directory + "/comp")
-
 					makedirs(self.directory + "/desk")
-
 					makedirs(self.directory + "/flip")
-
 					makedirs(self.directory + "/geo")
-
 					makedirs(self.directory + "/hda")
-
 					makedirs(self.directory + "/render")
-
 					makedirs(self.directory + "/scripts")
-
 					makedirs(self.directory + "/sim")
-
 					makedirs(self.directory + "/tex")
-
 					makedirs(self.directory + "/video")
 				else:
 					print("ERROR")
@@ -118,7 +106,7 @@ class Asset:
 
 			if not path.isfile(self.directory + "/superpipe/asset_data.spi"):
 				with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
-					f.write(self.priority + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
+					f.write(str(self.priority) + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
 				f.close()
 
 			asset_infos = []
@@ -128,9 +116,9 @@ class Asset:
 			f.close()
 
 			if len(asset_infos) > 0:
-				self.priority = asset_infos[0]
+				self.priority = int(asset_infos[0])
 			else:
-				self.priority = "Low"
+				self.priority = 0
 
 			if len(asset_infos) > 1:
 				self.modeling_done = int(asset_infos[1])
@@ -157,20 +145,42 @@ class Asset:
 			else:
 				self.software = "maya"
 
+
 	def getAssetName(self):
 		return self.asset_name
+
 
 	def getDirectory(self):
 		return self.directory
 
+
 	def getCategory(self):
 		return self.category
+
 
 	def getPriority(self):
 		return self.priority
 
+
+	def getModelingDone(self):
+		return self.modeling_done
+
+
+	def getRigDone(self):
+		return self.rig_done
+
+
+	def getLookdevDone(self):
+		return self.lookdev_done
+
+
+	def getDone(self):
+		return self.done
+
+
 	def getSoftware(self):
 		return self.software
+
 
 	def getComment(self, version_file):
 		if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
@@ -195,11 +205,13 @@ class Asset:
 
 		return "No comment"
 
+
 	def isDone(self):
 		if self.done == 1:
 			return True
 		else:
 			return False
+
 
 	def setAsset(self):
 		if self.software == "maya":
@@ -212,6 +224,7 @@ class Asset:
 			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.blend")
 			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.blend")
 			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.blend")
+
 
 	def isSet(self):
 		if self.software == "maya":
@@ -231,9 +244,11 @@ class Asset:
 
 		return False
 
+
 	def deleteAsset(self):
 		copytree(self.directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[1] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
 		rmtree(self.directory)
+
 
 	def getVersionsList(self, last_only, modeling, rigging, lookdev, other):
 		versions_list = []
@@ -308,6 +323,7 @@ class Asset:
 
 		return sorted(versions_list, reverse = True)
 
+
 	def getPlayblastsList(self):
 		playblasts_list = []
 		for playblast_file in listdir(self.directory + "/movies/"):
@@ -315,6 +331,7 @@ class Asset:
 				playblasts_list.append((path.getmtime(self.directory + "/movies/" + playblast_file), playblast_file))
 
 		return sorted(playblasts_list, reverse = True)
+
 
 	def renameAsset(self, new_name):
 		new_dir = path.dirname(self.directory) + "/" + new_name
@@ -343,21 +360,26 @@ class Asset:
 				if self.asset_name in f:
 					rename(new_dir + "/" + f, new_dir + "/" + f.replace(self.asset_name, new_name))
 
+
 	def setPriority(self, priority):
 		self.priority = int(priority)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.priority), 1)
+
 
 	def setModelingDone(self, modeling_done):
 		self.modeling_done = int(modeling_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.modeling_done), 2)
 
+
 	def setRigDone(self, rig_done):
 		self.rig_done = int(rig_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.rig_done), 3)
 
+
 	def setLookdevDone(self, lookdev_done):
 		self.lookdev_done = int(lookdev_done)
 		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.lookdev_done), 4)
+
 
 	def setDone(self, done):
 		self.done = int(done)

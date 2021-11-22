@@ -13,6 +13,7 @@ from Resources import *
 import NewProjectDialog
 import re
 
+
 class Project:
 	def __init__(self, directory):
 		self.shot_list = []
@@ -26,6 +27,7 @@ class Project:
 		self.res_y = 1080
 		self.valid = True
 		self.default_software = "maya"
+		self.custom_link = ""
 
 		if not path.isdir(self.directory):
 			makedirs(self.directory)
@@ -94,17 +96,21 @@ class Project:
 			self.res_x = res[0]
 			self.res_y = res[1]
 
+			self.custom_link = Resources.readLine(self.directory + "/project_option.spi", 1)
 			self.sequence_number = int(Resources.readLine(self.directory + "/project_option.spi", 3))
 			self.default_software = Resources.readLine(self.directory + "/project_option.spi", 4)
 
 		else:
 			self.valid = False
 
+
 	def getShotList(self):
 		return self.shot_list
 
+
 	def getAssetList(self):
 		return self.asset_list
+
 
 	def updateShotList(self):
 		self.shot_list = []
@@ -112,6 +118,7 @@ class Project:
 			if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_name):
 				shot = Shot(self.directory, shot_name)
 				self.shot_list.append((shot.getShotNb(), shot.getShotName()))
+
 
 	def updateAssetList(self):
 		self.asset_list = []
@@ -124,20 +131,26 @@ class Project:
 				if not "backup" in cur_dir:
 					self.asset_list.append((path.basename(cur_dir), path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset", "")))
 
+
 	def getDirectory(self):
 		return self.directory
+
 
 	def getName(self):
 		return self.directory.split("/")[-1]
 
+
 	def getSequenceNumber(self):
 		return self.sequence_number
+
 
 	def getShot(self, shot_name):
 		return Shot(self.directory, shot_name)
 
+
 	def isValid(self):
 		return self.valid
+
 
 	def createShot(self, shot_sequence):
 		current_sequence = 1
@@ -176,6 +189,7 @@ class Project:
 
 		return shot_nb
 
+
 	def removeShot(self, shot_name):
 		shot = Shot(self.directory, shot_name)
 
@@ -190,6 +204,7 @@ class Project:
 
 		self.updateShotList()
 
+
 	def moveShotUp(self, shot_name):
 		shot = Shot(self.directory, shot_name)
 		shot_name_backup = shot.getShotName()
@@ -202,6 +217,7 @@ class Project:
 		swap_shot.renameShot(shot_name_backup)
 
 		shot.renameShot(swap_shot_name_backup)
+
 
 	def moveShotDown(self, shot_name):
 		shot = Shot(self.directory, shot_name)
@@ -216,6 +232,7 @@ class Project:
 
 		shot.renameShot(swap_shot_name_backup)
 
+
 	def createAsset(self, asset_name, second_path, software):
 		for check_asset in self.asset_list:
 			if asset_name == check_asset[0]:
@@ -226,10 +243,12 @@ class Project:
 
 		return True
 
+
 	def removeAsset(self, asset_name, second_path):
 		asset = Asset(self.directory, second_path, asset_name)
 		asset.deleteAsset()
 		self.updateAssetList()
+
 
 	def filterAssetList(self, filter_str):
 		filtered_asset_list = []
@@ -239,6 +258,7 @@ class Project:
 				filtered_asset_list.append(asset)
 
 		return filtered_asset_list
+
 
 	def cleanBackups(self):
 		rmtree(self.directory + "/05_shot/backup")
@@ -256,6 +276,7 @@ class Project:
 		rmtree(self.directory + "/04_asset/set/backup")
 		makedirs(self.directory + "/04_asset/set/backup")
 
+
 	def setSelection(self, shot_name = None, asset_name = None, second_path = None):
 		if shot_name:
 			self.selected_shot = Shot(self.directory, shot_name)
@@ -264,11 +285,13 @@ class Project:
 			self.selected_asset = Asset(self.directory, second_path, asset_name)
 			self.selected_shot = None
 
+
 	def getSelection(self):
 		if self.selected_shot:
 			return self.selected_shot
 		elif self.selected_asset:
 			return self.selected_asset
+
 
 	def getSelectionType(self):
 		if self.selected_shot:
@@ -276,11 +299,13 @@ class Project:
 		elif self.selected_asset:
 			return "asset"
 
+
 	def setResolution(self, res):
 		self.res_x = res[0]
 		self.res_y = res[1]
 
 		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.res_x + "x" + self.res_y, 2)
+
 
 	def setAllShotsRes(self):
 		for shot in listdir(self.getDirectory() + "/05_shot/"):
@@ -288,8 +313,28 @@ class Project:
 				cur_shot = Shot(self.getDirectory(), shot)
 				cur_shot.setResolution(self.getResolution())
 
+
 	def getResolution(self):
 		return (self.res_x, self.res_y)
+
+
+	def setDefaultSoftware(self, default_software):
+		self.default_software = default_software
+		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.default_software, 4)
+
+
+	def getDefaultSoftware(self):
+		return self.default_software
+
+
+	def setCustomLink(self, custom_link):
+		self.custom_link = custom_link
+		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.custom_link, 1)
+
+
+	def getCustomLink(self):
+		return self.custom_link
+
 
 	def addSequence(self):
 		self.sequence_number += 1

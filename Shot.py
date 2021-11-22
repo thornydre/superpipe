@@ -16,7 +16,8 @@ class Shot:
 		self.shot_directory = directory + "/05_shot/" + self.shot_name
 		self.postprod_directory = directory + "/06_postprod/" + self.shot_name
 		self.done = 0
-		self.priority = "Low"
+		self.priority = 0
+		self.description = ""
 		self.step = "Layout"
 		self.frame_range = 200
 		self.software = software
@@ -28,7 +29,7 @@ class Shot:
 				makedirs(self.shot_directory + "/superpipe")
 
 				with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
-					f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
+					f.write(str(self.done) + "\n" + str(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
 				f.close()
 
 				open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
@@ -83,29 +84,17 @@ class Shot:
 
 				elif self.software == "houdini":
 					makedirs(self.shot_directory + "/abc")
-
 					makedirs(self.shot_directory + "/audio")
-
 					makedirs(self.shot_directory + "/backup")
-
 					makedirs(self.shot_directory + "/comp")
-
 					makedirs(self.shot_directory + "/desk")
-
 					makedirs(self.shot_directory + "/flip")
-
 					makedirs(self.shot_directory + "/geo")
-
 					makedirs(self.shot_directory + "/hda")
-
 					makedirs(self.shot_directory + "/render")
-
 					makedirs(self.shot_directory + "/scripts")
-
 					makedirs(self.shot_directory + "/sim")
-
 					makedirs(self.shot_directory + "/tex")
-
 					makedirs(self.shot_directory + "/video")
 
 			else:
@@ -117,7 +106,7 @@ class Shot:
 
 			if not path.isfile(self.shot_directory + "/superpipe/shot_data.spi"):
 				with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
-					f.write(str(self.done) + "\n" + self.priority + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
+					f.write(str(self.done) + "\n" + int(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
 				f.close()
 
 			if not Resources.readLine(self.shot_directory + "/superpipe/shot_data.spi", 4):
@@ -130,13 +119,17 @@ class Shot:
 			f.close()
 
 			self.done = int(shot_infos[0])
-			self.priority = shot_infos[1]
+			self.priority = int(shot_infos[1])
 			self.step = shot_infos[2]
 			self.frame_range = int(shot_infos[3])
 			if len(shot_infos) > 4:
 				self.software = shot_infos[4]
 			else:
 				self.software = "maya"
+			if len(shot_infos) > 5:
+				self.description = shot_infos[5]
+			else:
+				self.description = ""
 
 		else:
 			print("ERROR2 : " + self.shot_name)
@@ -147,29 +140,46 @@ class Shot:
 			makedirs(self.postprod_directory + "/input")
 			makedirs(self.postprod_directory + "/output")
 
+
 	def getShotNb(self):
 		return self.shot_nb
+
 
 	def getShotName(self):
 		return self.shot_name
 
+
 	def getDirectory(self):
 		return self.shot_directory
+
 
 	def getSequence(self):
 		return self.sequence
 
+
+	def getDescription(self):
+		return self.description
+
+
 	def getPriority(self):
 		return self.priority
+
+
+	def getDone(self):
+		return self.done
+
 
 	def getSoftware(self):
 		return self.software
 
+
 	def getStep(self):
 		return self.step
 
+
 	def getFrameRange(self):
 		return self.frame_range
+
 
 	def getComment(self, version_file):
 		if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
@@ -197,11 +207,13 @@ class Shot:
 
 		return "No comment"
 
+
 	def isDone(self):
 		if self.done == 1:
 			return True
 		else:
 			return False
+
 
 	def setShot(self, res):
 		if self.software == "maya":
@@ -209,6 +221,7 @@ class Shot:
 			Resources.insertAtLine(self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 		elif self.software == "blender":
 			copyfile("src/set_up_file_shot_blender.blend", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.blend")
+
 
 	def setFrameRange(self, frame_range):
 		self.frame_range = frame_range
@@ -224,6 +237,7 @@ class Shot:
 			elif path.splitext(file)[1] == ".blend":
 				print("blender file")
 
+
 	def setResolution(self, res):
 		if path.isdir(self.shot_directory + "/scenes/.mayaSwatches"):
 					rmtree(self.shot_directory + "/scenes/.mayaSwatches")
@@ -233,6 +247,7 @@ class Shot:
 				Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "select -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 			elif path.splitext(file)[1] == ".blend":
 				print("blender file")
+
 
 	def isSet(self):
 		if self.software == "maya":
@@ -247,9 +262,11 @@ class Shot:
 
 		return False
 
+
 	def deleteShot(self):
 		copytree(self.shot_directory, self.shot_directory +"/../backup/" + self.shot_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
 		rmtree(self.shot_directory)
+
 
 	def getVersionsList(self, last_only, layout, blocking, splining, rendering, other):
 		if not path.isdir(self.shot_directory + "/scenes/"):
@@ -323,6 +340,7 @@ class Shot:
 
 		return sorted(versions_list, reverse = True)
 
+
 	def getPlayblastsList(self):
 		playblasts_list = []
 		for playblast_file in listdir(self.shot_directory + "/movies/"):
@@ -331,28 +349,29 @@ class Shot:
 
 		return sorted(playblasts_list, reverse = True)
 
+
 	def renameShot(self, new_name):
 		new_dir = path.dirname(self.shot_directory) + "/" + new_name
 
 		if not path.isdir(new_dir):
 			try:
-				rename(self.shot_directory, new_dir)
+				os.rename(self.shot_directory, new_dir)
 
 				for f in listdir(new_dir + "/scenes/"):
 					if self.shot_name in f:
-						rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f .replace(self.shot_name, new_name))
+						os.rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f .replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/scenes/edits/"):
 					if self.shot_name in f:
-						rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.shot_name, new_name))
+						os.rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/scenes/backup/"):
 					if self.shot_name in f:
-						rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.shot_name, new_name))
+						os.rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/images/screenshots/"):
 					if self.shot_name in f:
-						rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
+						os.rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
 			except Exception as e:
 				return False
 
@@ -362,13 +381,21 @@ class Shot:
 
 		return True
 
+
+	def setDescription(self, description):
+		self.description = description
+		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.description), 6)
+
+
 	def setDone(self, done):
 		self.done = done
 		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.done), 1)
 
+
 	def setPriority(self, priority):
 		self.priority = priority
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.priority, 2)
+		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.priority), 2)
+
 
 	def upgrade(self):
 		version = 0
@@ -390,7 +417,7 @@ class Shot:
 					print("IMPOSSIBLE TO CONVERT " + tmp_version_str + " INTO AN INTEGER")
 
 		for file in listdir(self.shot_directory + "/scenes/"):
-			if file[:6] == self.shot_name:
+			if file[:7] == self.shot_name:
 				file_to_upgrade = file
 
 		if "file_to_upgrade" in locals():
@@ -420,6 +447,7 @@ class Shot:
 			print("IMPOSSIBLE TO UPGRADE THIS FILE")
 			return False
 
+
 	def downgrade(self):
 		if self.software == "maya":
 			ext = ".ma"
@@ -428,11 +456,11 @@ class Shot:
 
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if self.step.lower() in file:
-				rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
+				os.rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
 		for file in listdir(self.shot_directory + "/scenes/edits/"):
 			if self.step.lower() in file:
-				rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
+				os.rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
 		for file in listdir(self.shot_directory + "/images/screenshots/"):
 			if self.step.lower() in file:
@@ -446,6 +474,7 @@ class Shot:
 			self.step = "Splining"
 
 		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
+
 
 	def validShot(dir_to_check = None):
 		if not path.isdir(dir_to_check):

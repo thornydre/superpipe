@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from Main import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 from Resources import *
 from os import listdir, path
 
 
 class PreferencesDialogPySide(QDialog):
-	def __init__(self, parent=None):
+	def __init__(self, parent=None,):
 		super(PreferencesDialogPySide, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		self.validate = True
@@ -18,32 +18,7 @@ class PreferencesDialogPySide(QDialog):
 
 		main_layout = QVBoxLayout()
 
-		# software_label = QLabel("Default software")
-		# main_layout.addWidget(software_label)
-
-		# software_layout = QHBoxLayout()
-		# self.software_button_group = QButtonGroup()
-		# self.softwares_list = ("maya", "houdini", "blender")
-		# i = 0
-
-		# default_software = "maya"
-
-		# if project_options_path:
-		# 	default_software = Resources.readLine(project_options_path, 4)
-
-		# for software in self.softwares_list:
-		# 	software_radiobutton = QRadioButton(software)
-		# 	software_layout.addWidget(software_radiobutton, int(i/2), i % 2)
-		# 	self.software_button_group.addButton(software_radiobutton)
-
-		# 	if software == project.default_software:
-		# 		software_radiobutton.setChecked(True)
-
-		# 	i += 1
-
-		# main_layout.addLayout(software_layout)
-
-		maya_label = QLabel("Path to Maya")
+		maya_label = QLabel("Path to Maya :")
 		main_layout.addWidget(maya_label)
 
 		maya_layout = QHBoxLayout()
@@ -55,7 +30,7 @@ class PreferencesDialogPySide(QDialog):
 		maya_layout.addWidget(maya_button)
 		main_layout.addLayout(maya_layout)
 
-		houdini_label = QLabel("Path to Houdini")
+		houdini_label = QLabel("Path to Houdini :")
 		main_layout.addWidget(houdini_label)
 
 		houdini_layout = QHBoxLayout()
@@ -67,7 +42,7 @@ class PreferencesDialogPySide(QDialog):
 		houdini_layout.addWidget(houdini_button)
 		main_layout.addLayout(houdini_layout)
 
-		blender_label = QLabel("Path to Blender")
+		blender_label = QLabel("Path to Blender :")
 		main_layout.addWidget(blender_label)
 
 		blender_layout = QHBoxLayout()
@@ -79,7 +54,7 @@ class PreferencesDialogPySide(QDialog):
 		blender_layout.addWidget(blender_button)
 		main_layout.addLayout(blender_layout)
 
-		vlc_label = QLabel("Path to VLC")
+		vlc_label = QLabel("Path to VLC :")
 		main_layout.addWidget(vlc_label)
 
 		vlc_layout = QHBoxLayout()
@@ -99,13 +74,6 @@ class PreferencesDialogPySide(QDialog):
 		cancel_button.clicked.connect(self.cancelCommand)
 		buttons_layout.addWidget(cancel_button)
 		main_layout.addLayout(buttons_layout)
-
-		# custom_link_label = QLabel("Edit custom link")
-		# main_layout.addWidget(custom_link_label)
-
-		# self.custom_link_textfield = QLineEdit()
-		# self.custom_link_textfield.setText(Resources.readLine("save/options.spi", 1))
-		# main_layout.addWidget(self.custom_link_textfield)
 
 		self.setLayout(main_layout)
 
@@ -146,16 +114,12 @@ class PreferencesDialogPySide(QDialog):
 
 
 	def submitCommand(self, dict_key):
-		maya_path = self.maya_path_textfield.text()
-		houdini_path = self.houdini_path_textfield.text()
-		blender_path = self.blender_path_textfield.text()
-		vlc_path = self.vlc_path_textfield.text()
+		self.maya_path = self.maya_path_textfield.text()
+		self.houdini_path = self.houdini_path_textfield.text()
+		self.blender_path = self.blender_path_textfield.text()
+		self.vlc_path = self.vlc_path_textfield.text()
 		# theme = path.splitext(self.themes_list[self.rb_theme.get()])[0]
-		if maya_path and houdini_path and blender_path and vlc_path:
-			self.maya_path = maya_path
-			self.houdini_path = houdini_path
-			self.blender_path = blender_path
-			self.vlc_path = vlc_path
+		if self.maya_path and self.houdini_path and self.blender_path and self.vlc_path:
 			self.close()
 
 

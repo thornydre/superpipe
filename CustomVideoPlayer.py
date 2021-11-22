@@ -5,7 +5,7 @@ from tkinter import *
 from Resources import *
 from PIL import ImageTk
 
-import cv2
+# import cv2
 import PIL
 
 class CustomVideoPlayer(Canvas):

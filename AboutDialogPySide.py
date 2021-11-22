@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from Main import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
+from PySide6.QtGui import *
+from Resources import *
+from os import listdir, path
+
+
+class AboutDialogPySide(QDialog):
+	def __init__(self, parent=None):
+		super(AboutDialogPySide, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
+
+		version = 2.0
+
+		self.setWindowTitle("Super Pipe || About")
+
+		main_layout = QVBoxLayout()
+
+		text = QLabel("Superpipe v" + str(version) + "\nPipeline manager\n(C) Lucas Boutrot")
+		text.setAlignment(Qt.AlignCenter)
+		main_layout.addWidget(text)
+
+		button = QPushButton("OK")
+		button.clicked.connect(self.submitCommand)
+		# button.setFlat(True)
+		f = QFont("Arial", 10)
+		text.setFont(f)
+		main_layout.addWidget(button)
+	
+		self.setLayout(main_layout)
+
+		self.resize(250, 150)
+
+
+	def submitCommand(self, dict_key):
+		self.close()

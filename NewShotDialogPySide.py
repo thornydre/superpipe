@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from Main import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 from Resources import *
 from os import path
 
@@ -24,7 +24,7 @@ class NewShotDialogPySide(QDialog):
 
 		main_layout = QVBoxLayout()
 
-		sequence_label = QLabel("Select a sequence")
+		sequence_label = QLabel("Select a sequence :")
 		main_layout.addWidget(sequence_label)
 
 		self.sequence_list = QListWidget()

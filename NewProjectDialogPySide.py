@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from Main import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 
 
 class NewProjectDialogPySide(QDialog):

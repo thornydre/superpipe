@@ -1,10 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from Main import *
-# from tkinter import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 from Resources import *
 from os import path
 
@@ -23,7 +19,7 @@ class NewAssetDialogPySide(QDialog):
 
 		main_layout = QVBoxLayout()
 
-		software_label = QLabel("Select asset software")
+		software_label = QLabel("Select asset software :")
 		main_layout.addWidget(software_label)
 
 		software_layout = QGridLayout()
@@ -36,14 +32,14 @@ class NewAssetDialogPySide(QDialog):
 			software_layout.addWidget(software_radiobutton, int(i/2), i % 2)
 			self.software_button_group.addButton(software_radiobutton)
 
-			if software == project.default_software:
+			if software == project.getDefaultSoftware():
 				software_radiobutton.setChecked(True)
 
 			i += 1
 
 		main_layout.addLayout(software_layout)
 
-		category_label = QLabel("Select asset category")
+		category_label = QLabel("Select asset category :")
 		main_layout.addWidget(category_label)
 
 		self.categories_list = QTreeWidget()
