@@ -18,7 +18,7 @@ from PIL import ImageTk
 # from watchdog.observers import Observer
 
 from CustomSliderPySide import *
-from CustomVideoPlayer import *
+from CustomVideoPlayerPySide import *
 from StatisticsView import *
 
 import sys
@@ -427,6 +427,7 @@ class SuperPipePyside(QMainWindow):
 
 		self.shot_description_title_label = QLabel("Shot description :")
 		self.shot_description_textfield = QLineEdit()
+		self.shot_description_textfield.textChanged.connect(self.shotDescriptionCommand)
 
 		shot_description_layout.addWidget(self.shot_description_title_label)
 		shot_description_layout.addWidget(self.shot_description_textfield)
@@ -486,9 +487,9 @@ class SuperPipePyside(QMainWindow):
 
 		shot_current_playblast_layout = QVBoxLayout()
 		self.shot_playblast_label = QLabel("Current playblast :")
-		self.shot_playblast_widget = QLabel()
+		self.playblast_player = CustomVideoPlayerPySide(512, 288)
 		shot_current_playblast_layout.addWidget(self.shot_playblast_label)
-		shot_current_playblast_layout.addWidget(self.shot_playblast_widget)
+		shot_current_playblast_layout.addWidget(self.playblast_player)
 		shot_playblasts_layout.addLayout(shot_current_playblast_layout)
 
 		self.shot_playblasts_widget.setLayout(shot_playblasts_layout)
@@ -773,27 +774,24 @@ class SuperPipePyside(QMainWindow):
 
 
 	def deleteAssetCommand(self):
-		selected_asset = self.asset_list.focus()
+		selected_asset = self.asset_list.currentItem()
 
-		yesno = {"result" : ""}
+		yesno = self.dialog("Delete asset", "Q", "Delete asset \"" + selected_asset.text(0) + "\" from \"" + selected_asset.parent().text(0).upper() + "\" category ?")
 
-		dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Delete asset", "Delete asset \"" + selected_asset + "\" from \"" + self.asset_list.parent(selected_asset).upper() + "\" category ?", (yesno, "result"))
-		self.wait_window(dialog().top)
-
-		if yesno["result"] == "yes":
+		if yesno:
 			cur_item = selected_asset
 			path_array = []
 
 			is_parent = True
 
 			while is_parent:
-				if self.asset_list.parent(cur_item):
-					cur_item = self.asset_list.parent(cur_item)
-					path_array.insert(0, cur_item)
+				if cur_item.parent():
+					cur_item = cur_item.parent()
+					path_array.insert(0, cur_item.text(0))
 				else:
 					is_parent = False
 
-			self.current_project.removeAsset(selected_asset, "/" + "/".join(path_array))
+			self.current_project.removeAsset(selected_asset.text(0), "/" + "/".join(path_array))
 
 			self.updateAssetListView()
 
@@ -803,15 +801,11 @@ class SuperPipePyside(QMainWindow):
 
 
 	def deleteShotCommand(self):
-		selected_line = self.shot_list.curselection()[0]
-		selected_shot = self.shot_list.get(selected_line)
+		selected_shot = self.shot_list.currentItem().text()
 
-		yesno = {"result" : ""}
+		yesno = self.dialog("Delete shot", "Q", "Delete shot \"" + selected_shot + "\" ?")
 
-		dialog = lambda: YesNoDialog.YesNoDialog(self.parent, "Delete shot", "Delete shot \"" + selected_shot + "\" ?", (yesno, "result"))
-		self.wait_window(dialog().top)
-
-		if yesno["result"] == "yes":
+		if yesno:
 			self.current_project.removeShot(selected_shot)
 
 			self.updateShotListView()
@@ -1159,8 +1153,7 @@ class SuperPipePyside(QMainWindow):
 						self.shot_prev_pict_widget.setVisible(False)
 
 				else:
-					dialog = lambda: OkDialog.OkDialog(self.parent, "Error", "The shot \"" + shot.getShotName() + "\" is not available !")
-					self.wait_window(dialog().top)
+					self.dialog("Error", "E", "The shot \"" + shot.getShotName() + "\" is not available !")
 
 
 	def versionlistCommand(self):
@@ -1201,7 +1194,7 @@ class SuperPipePyside(QMainWindow):
 
 					playblast_file = shot.getDirectory() + "/movies/" + selected_version
 
-					# self.playblast_player.updateVideo(playblast_file)
+					self.playblast_player.updateVideo(playblast_file)
 
 			elif self.current_project.getSelectionType() == "asset":
 				self.asset_version_comment_label.setText(self.current_project.getSelection().getComment(selected_version))
@@ -1230,8 +1223,7 @@ class SuperPipePyside(QMainWindow):
 						maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
 						subprocess.Popen(maya_args)
 					except:
-						dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-						self.wait_window(dialog().top)
+						self.dialog("Maya path", "E", "Check Maya path in Edit > Preferences")
 
 				elif asset.getSoftware() == "houdini":
 					try:
@@ -1242,8 +1234,7 @@ class SuperPipePyside(QMainWindow):
 
 						subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
 					except:
-						dialog = lambda: OkDialog.OkDialog(self.parent, "Houdini path", "Check Houdini path in Edit > Preferences")
-						self.wait_window(dialog().top)
+						self.dialog("Houdini path", "E", "Check Houdini path in Edit > Preferences")
 
 				elif asset.getSoftware() == "blender":
 					try:
@@ -1254,15 +1245,13 @@ class SuperPipePyside(QMainWindow):
 
 						subprocess.Popen("%s %s" % (self.blender_path, blender_file))
 					except:
-						dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
-						self.wait_window(dialog().top)
+						self.dialog("Blender path", "E", "Check Blender path in Edit > Preferences")
 			else:
 				try:
 					playblast_file = asset.getDirectory() + "/movies/" + selected_asset_version
 					subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
 				except:
-					dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
-					self.wait_window(dialog().top)
+					self.dialog("VLC path", "E", "Check VLC path in Edit > Preferences")
 
 
 	def openShotCommand(self):
@@ -1282,8 +1271,7 @@ class SuperPipePyside(QMainWindow):
 						maya_args = [self.maya_path, "-file", maya_file, "-proj", shot.getDirectory()]
 						subprocess.Popen(maya_args)
 					except:
-						dialog = lambda: OkDialog.OkDialog(self.parent, "Maya path", "Check Maya path in Edit > Preferences")
-						self.wait_window(dialog().top)
+						self.dialog("Maya path", "E", "Check Maya path in Edit > Preferences")
 
 				elif shot.getSoftware() == "blender":
 					try:
@@ -1294,15 +1282,13 @@ class SuperPipePyside(QMainWindow):
 
 						subprocess.Popen("%s %s" % (self.blender_path, blender_file))
 					except:
-						dialog = lambda: OkDialog.OkDialog(self.parent, "Blender path", "Check Blender path in Edit > Preferences")
-						self.wait_window(dialog().top)
+						self.dialog("Blender path", "E", "Check Blender path in Edit > Preferences")
 			else:
 				try:
 					playblast_file = shot.getDirectory() + "/movies/" + selected_shot_version
 					subprocess.Popen("%s %s" % (self.vlc_path, playblast_file.replace("/", "\\")))
 				except:
-					dialog = lambda: OkDialog.OkDialog(self.parent, "VLC path", "Check VLC path in Edit > Preferences")
-					self.wait_window(dialog().top)
+					self.dialog("VLC path", "E", "Check VLC path in Edit > Preferences")
 
 
 	def renameAssetCommand(self):
@@ -1609,7 +1595,7 @@ class SuperPipePyside(QMainWindow):
 
 	def shotsPreviewCommand(self):
 		self.app.setOverrideCursor(Qt.WaitCursor)
-		self.parent.update()
+		# self.parent.update()
 
 		self.main_area_preview.grid(self.main_area_preview.pi)
 		self.main_area_shot.grid_forget()
@@ -1735,6 +1721,11 @@ class SuperPipePyside(QMainWindow):
 		self.version_list.setCurrentRow(0)
 
 
+	def shotDescriptionCommand(self):
+		if self.current_project:
+			Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", self.shot_description_textfield.text(), 6)
+
+
 	def customSliderCommand(self):
 		Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", str(self.step_slider.getPercentage()), 7)
 
@@ -1754,12 +1745,12 @@ class SuperPipePyside(QMainWindow):
 
 	def clearMainFrame(self, type):
 		if type == "asset":
-			self.var_asset_label.set("NO ASSET SELECTED")
+			self.asset_label.setText("NO ASSET SELECTED")
 			self.delete_asset_button.setVisible(False)
 			self.rename_asset_button.setVisible(False)
 			self.set_asset_button.setVisible(False)
-			self.var_selection_path_label.set("")
-			self.asset_pict_caneva.setVisible(False)
+			self.asset_file_path_label.setText("")
+			self.asset_pict_widget.setVisible(False)
 			self.open_asset_button.setVisible(False)
 			self.open_asset_folder_button.setVisible(False)
 			self.priority_asset_menu.setVisible(False)
@@ -1769,12 +1760,13 @@ class SuperPipePyside(QMainWindow):
 			self.lookdev_done_asset_button.setVisible(False)
 			self.done_asset_button.setVisible(False)
 		elif type == "shot":
-			self.var_shot_nb_label.set("NO SHOT SELECTED")
-			self.up_down_shot.setVisible(False)
+			self.shot_label.setText("NO SHOT SELECTED")
+			self.up_button.setVisible(False)
+			self.down_button.setVisible(False)
 			self.delete_shot_button.setVisible(False)
 			self.set_shot_button.setVisible(False)
-			self.var_selection_path_label.set("")
-			self.shot_pict_caneva.setVisible(False)
+			self.shot_file_path_label.setText("")
+			self.shot_pictures_widget.setVisible(False)
 			self.open_shot_button.setVisible(False)
 			self.open_shot_folder_button.setVisible(False)
 			self.priority_shot_menu.setVisible(False)
@@ -1873,14 +1865,6 @@ class SuperPipePyside(QMainWindow):
 			dialog.critical(self, title, message)
 
 		return None
-
-
-	def scrollCommand(self, event):
-		self.preview_canva_scroll.configure(scrollregion = self.preview_canva_scroll.bbox("all"), width = 2000, height = self.parent.winfo_height())
-
-
-	def wheelScrollCommand(self, event):
-		self.preview_canva_scroll.yview_scroll(int(-1 * e.delta/120), "units")
 
 
 def main():

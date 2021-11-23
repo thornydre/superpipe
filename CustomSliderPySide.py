@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -7,16 +9,11 @@ class CustomSliderPySide(QWidget):
 	released = Signal()
 	
 	def __init__(self, width, height, steps):
-	# def __init__(self, width, height, bg, fg, txt, grid, steps):
 		self.steps_name = steps
 		self.steps = len(self.steps_name)
 		self.current_step = 1
-		# self.fg_color = fg
-		# self.grid_color = grid
-		# self.txt_color = txt
 		self.active = True
 		self.percentage = 0
-
 
 		super(CustomSliderPySide, self).__init__()
 

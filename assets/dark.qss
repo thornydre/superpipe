@@ -1,7 +1,12 @@
 QWidget{
 	background-color: #333333;
-	color: #FFFFFF;
+	color: #ffffff;
 	border-color: #051a39;
+}
+
+QWidget::disabled{
+	background-color: #3a3a3a;
+	color: #666666;
 }
 
 QPushButton{
@@ -20,7 +25,14 @@ QPushButton::hover{
 	background-color: #666666;
 }
 
-QWidget::disabled{
-	background-color: #3a3a3a;
-	color: #666666;
+QTreeWidget{
+	background-color: #252525;
+}
+
+QListWidget{
+	background-color: #252525;
+}
+
+QListWidget::item:selected{
+	background-color: #116cb8;
 }
