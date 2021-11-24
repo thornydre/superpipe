@@ -1,13 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
 from os import makedirs, path, listdir, rename, remove
-from tkinter import *
 from shutil import copyfile, copytree, rmtree
 from Resources import *
 
 import time
+
 
 class Shot:
 	def __init__(self, directory = None, shot_name = None, software = None):

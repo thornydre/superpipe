@@ -1,100 +1,68 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
-from tkinter import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 from Resources import *
-from tkinter import ttk
+from os import listdir
 
-import Theme
+class ManageBackupsDialog(QDialog):
+	def __init__(self, parent=None, project=None):
+		super(ManageBackupsDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
-class ManageBackupsDialog(object):
-	def __init__(self, parent, project, dict_key = None):
-		## THEME COLORS ##
-		self.theme = Theme.Theme(Resources.readLine("save/options.spi", 2))
-
-		self.root = parent
-		self.top = Toplevel(self.root)
-		self.top.transient(self.root)
-		self.top.title("Super Pipe || Clean backups")
-		self.top["bg"] = self.theme.main_color
-
-		self.top.resizable(width = False, height = False)
+		self.setWindowTitle("Super Pipe || Clean backups")
 
 		self.project = project
 
-		top_frame = Frame(self.top, borderwidth = 0, bg = self.theme.main_color)
-		top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
+		main_layout = QVBoxLayout()
 
-		top_frame.columnconfigure(0, pad = 5)
-		top_frame.columnconfigure(1, pad = 5)
-		
-		top_frame.rowconfigure(0, pad = 5)
-		top_frame.rowconfigure(1, pad = 5)
-		top_frame.rowconfigure(2, pad = 5)
-		top_frame.rowconfigure(3, pad = 5)
-		top_frame.rowconfigure(4, pad = 5)
-
-		label = Label(top_frame, text = "Select backups to delete", bg = self.theme.main_color, fg = self.theme.text_color)
-		label.grid(row = 0, column = 0, columnspan = 2)
-
-		self.backup_list = ttk.Treeview(top_frame, height = 15, show = "tree")
-		ttk.Style().configure("Treeview", background = self.theme.list_color)
-		self.backup_list.insert("", 1, "shots", text = "SHOTS")
-		self.backup_list.insert("", 2, "character", text = "CHARACTER")
-		self.backup_list.insert("", 3, "fx", text = "FX")
-		self.backup_list.insert("", 4, "props", text = "PROPS")
-		self.backup_list.insert("", 5, "set", text = "SET")
-		self.backup_list.grid(row = 1, column = 0, columnspan = 2)
+		self.backup_list = QTreeWidget()
+		self.backup_list.setHeaderHidden(True)
+		self.backup_list.setSelectionMode(QAbstractItemView.ExtendedSelection)
+		self.categories = {"shots":QTreeWidgetItem(["SHOTS"]), "character":QTreeWidgetItem(["CHARACTER"]), "fx":QTreeWidgetItem(["FX"]), "props":QTreeWidgetItem(["PROPS"]), "set":QTreeWidgetItem(["SET"])}
+		for cat in self.categories:
+			self.backup_list.addTopLevelItem(self.categories[cat])
 
 		for folder in listdir(self.project.getDirectory() + "/05_shot/backup/"):
-			self.backup_list.insert("shots", END, folder, text = folder)
+			self.categories["shots"].addChild(QTreeWidgetItem([folder]))
 
 		for folder in listdir(self.project.getDirectory() + "/04_asset/character/backup/"):
-			self.backup_list.insert("character", END, folder, text = folder)
+			self.categories["character"].addChild(QTreeWidgetItem([folder]))
 
 		for folder in listdir(self.project.getDirectory() + "/04_asset/FX/backup/"):
-			self.backup_list.insert("fx", END, folder, text = folder)
+			self.categories["fx"].addChild(QTreeWidgetItem([folder]))
 
 		for folder in listdir(self.project.getDirectory() + "/04_asset/props/backup/"):
-			self.backup_list.insert("props", END, folder, text = folder)
+			self.categories["props"].addChild(QTreeWidgetItem([folder]))
 
 		for folder in listdir(self.project.getDirectory() + "/04_asset/set/backup/"):
-			self.backup_list.insert("set", END, folder, text = folder)
+			self.categories["set"].addChild(QTreeWidgetItem([folder]))
 
-		submit_button = Button(top_frame, text = "Delete", bg = self.theme.button_color1, activebackground = self.theme.over_button_color1, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 12, height = 1)
-		submit_button["command"] = lambda: self.submit(dict_key)
-		submit_button.grid(row = 2, column = 0, sticky = W, pady = (10, 0))
+		main_layout.addWidget(self.backup_list)
 
-		self.top.bind("<Return>", lambda event, a = dict_key:self.submit(a))
+		buttons_layout = QHBoxLayout()
+		submit_button = QPushButton("Delete")
+		submit_button.setObjectName("important")
+		submit_button.clicked.connect(self.submitCommand)
+		buttons_layout.addWidget(submit_button)
+		cancel_button = QPushButton("Cancel")
+		cancel_button.clicked.connect(self.cancelCommand)
+		buttons_layout.addWidget(cancel_button)
+		main_layout.addLayout(buttons_layout)
 
-		cancel_button = Button(top_frame, text = "Cancel", bg = self.theme.button_color2, activebackground = self.theme.over_button_color2, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 8, height = 1)
-		cancel_button["command"] = self.top.destroy
-		cancel_button.grid(row = 2, column = 1, sticky = E, pady = (10, 0))
+		self.setLayout(main_layout)
 
-		self.top.bind("<Escape>", lambda event: self.top.destroy())
 
-		self.top.update_idletasks()
-		w = self.top.winfo_screenwidth()
-		h = self.top.winfo_screenheight()
-		size = tuple(int(_) for _ in self.top.geometry().split("+")[0].split("x"))
-		x = w/2 - size[0]/2
-		y = h/2 - size[1]/2
-		self.top.geometry("%dx%d+%d+%d" % (size + (x, y)))
+	def submitCommand(self):
+		for backup_item in self.backup_list.selectedItems():
+			if backup_item not in self.categories:
+				parent_item = backup_item.parent()
+				if parent_item:
+					if parent_item.text(0) == "SHOTS":
+						rmtree(self.project.getDirectory() + "/05_shot/backup/" + backup_item.text(0))
+					else:
+						rmtree(self.project.getDirectory() + "/04_asset/" + backup_item.parent().text(0) + "/backup/" + backup_item.text(0))
+		self.close()
 
-		self.top.iconbitmap("img/icon.ico")
-		self.top.focus()
 
-	def submit(self, dict_key):
-		backups = self.backup_list.selection()
-
-		categories = ["shots", "character", "fx", "props", "set"]
-
-		for backup in backups:
-			if backup not in categories:
-				if self.backup_list.parent(backup) == "shots":
-					rmtree(self.project.getDirectory() + "/05_shot/backup/" + backup)
-				else:
-					rmtree(self.project.getDirectory() + "/04_asset/" + self.backup_list.parent(backup) + "/backup/" + backup)
-
-		self.top.destroy()
+	def cancelCommand(self):
+		self.close()

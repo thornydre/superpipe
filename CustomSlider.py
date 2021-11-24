@@ -1,74 +1,94 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from tkinter import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
-class CustomSlider(Canvas):
-	def __init__(self, parent, width, height, bg, fg, txt, grid, steps):
-		self.width = width
-		self.height = height
+
+class CustomSlider(QWidget):
+	released = Signal()
+	
+	def __init__(self, width, height, steps):
 		self.steps_name = steps
 		self.steps = len(self.steps_name)
 		self.current_step = 1
-		self.fg_color = fg
-		self.grid_color = grid
-		self.txt_color = txt
 		self.active = True
 		self.percentage = 0
 
-		super().__init__(parent, width = self.width, height = self.height, bg = bg, bd = 0, highlightthickness = 0)
+		super(CustomSlider, self).__init__()
 
-		self.bind("<B1-Motion>", self.update)
-		self.bind("<Button-1>", self.update)
+		self.setMinimumSize(1, 30)
+		self.resize(width, height)    
+
+
+	def mousePressEvent(self, e):
+		self.update(e)
+
+
+	def mouseReleaseEvent(self, e):
+		self.released.emit()
+
+
+	def mouseMoveEvent(self, e):
+		self.update(e)
+
+
+	def paintEvent(self, e):
+		qp = QPainter()
+		qp.begin(self)
+
+		font = QFont("Serif", 7, QFont.Light)
+		qp.setFont(font)
+
+		size = self.size()
+		w = size.width()
+		h = size.height()
+
+		qp.setPen(QColor(100, 100, 100))
+		qp.setBrush(QColor(100, 100, 100))
+		qp.drawRect(0, 0, w, h)
+
+		qp.setPen(QColor(184, 184, 255))
+		qp.setBrush(QColor(184, 184, 255))
+		qp.drawRect(0, 0, w * self.percentage * 0.01, h)
+
+		pen = QPen(QColor(20, 20, 20), 1, Qt.SolidLine)
+
+		qp.setPen(pen)
 
 		for i in range(self.steps - 1):
-			self.create_line(self.width/self.steps * (i + 1) + 1, 5, self.width/self.steps * (i + 1) + 1, self.height - 5, fill = self.grid_color, width = 1)
+			qp.drawLine(w/self.steps * (i + 1) + 1, 5, w/self.steps * (i + 1) + 1, h - 5)
 
 		i = 0
 
 		for step_name in self.steps_name:
-			self.create_text(self.width/self.steps/2 + self.width/self.steps * i, self.height/2, text = step_name, fill = self.txt_color)
+			text_bounds = qp.fontMetrics().boundingRect(step_name)
+			fw = text_bounds.width()
+			fh = text_bounds.height()
+			qp.drawText(w/self.steps * i + w/self.steps/2 - fw/2, h/2 + fh/2, step_name)
 			i += 1
 
-	def update(self, event = None):
-		if event:
+		qp.end()
+
+
+	def update(self, e = None):
+		size = self.size()
+		w = size.width()
+		
+		if e:
 			if self.active:
-				x = event.x
-
-				if x > self.width/self.steps * self.current_step - self.width/self.steps and x <= self.width/self.steps * self.current_step:
-					self.delete("all")
-					self.create_rectangle(0, 0, x, self.height, fill = self.fg_color, width = 0)
-					self.percentage = int(x / self.width * 100)
-				elif x < self.width/self.steps * self.current_step - self.width/self.steps:
-					self.delete("all")
-					self.create_rectangle(0, 0, self.width/self.steps * self.current_step - self.width/self.steps + 1, self.height, fill = self.fg_color, width = 0)
-					self.percentage = int((self.width/self.steps * self.current_step - self.width/self.steps) / self.width * 100)
-				elif x >= self.width/self.steps * self.current_step:
-					self.delete("all")
-					self.create_rectangle(0, 0, self.width/self.steps * self.current_step + 1, self.height, fill = self.fg_color, width = 0)
-					self.percentage = int((self.width/self.steps * self.current_step + 1) / self.width * 100)
-
-				for i in range(self.steps - 1):
-					self.create_line(self.width/self.steps * (i + 1) + 1, 5, self.width/self.steps * (i + 1) + 1, self.height - 5, fill = self.grid_color, width = 1)
-
-				i = 0
-
-				for step_name in self.steps_name:
-					self.create_text(self.width/self.steps/2 + self.width/self.steps * i, self.height/2, text = step_name, fill = self.txt_color)
-					i += 1
+				x = e.x()
+				if x > w/self.steps * self.current_step - w/self.steps and x <= w/self.steps * self.current_step:
+					self.setPercentage(int(x / w * 100))
+				elif x < w/self.steps * self.current_step - w/self.steps:
+					self.setPercentage(int((w/self.steps * self.current_step - w/self.steps) / w * 100))
+				elif x >= w/self.steps * self.current_step:
+					self.setPercentage(int((w/self.steps * self.current_step + 1) / w * 100))
 		else:
-			self.delete("all")
-			self.create_rectangle(0, 0, self.width/self.steps * self.current_step - self.width/self.steps + 1, self.height, fill = self.fg_color, width = 0)
-			self.percentage = int((self.width/self.steps * self.current_step - self.width/self.steps) / self.width * 100)
+			self.setPercentage(int((w/self.steps * self.current_step - w/self.steps) / w * 100))
 
-			for i in range(self.steps - 1):
-				self.create_line(self.width/self.steps * (i + 1) + 1, 5, self.width/self.steps * (i + 1) + 1, self.height - 5, fill = self.grid_color, width = 1)
+		self.repaint()
 
-			i = 0
-
-			for step_name in self.steps_name:
-				self.create_text(self.width/self.steps/2 + self.width/self.steps * i, self.height/2, text = step_name, fill = self.txt_color)
-				i += 1
 
 	def setCurrentStep(self, step):
 		i = 1
@@ -80,36 +100,28 @@ class CustomSlider(Canvas):
 
 		self.update()
 
+
 	def nextStep(self):
 		self.current_step += 1
-
 		self.update()
+
 
 	def previousStep(self):
 		self.current_step -= 1
-
 		self.update()
+
 
 	def setActive(self, active):
 		self.active = active
 
+
 	def setPercentage(self, percentage):
 		self.percentage = percentage
 
-		self.delete("all")
-		self.create_rectangle(0, 0, self.width * self.percentage/100, self.height, fill = self.fg_color, width = 0)
-
-		for i in range(self.steps - 1):
-			self.create_line(self.width/self.steps * (i + 1) + 1, 5, self.width/self.steps * (i + 1) + 1, self.height - 5, fill = self.grid_color, width = 1)
-
-		i = 0
-
-		for step_name in self.steps_name:
-			self.create_text(self.width/self.steps/2 + self.width/self.steps * i, self.height/2, text = step_name, fill = self.txt_color)
-			i += 1
 
 	def getPercentage(self):
 		return self.percentage
+
 
 	def getCurrentStep(self):
 		return self.steps_name[self.current_step]

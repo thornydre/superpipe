@@ -1,77 +1,55 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
-from tkinter import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
 from Resources import *
-from os import walk
+from os import path
+from Asset import *
 
-import Theme
 
-class NewAssetDialog(object):
-	def __init__(self, parent, project, dict_key = None):
-		## THEME COLORS ##
-		self.theme = Theme.Theme(Resources.readLine("save/options.spi", 2))
+class NewAssetDialog(QDialog):
+	def __init__(self, parent=None, project=None):
+		super(NewAssetDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
-		self.root = parent
-		self.top = Toplevel(self.root)
-		self.top.transient(self.root)
-		self.top.title("Super Pipe || Add asset")
-		self.top["bg"] = self.theme.main_color
+		# flags = Qt.WindowFlags
+		# help_flag = Qt.WindowContextHelpButtonHint
+		# flags = flags & (~help_flag)
+		# self.setWindowFlags(flags)
 
-		self.top.resizable(width = False, height = False)
+		self.validate = True
 
-		top_frame = Frame(self.top, borderwidth = 0, bg = self.theme.main_color)
-		top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
+		self.setWindowTitle("Super Pipe || Add asset")
 
-		top_frame.columnconfigure(0, pad = 5)
-		top_frame.columnconfigure(1, pad = 5)
-		
-		top_frame.rowconfigure(0, pad = 5)
-		top_frame.rowconfigure(1, pad = 5)
-		top_frame.rowconfigure(2, pad = 5)
-		top_frame.rowconfigure(3, pad = 5)
-		top_frame.rowconfigure(4, pad = 5)
-		top_frame.rowconfigure(5, pad = 5)
-		top_frame.rowconfigure(6, pad = 5)
+		main_layout = QVBoxLayout()
 
-		label = Label(top_frame, text = "Select asset software", bg = self.theme.main_color, fg = self.theme.text_color)
-		label.grid(row = 0, column = 0, columnspan = 3)
+		software_label = QLabel("Select asset software :")
+		main_layout.addWidget(software_label)
 
-		self.rb_software = IntVar()
+		software_layout = QGridLayout()
+		self.software_button_group = QButtonGroup()
 		self.softwares_list = ("maya", "houdini", "blender")
 		i = 0
 
 		for software in self.softwares_list:
-			rb_software = Radiobutton(top_frame, text = software.upper(), variable = self.rb_software, value = i, bg = self.theme.main_color, activebackground = self.theme.main_color, fg = self.theme.text_color, activeforeground = self.theme.text_color, selectcolor = self.theme.second_color)
-			rb_software.grid(row = int(i/2) + 1, column = i % 2, sticky = W)
+			software_radiobutton = QRadioButton(software)
+			software_layout.addWidget(software_radiobutton, int(i/2), i % 2)
+			self.software_button_group.addButton(software_radiobutton)
 
-			if software == project.default_software:
-				rb_software.select()
+			if software == project.getDefaultSoftware():
+				software_radiobutton.setChecked(True)
 
 			i += 1
 
-		# rb_software1 = Radiobutton(top_frame, text = "MAYA", variable = self.rb_software, value = 1, bg = self.theme.main_color, activebackground = self.theme.main_color, fg = self.theme.text_color, activeforeground = self.theme.text_color, selectcolor = self.theme.second_color)
-		# rb_software1.grid(row = 1, column = 0, sticky = W)
+		main_layout.addLayout(software_layout)
 
-		# rb_software2 = Radiobutton(top_frame, text = "HOUDINI", variable = self.rb_software, value = 2, bg = self.theme.main_color, activebackground = self.theme.main_color, fg = self.theme.text_color, activeforeground = self.theme.text_color, selectcolor = self.theme.second_color)
-		# rb_software2.grid(row = 1, column = 1, sticky = W)
+		category_label = QLabel("Select asset category :")
+		main_layout.addWidget(category_label)
 
-		# rb_software3 = Radiobutton(top_frame, text = "BLENDER", variable = self.rb_software, value = 3, bg = self.theme.main_color, activebackground = self.theme.main_color, fg = self.theme.text_color, activeforeground = self.theme.text_color, selectcolor = self.theme.second_color)
-		# rb_software3.grid(row = 2, column = 0, sticky = W)
-
-		# rb_software1.select()
-
-		label = Label(top_frame, text = "Select asset category", bg = self.theme.main_color, fg = self.theme.text_color)
-		label.grid(row = 3, column = 0, columnspan = 3)
-
-		self.categories_list = ttk.Treeview(top_frame, height = 5, show = "tree", selectmode = "browse")
-		ttk.Style().configure("Treeview", background = self.theme.list_color)
-		self.categories_list.insert("", 1, "character", text = "CHARACTER")
-		self.categories_list.insert("", 2, "fx", text = "FX")
-		self.categories_list.insert("", 3, "props", text = "PROPS")
-		self.categories_list.insert("", 4, "set", text = "SET")
-		self.categories_list.grid(row = 4, column = 0, columnspan = 2)
+		self.categories_list = QTreeWidget()
+		self.categories_list.setHeaderHidden(True)
+		self.categories = {"character":QTreeWidgetItem(["CHARACTER"]), "fx":QTreeWidgetItem(["FX"]), "props":QTreeWidgetItem(["PROPS"]), "set":QTreeWidgetItem(["SET"])}
+		for cat in self.categories:
+			self.categories_list.addTopLevelItem(self.categories[cat])
 
 		assets = project.getAssetList()
 
@@ -80,67 +58,72 @@ class NewAssetDialog(object):
 				if path.isdir(project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
 					cur_asset = Asset(project.getDirectory(), asset[1], asset[0])
 
-					asset_subfolders = asset[1].split("/")
+					asset_subfolders = asset[1].strip("/").split("/")
+					current_category = self.categories[asset_subfolders[0].lower()]
 
-					for i in range(len(asset_subfolders)):
-						if not self.categories_list.exists(asset_subfolders[i].lower()):
-							if i > 1:
-								self.categories_list.insert(asset_subfolders[i - 1].lower(), END, asset_subfolders[i].lower(), text = asset_subfolders[i].upper(), tags = ("folder"))
+					for subfolder in asset_subfolders[1:]:
+						if not self.categories_list.findItems(subfolder.lower(), Qt.MatchExactly):
+							new_item = QTreeWidgetItem([subfolder.lower()])
+							current_category.addChild(new_item)
+							current_category = new_item
 				else:
-					dialog = lambda: OkDialog.OkDialog(self.parent, "ERROR", "The asset \"" + asset[0] + "\" has a problem !", padding = 20)
-					self.wait_window(dialog().top)
+					dialog = QMessageBox()
+					dialog.setWindowTitle("ERROR")
+					dialog.setIcon(QMessageBox.Warning)
+					dialog.setText("The asset \"" + asset[0] + "\" has a problem !")
+					dialog.exec_()
 
-		name_label = Label(top_frame, text = "Asset name : ", bg = self.theme.main_color, fg = self.theme.text_color)
-		name_label.grid(row = 5, column = 0, sticky = E)
+		main_layout.addWidget(self.categories_list)
 
-		self.name_entry = Entry(top_frame, relief = FLAT, bg = self.theme.button_color2)
-		self.name_entry.grid(row = 5, column = 1, sticky = W)
-		self.name_entry.focus_set()
+		asset_name_layout = QHBoxLayout()
+		asset_name_label = QLabel("Asset name :")
+		asset_name_layout.addWidget(asset_name_label)
+		self.asset_name_textfield = QLineEdit()
+		asset_name_layout.addWidget(self.asset_name_textfield)
+		main_layout.addLayout(asset_name_layout)
 
-		submit_button = Button(top_frame, text = "Create asset", bg = self.theme.button_color1, activebackground = self.theme.over_button_color1, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 12, height = 1)
-		submit_button["command"] = lambda: self.submit(dict_key)
-		submit_button.grid(row = 6, column = 0, sticky = W, pady = (10, 0))
+		buttons_layout = QHBoxLayout()
+		submit_button = QPushButton("Create asset")
+		submit_button.setObjectName("important")
+		submit_button.clicked.connect(self.submitCommand)
+		buttons_layout.addWidget(submit_button)
+		cancel_button = QPushButton("Cancel")
+		cancel_button.clicked.connect(self.cancelCommand)
+		buttons_layout.addWidget(cancel_button)
+		main_layout.addLayout(buttons_layout)
 
-		self.top.bind("<Return>", lambda event, a = dict_key:self.submit(a))
+		self.setLayout(main_layout)
 
-		cancel_button = Button(top_frame, text = "Cancel", bg = self.theme.button_color2, activebackground = self.theme.over_button_color2, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 8, height = 1)
-		cancel_button["command"] = self.top.destroy
-		cancel_button.grid(row = 6, column = 1, sticky = E, pady = (10, 0))
 
-		self.top.bind("<Escape>", lambda event: self.top.destroy())
-
-		self.top.update_idletasks()
-		w = self.top.winfo_screenwidth()
-		h = self.top.winfo_screenheight()
-		size = tuple(int(_) for _ in self.top.geometry().split("+")[0].split("x"))
-		x = w/2 - size[0]/2
-		y = h/2 - size[1]/2
-		self.top.geometry("%dx%d+%d+%d" % (size + (x, y)))
-
-		self.top.iconbitmap("img/icon.ico")
-		self.top.focus()
-
-	def submit(self, dict_key):
-		print(self.softwares_list[self.rb_software.get()])
-		parent = self.categories_list.focus()
+	def submitCommand(self):
+		parent = self.categories_list.currentItem()
 		category_list = []
-
-		if parent:
-			category_list.insert(0, parent)
 		
-			while parent:
-				parent = self.categories_list.parent(parent)
-				if parent:
-					category_list.insert(0, parent)
+		while parent:
+			category_list.insert(0, parent.text(0))
+			parent = parent.parent()
 
-		category = "/" + "/".join(category_list)
+		self.category = "/" + "/".join(category_list)
 
-		name = self.name_entry.get()
-		name = Resources.normString(name)
-		software = self.softwares_list[self.rb_software.get()]
-		if category and name:
-			d, key1, key2, key3 = dict_key
-			d[key1] = category
-			d[key2] = name
-			d[key3] = software
-			self.top.destroy()
+		self.name = self.asset_name_textfield.text()
+		self.name = Resources.normString(self.name)
+		self.software = self.software_button_group.checkedButton().text()
+
+		if category_list and self.name:
+			self.close()
+
+
+	def cancelCommand(self):
+		self.validate = False
+		self.close()
+
+
+	def getData(self):
+		if self.validate:
+			if self.name and self.category and self.software:
+				result = {}
+				result["name"] = self.name
+				result["cat"] = self.category
+				result["software"] = self.software
+				return result
+		return None

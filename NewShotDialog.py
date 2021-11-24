@@ -1,81 +1,76 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
-from tkinter import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt
+from Resources import *
+from os import path
 
-import Theme
 
-class NewShotDialog(object):
-	def __init__(self, parent, project, dict_key = None):
-		## THEME COLORS ##
-		self.theme = Theme.Theme(Resources.readLine("save/options.spi", 2))
+class NewShotDialog(QDialog):
+	def __init__(self, parent=None, project=None):
+		super(NewShotDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
-		self.root = parent
-		self.top = Toplevel(self.root)
-		self.top.transient(self.root)
-		self.top.title("Super Pipe || Add shot")
-		self.top["bg"] = self.theme.main_color
+		# flags = Qt.WindowFlags
+		# help_flag = Qt.WindowContextHelpButtonHint
+		# flags = flags & (~help_flag)
+		# self.setWindowFlags(flags)
 
-		self.top.resizable(width = False, height = False)
-
+		self.validate = True
 		self.project = project
 
-		top_frame = Frame(self.top, borderwidth = 0, bg = self.theme.main_color)
-		top_frame.pack(fill = "both", expand = True, padx = 10, pady = 10)
+		self.setWindowTitle("Super Pipe || Add shot")
 
-		label = Label(top_frame, text = "Select sequence", bg = self.theme.main_color, fg = self.theme.text_color)
-		label.pack(padx = 4, pady = 4)
+		main_layout = QVBoxLayout()
 
-		self.sequence_list = Listbox(top_frame, bg = self.theme.list_color, selectbackground = self.theme.second_color, bd = 0, highlightthickness = 0, width = 30, exportselection = False)
-		self.sequence_list.pack(fill = BOTH, pady = (5, 15))
+		sequence_label = QLabel("Select a sequence :")
+		main_layout.addWidget(sequence_label)
 
+		self.sequence_list = QListWidget()
 		for sequence in range(self.project.getSequenceNumber()):
-			self.sequence_list.insert(END, "Sequence " + str(sequence + 1))
+			self.sequence_list.addItem("Sequence " + str(sequence + 1))
+		self.sequence_list.setCurrentRow(self.project.getSequenceNumber() - 1)
+		main_layout.addWidget(self.sequence_list)
 
-		self.sequence_list.select_set(END)
+		buttons_layout = QHBoxLayout()
+		submit_button = QPushButton("Create shot")
+		submit_button.setObjectName("important")
+		submit_button.clicked.connect(self.submitCommand)
+		buttons_layout.addWidget(submit_button)
+		sequence_button = QPushButton("Create sequence")
+		sequence_button.setObjectName("important")
+		sequence_button.clicked.connect(self.addSequenceCommand)
+		buttons_layout.addWidget(sequence_button)
+		cancel_button = QPushButton("Cancel")
+		cancel_button.clicked.connect(self.cancelCommand)
+		buttons_layout.addWidget(cancel_button)
+		main_layout.addLayout(buttons_layout)
 
-		submit_button = Button(top_frame, text = "Create shot", bg = self.theme.button_color1, activebackground = self.theme.over_button_color1, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 12, height = 1)
-		submit_button["command"] = lambda: self.createShotEntry(dict_key)
-		submit_button.pack(side = LEFT, padx = 4, pady = 4)
+		self.setLayout(main_layout)
 
-		self.top.bind("<Return>", lambda event, a = dict_key:self.createShotEntry(a))
 
-		add_sequence_button = Button(top_frame, text = "Add sequence", bg = self.theme.button_color2, activebackground = self.theme.over_button_color2, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 12, height = 1)
-		add_sequence_button["command"] = lambda: self.addSequenceEntry(self.project)
-		add_sequence_button.pack(side = LEFT, padx = 4, pady = 4)
+	def submitCommand(self):
+		self.sequence = self.sequence_list.currentRow() + 1
 
-		cancel_button = Button(top_frame, text = "Cancel", bg = self.theme.button_color2, activebackground = self.theme.over_button_color2, fg = self.theme.text_color, activeforeground = self.theme.text_color, bd = 0, width = 8, height = 1)
-		cancel_button["command"] = self.top.destroy
-		cancel_button.pack(padx = 4, pady = 4)
+		if self.sequence:
+			self.close()
 
-		self.top.bind("<Escape>", lambda event: self.top.destroy())
 
-		self.top.update_idletasks()
-		w = self.top.winfo_screenwidth()
-		h = self.top.winfo_screenheight()
-		size = tuple(int(_) for _ in self.top.geometry().split("+")[0].split("x"))
-		x = w/2 - size[0]/2
-		y = h/2 - size[1]/2
-		self.top.geometry("%dx%d+%d+%d" % (size + (x, y)))
+	def addSequenceCommand(self):
+		self.project.addSequence()
 
-		self.top.iconbitmap("img/icon.ico")
-		self.top.focus()
+		self.sequence_list.addItem("Sequence " + str(self.project.getSequenceNumber()))
+		self.sequence_list.setCurrentRow(self.project.getSequenceNumber() - 1)
 
-	def addSequenceEntry(self, project):
-		project.addSequence()
 
-		self.sequence_list.delete(0, END)
+	def cancelCommand(self):
+		self.validate = False
+		self.close()
 
-		for sequence in range(project.getSequenceNumber()):
-			self.sequence_list.insert(END, "Sequence " + str(sequence + 1))
 
-		self.sequence_list.select_set(END)
-
-	def createShotEntry(self, dict_key):
-		sequence = self.sequence_list.curselection()
-		if sequence:
-			data = sequence[0] + 1
-			d, key = dict_key
-			d[key] = data
-			self.top.destroy()
+	def getData(self):
+		if self.validate:
+			if self.sequence:
+				result = {}
+				result["seq"] = self.sequence
+				return result
+		return None

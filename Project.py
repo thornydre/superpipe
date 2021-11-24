@@ -1,16 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
 from os import makedirs, listdir, path, rename, walk
 from shutil import rmtree
 from Shot import *
 from Asset import *
-from tkinter import *
-from tkinter import messagebox
 from Resources import *
 
-import NewProjectDialog
 import re
 
 

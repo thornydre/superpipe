@@ -1,70 +1,51 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from tkinter import *
-from Resources import *
-from PIL import ImageTk
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
-# import cv2
+import cv2
 import PIL
 
-class CustomVideoPlayer(Canvas):
-	def __init__(self, parent, video, width, bg):
+class CustomVideoPlayer(QLabel):
+	def __init__(self, width, height):
 		self.video_width = width
-		self.video_height = self.video_width / 1.85
+		self.video_height = height
 		self.playblast_shot_gifdict = {}
 
-		super().__init__(parent, width = self.video_width, height = self.video_height, bg = bg, bd = 0, highlightthickness = 0)
+		super(CustomVideoPlayer, self).__init__()
 
-		self.create_text(self.video_width/2, self.video_height/2, font = ("Helvetica", 50), text = "ERROR", fill = "#D34E4E")
+		self.setMinimumSize(width, height)
+		self.resize(width, height)
 
-		self.bind("<Motion>", self.update)
 
-	def update(self, event):
-		self.delete("all")
+	def update(self, x):
+		frame = x / self.video_width * self.video_capture.get(cv2.CAP_PROP_FRAME_COUNT)
 
-		x = event.x
+		self.video_capture.set(cv2.CAP_PROP_POS_FRAMES, frame)
+		success, captured_img = self.video_capture.read()
 
-		try:
-			second = x / self.video_width * int(self.video_capture.get(cv2.CAP_PROP_FRAME_COUNT)) / int(self.video_capture.get(cv2.CAP_PROP_FPS)) * 1000
+		if success:
+			final_img = cv2.cvtColor(captured_img, cv2.COLOR_BGR2RGBA)
+			final_img = cv2.resize(final_img, (self.video_width, self.video_height), interpolation= cv2.INTER_LINEAR)
 
-			self.video_capture.set(0, second)
-			success,test_img = self.video_capture.read()
+			if len(final_img.shape) == 3:
+				if(final_img.shape[2]) == 4:
+					qformat = QImage.Format_RGBA8888
+				else:
+					qformat = QImage.Format_RGB888
 
-			cv2_image = cv2.cvtColor(test_img, cv2.COLOR_BGR2RGBA)
+				img = QImage(final_img.data, final_img.shape[1], final_img.shape[0], qformat)
 
-			test_img = PIL.Image.fromarray(cv2_image)
-			test_img = Resources.resizeImage(test_img, self.video_width)
-			tk_image = ImageTk.PhotoImage(image = test_img)
+				# img = img.rgbSwapped()
+				self.setPixmap(QPixmap.fromImage(img))
 
-			self.playblast_shot_gifdict["temp_img"] = tk_image
-
-			self.create_image(0, 0, anchor = N + W, image = tk_image)
-
-		except:
-			self.create_text(self.video_width/2, self.video_height/2, font = ("Helvetica", 50), text = "ERROR", fill = "#D34E4E")
 
 	def updateVideo(self, video):
-		self.delete("all")
+		self.video_capture = cv2.VideoCapture(video)
 
-		try:
-			self.video_capture = cv2.VideoCapture(video)
+		self.update(0.5)
 
-			second = 0.5 * int(self.video_capture.get(cv2.CAP_PROP_FRAME_COUNT)) / int(self.video_capture.get(cv2.CAP_PROP_FPS)) * 1000
 
-			self.video_capture.set(0, second)
-			success,test_img = self.video_capture.read()
-
-			cv2_image = cv2.cvtColor(test_img, cv2.COLOR_BGR2RGBA)
-
-			test_img = PIL.Image.fromarray(cv2_image)
-			test_img = Resources.resizeImage(test_img, self.video_width)
-			tk_image = ImageTk.PhotoImage(image = test_img)
-
-			self.playblast_shot_gifdict["temp_img"] = tk_image
-
-			self.create_image(0, 0, anchor = N + W, image = tk_image)
-			self.config(width = tk_image.width(), height = tk_image.height())
-
-		except:
-			self.create_text(self.video_width/2, self.video_height/2, font = ("Helvetica", 50), text = "ERROR", fill = "#D34E4E")
+	def mouseMoveEvent(self, e):
+		self.update(e.position().x())

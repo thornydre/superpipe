@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
 from tkinter import *
 from Resources import *
@@ -13,7 +12,7 @@ import Theme
 class StatisticsView(Frame):
 	def __init__(self, parent):
 		## THEME COLORS ##
-		self.theme = Theme.Theme(Resources.readLine("save/options.spi", 2))
+		self.theme = Theme.Theme(Resources.readLine("assets/options.spi", 2))
 
 		super().__init__(parent, bg = self.theme.main_color, bd = 0)
 

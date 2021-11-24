@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# -*-coding:Utf-8 -*
+#!/usr/bin/python
 
-from Main import *
-from os import makedirs, path
-from tkinter import *
+from os import makedirs, path, listdir
 from shutil import copyfile, copytree
 
 import time
+
 
 class Asset:
 	def __init__(self, directory = None, second_path = None, asset_name = None, software = None):

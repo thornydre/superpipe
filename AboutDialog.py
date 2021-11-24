@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
 
-from Main import *
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from PySide6.QtGui import *
@@ -9,9 +7,9 @@ from Resources import *
 from os import listdir, path
 
 
-class AboutDialogPySide(QDialog):
+class AboutDialog(QDialog):
 	def __init__(self, parent=None):
-		super(AboutDialogPySide, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
+		super(AboutDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		version = 2.0
 
