@@ -7,8 +7,6 @@ from Shot import *
 from Project import *
 from Resources import *
 from ListsObserver import *
-from tkinter import *
-from tkinter import filedialog, ttk
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QFile, QTextStream
 from PySide6.QtGui import *
@@ -23,17 +21,13 @@ from StatisticsView import *
 
 import sys
 import PIL
-import Theme
-import NewShotDialog
 from NewAssetDialogPySide import *
 from NewShotDialogPySide import *
 from RenameAssetDialogPySide import *
 from ProjectSettingsDialogPySide import *
 from PreferencesDialogPySide import *
 from AboutDialogPySide import *
-import ManageBackupsDialog
-import YesNoDialog
-import OkDialog
+from ManageBackupsDialogPySide import *
 import subprocess
 import webbrowser
 # import queue
@@ -229,7 +223,7 @@ class SuperPipePyside(QMainWindow):
 
 		shot_label = QLabel("Shots", alignment=Qt.AlignHCenter)
 		self.shot_list = QListWidget()
-		self.shot_list.currentItemChanged.connect(self.shotlistCommand)
+		self.shot_list.currentItemChanged.connect(self.shotListCommand)
 
 		sidebar_shots_layout.addWidget(shot_label, alignment=Qt.AlignHCenter)
 		sidebar_shots_layout.addWidget(self.shot_list)
@@ -529,6 +523,24 @@ class SuperPipePyside(QMainWindow):
 		self.main_shot_widget.setVisible(False)
 
 		center_layout.addWidget(self.main_shot_widget)
+
+		## // PREVIEW PAGE \\ ##
+		self.main_preview_layout = QVBoxLayout()
+		preview_scroll_area = QScrollArea()
+		preview_scroll_area.setWidgetResizable(True)
+		self.preview_scroll_widget = QWidget()
+		self.preview_scroll_layout = QGridLayout()
+
+		self.main_preview_layout.addWidget(preview_scroll_area)
+		preview_scroll_area.setWidget(self.preview_scroll_widget)
+		self.preview_scroll_widget.setLayout(self.preview_scroll_layout)
+
+		## Finalize preview layout ##
+		self.main_preview_widget = QWidget()
+		self.main_preview_widget.setLayout(self.main_preview_layout)
+		self.main_preview_widget.setVisible(False)
+
+		center_layout.addWidget(self.main_preview_widget)
 
 		##################
 		## RIGHT COLUMN ##
@@ -847,7 +859,7 @@ class SuperPipePyside(QMainWindow):
 				shot_nb = self.current_project.createShot(sequence["seq"])
 				self.updateShotListView()
 				self.shot_list.setCurrentRow(shot_nb - 1)
-				self.shotlistCommand()
+				self.shotListCommand()
 
 
 	def assetListCommand(self):
@@ -858,6 +870,7 @@ class SuperPipePyside(QMainWindow):
 				self.main_home_page_widget.setVisible(False)
 				self.main_asset_widget.setVisible(True)
 				self.main_shot_widget.setVisible(False)
+				self.main_preview_widget.setVisible(False)
 
 				self.shot_list.clearSelection()
 
@@ -971,7 +984,7 @@ class SuperPipePyside(QMainWindow):
 					self.asset_version_comment_label.setVisible(False)
 
 
-	def shotlistCommand(self):
+	def shotListCommand(self):
 		if self.shot_list.currentItem():
 			if self.shot_list.count() != 0:
 				self.main_home_page_widget.setVisible(False)
@@ -1005,7 +1018,7 @@ class SuperPipePyside(QMainWindow):
 
 				self.main_shot_widget.setVisible(True)
 				self.main_asset_widget.setVisible(False)
-				# self.main_area_preview.setVisible(False)
+				self.main_preview_widget.setVisible(False)
 				# self.statistics_view.setVisible(False)
 
 				self.asset_list.clearSelection()
@@ -1054,8 +1067,6 @@ class SuperPipePyside(QMainWindow):
 						self.upgrade_shot_button.setVisible(True)
 						self.done_shot_button.setVisible(True)
 
-						# self.frame_range_textfield.delete(0, len(self.frame_range_textfield.get()))
-						# self.frame_range_textfield.insert(0, self.current_project.getSelection().getFrameRange())
 						self.frame_range_textfield.setText(str(self.current_project.getSelection().getFrameRange()))
 
 						if shot.getStep() == "Layout":
@@ -1376,7 +1387,6 @@ class SuperPipePyside(QMainWindow):
 
 		for shot in shots:
 			if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
-				# self.shot_list.insert(shot[0], shot[1])
 				item = QListWidgetItem(shot[1])
 				self.shot_list.insertItem(shot[0], item)
 
@@ -1462,8 +1472,6 @@ class SuperPipePyside(QMainWindow):
 		self.updateShotListView()
 		self.shot_list.setCurrentRow(new_selection)
 
-		# self.shotlistCommand()
-
 		self.up_button.setEnabled(True)
 		self.down_button.setEnabled(True)
 
@@ -1481,8 +1489,6 @@ class SuperPipePyside(QMainWindow):
 		new_selection = self.shot_list.currentRow() - 1
 		self.updateShotListView()
 		self.shot_list.setCurrentRow(new_selection)
-
-		# self.shotlistCommand()
 
 		self.up_button.setEnabled(True)
 		self.down_button.setEnabled(True)
@@ -1511,48 +1517,39 @@ class SuperPipePyside(QMainWindow):
 
 
 	def toggleAssetModelingDone(self):
-		# selected_asset = self.asset_list.currentItem()
+		selected_asset = self.asset_list.currentItem()
 		self.current_project.getSelection().setModelingDone(self.modeling_done_asset_button.isChecked())
-		# self.updateAssetListView()
-		# self.asset_list.setCurrentItem(selected_asset)
-		# self.asset_list.focus_set()
-		# self.asset_list.focus(selected_asset)
-		# self.asset_list.see(selected_asset)
+		self.updateAssetListView()
+		item = self.asset_list.findItems(selected_asset.text(0), Qt.MatchExactly|Qt.MatchRecursive)[0]
+		self.asset_list.setCurrentItem(item)
 
 
 	def toggleAssetRigDone(self):
-		# selected_asset = self.asset_list.currentItem()
+		selected_asset = self.asset_list.currentItem()
 		self.current_project.getSelection().setRigDone(self.rig_done_asset_button.isChecked())
-		# self.updateAssetListView()
-		# self.asset_list.setCurrentItem(selected_asset)
-		# self.asset_list.focus_set()
-		# self.asset_list.focus(selected_asset)
-		# self.asset_list.see(selected_asset)
+		self.updateAssetListView()
+		item = self.asset_list.findItems(selected_asset.text(0), Qt.MatchExactly|Qt.MatchRecursive)[0]
+		self.asset_list.setCurrentItem(item)
 
 
 	def toggleAssetLookdevDone(self):
-		# selected_asset = self.asset_list.currentItem()
+		selected_asset = self.asset_list.currentItem()
 		self.current_project.getSelection().setLookdevDone(self.lookdev_done_asset_button.isChecked())
-		# self.updateAssetListView()
-		# self.asset_list.setCurrentItem(selected_asset)
-		# self.asset_list.focus_set()
-		# self.asset_list.focus(selected_asset)
-		# self.asset_list.see(selected_asset)
+		self.updateAssetListView()
+		item = self.asset_list.findItems(selected_asset.text(0), Qt.MatchExactly|Qt.MatchRecursive)[0]
+		self.asset_list.setCurrentItem(item)
 
 
 	def toggleAssetDone(self):
-		# selected_asset = self.asset_list.currentItem()
+		selected_asset = self.asset_list.currentItem()
 		self.current_project.getSelection().setDone(self.done_asset_button.isChecked())
 		self.priorityAssetCommand()
-		# self.updateAssetListView()
-		# self.asset_list.setCurrentItem(selected_asset)
-		# self.asset_list.focus_set()
-		# self.asset_list.focus(selected_asset)
-		# self.asset_list.see(selected_asset)
+		self.updateAssetListView()
+		item = self.asset_list.findItems(selected_asset.text(0), Qt.MatchExactly|Qt.MatchRecursive)[0]
+		self.asset_list.setCurrentItem(item)
 
 
 	def priorityAssetCommand(self):
-		# selected_asset = self.asset_list.focus()
 		priority = self.priority_asset_menu.currentIndex()
 
 		self.current_project.getSelection().setPriority(priority)
@@ -1566,15 +1563,9 @@ class SuperPipePyside(QMainWindow):
 			self.asset_list.currentItem().setBackground(0, QBrush(QColor(239, 180, 98)))
 		elif priority == 3:
 			self.asset_list.currentItem().setBackground(0, QBrush(QColor(229, 82, 82)))
-		# self.updateAssetListView()
-		# self.asset_list.selection_set(selected_asset)
-		# self.asset_list.focus_set()
-		# self.asset_list.focus(selected_asset)
 
 
 	def priorityShotCommand(self, priority):
-		# loc = self.shot_list.yview()[0]
-		# selected_shot = self.shot_list.curselection()[0]
 		priority = self.priority_shot_menu.currentIndex()
 
 		self.current_project.getSelection().setPriority(priority)
@@ -1588,24 +1579,19 @@ class SuperPipePyside(QMainWindow):
 			self.shot_list.currentItem().setBackground(QBrush(QColor(239, 180, 98)))
 		elif priority == 3:
 			self.shot_list.currentItem().setBackground(QBrush(QColor(229, 82, 82)))
-		# self.updateShotListView()
-		# self.shot_list.select_set(selected_shot)
-		# self.shot_list.yview_moveto(loc)
 
 
 	def shotsPreviewCommand(self):
 		self.app.setOverrideCursor(Qt.WaitCursor)
-		# self.parent.update()
 
-		self.main_area_preview.grid(self.main_area_preview.pi)
-		self.main_area_shot.grid_forget()
-		self.main_area_asset.grid_forget()
-		self.statistics_view.grid_forget()
+		self.main_home_page_widget.setVisible(False)
+		self.main_preview_widget.setVisible(True)
+		self.main_shot_widget.setVisible(False)
+		self.main_asset_widget.setVisible(False)
 
-		self.asset_list.selection_remove(self.asset_list.focus())
-		self.shot_list.selection_clear(0, END)
-
-		self.version_list.clear()
+		self.shot_list.clearSelection()
+		self.asset_list.clearSelection()
+		self.version_list.clearSelection()
 
 		all_shots_preview = []
 
@@ -1627,24 +1613,11 @@ class SuperPipePyside(QMainWindow):
 					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.jpg"])
 
 		for nb, name, img in all_shots_preview:
-			shot_preview_caneva = Canvas(self.shots_preview_list, bg = self.theme.main_color, bd = 0, highlightthickness = 0)
+			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter)
+			preview_pixmap = QPixmap(img)
+			shot_preview_widget.setPixmap(preview_pixmap.scaledToWidth(230))
 
-			to_edit_pict = PIL.Image.open(img)
-
-			edited_pict = Resources.resizeImage(to_edit_pict, 256)
-
-			pict = ImageTk.PhotoImage(edited_pict)
-
-			self.preview_gifdict[nb] = pict
-
-			shot_preview_label = Label(self.shots_preview_list, text = name, bg = self.theme.main_color, fg = self.theme.text_color)
-			shot_preview_label.grid(row = int((nb - 1)/5) * 2, column = (nb - 1) % 5, pady = (10, 5))
-
-			shot_preview_caneva.create_image(0, 0, anchor = N + W, image = pict)
-			shot_preview_caneva.config(height = pict.height(), width = pict.width())
-
-			shot_preview_caneva.grid(row = (int((nb - 1)/5) * 2) + 1, column = (nb - 1) % 5, pady = (0, 10))
-			shot_preview_caneva.bind("<MouseWheel>", self.wheelScrollCommand)
+			self.preview_scroll_layout.addWidget(shot_preview_widget, int((nb - 1)/5) * 2, (nb - 1) % 5)
 
 		self.app.restoreOverrideCursor()
 
@@ -1659,7 +1632,7 @@ class SuperPipePyside(QMainWindow):
 			self.step_slider.nextStep()
 			self.customSliderCommand()
 
-			self.shotlistCommand()
+			self.shotListCommand()
 
 
 	def downgradeShotCommand(self):
@@ -1676,7 +1649,7 @@ class SuperPipePyside(QMainWindow):
 			self.step_slider.previousStep()
 			self.customSliderCommand()
 
-			self.shotlistCommand()
+			self.shotListCommand()
 
 
 	def setShotFrameRangeCommand(self):
@@ -1731,20 +1704,14 @@ class SuperPipePyside(QMainWindow):
 
 
 	def customButtonCommand(self):
-		# if not path.isfile(self.current_project.getDirectory() + "/project_option.spi"):
-		# 	with open(self.current_project.getDirectory() + "/project_option.spi", "w") as f:
-		# 		f.write("www.google.fr\n")
-		# 	f.close()
-
-		# base_url = Resources.readLine(self.current_project.getDirectory() + "/project_option.spi", 1)
 		base_url = self.current_project.getCustomLink()
 
 		if base_url:
 			webbrowser.open(base_url)
 
 
-	def clearMainFrame(self, type):
-		if type == "asset":
+	def clearMainFrame(self, area_type):
+		if area_type == "asset":
 			self.asset_label.setText("NO ASSET SELECTED")
 			self.delete_asset_button.setVisible(False)
 			self.rename_asset_button.setVisible(False)
@@ -1759,7 +1726,7 @@ class SuperPipePyside(QMainWindow):
 			self.rig_done_asset_button.setVisible(False)
 			self.lookdev_done_asset_button.setVisible(False)
 			self.done_asset_button.setVisible(False)
-		elif type == "shot":
+		elif area_type == "shot":
 			self.shot_label.setText("NO SHOT SELECTED")
 			self.up_button.setVisible(False)
 			self.down_button.setVisible(False)
@@ -1778,13 +1745,8 @@ class SuperPipePyside(QMainWindow):
 
 
 	def cleanBackupsCommand(self):
-		settings = {"res" : ""}
-
-		dialog = lambda: ManageBackupsDialog.ManageBackupsDialog(self.parent, self.current_project, (settings, "res"))
-		self.wait_window(dialog().top)
-
-		if settings["res"]:
-			self.current_project.setResolution(settings["res"])
+		dialog = ManageBackupsDialogPySide(self, self.current_project)
+		dialog.exec()
 
 
 	def projectSettingsCommand(self):
@@ -1796,15 +1758,6 @@ class SuperPipePyside(QMainWindow):
 			self.current_project.setResolution(settings["res"])
 			self.current_project.setDefaultSoftware(settings["software"])
 			self.current_project.setCustomLink(settings["custom_link"])
-
-
-		# settings = {"res" : ""}
-
-		# dialog = lambda: ProjectSettingsDialog.ProjectSettingsDialog(self.parent, self.current_project, (settings, "res"))
-		# self.wait_window(dialog().top)
-
-		# if settings["res"]:
-		# 	self.current_project.setResolution(settings["res"])
 
 
 	def projectStatisticsCommand(self):
@@ -1825,9 +1778,7 @@ class SuperPipePyside(QMainWindow):
 			self.houdini_path = preferences["houdini_path"]
 			self.blender_path = preferences["blender_path"]
 			self.vlc_path = preferences["vlc_path"]
-			# self.theme = preferences["theme"]
 
-			# Resources.writeAtLine("save/options.spi", preferences["theme"], 2)
 			Resources.writeAtLine("save/options.spi", preferences["maya_path"], 3)
 			Resources.writeAtLine("save/options.spi", preferences["houdini_path"], 4)
 			Resources.writeAtLine("save/options.spi", preferences["blender_path"], 5)

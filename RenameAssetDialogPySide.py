@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from Main import *
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
@@ -5,7 +7,7 @@ from Resources import *
 from os import path
 
 class RenameAssetDialogPySide(QDialog):
-	def __init__(self, parent=None, project=None):
+	def __init__(self, parent=None):
 		super(RenameAssetDialogPySide, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		self.validate = True
@@ -23,6 +25,7 @@ class RenameAssetDialogPySide(QDialog):
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Rename asset")
+		submit_button.setObjectName("important")
 		submit_button.clicked.connect(self.submitCommand)
 		buttons_layout.addWidget(submit_button)
 		cancel_button = QPushButton("Cancel")

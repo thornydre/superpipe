@@ -11,7 +11,7 @@ from os import listdir
 import Theme
 
 class ProjectSettingsDialogPySide(QDialog):
-	def __init__(self, parent=None, project=None, project_options_path=None):
+	def __init__(self, parent=None, project=None):
 		super(ProjectSettingsDialogPySide, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		self.project = project
@@ -85,6 +85,7 @@ class ProjectSettingsDialogPySide(QDialog):
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Save")
+		submit_button.setObjectName("important")
 		submit_button.clicked.connect(self.submitCommand)
 		buttons_layout.addWidget(submit_button)
 		cancel_button = QPushButton("Cancel")

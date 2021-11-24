@@ -35,9 +35,11 @@ class NewShotDialogPySide(QDialog):
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Create shot")
+		submit_button.setObjectName("important")
 		submit_button.clicked.connect(self.submitCommand)
 		buttons_layout.addWidget(submit_button)
 		sequence_button = QPushButton("Create sequence")
+		submit_button.setObjectName("important")
 		sequence_button.clicked.connect(self.addSequenceCommand)
 		buttons_layout.addWidget(sequence_button)
 		cancel_button = QPushButton("Cancel")

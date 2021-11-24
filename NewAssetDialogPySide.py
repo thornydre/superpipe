@@ -81,6 +81,7 @@ class NewAssetDialogPySide(QDialog):
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Create asset")
+		submit_button.setObjectName("important")
 		submit_button.clicked.connect(self.submitCommand)
 		buttons_layout.addWidget(submit_button)
 		cancel_button = QPushButton("Cancel")

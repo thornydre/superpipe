@@ -68,6 +68,7 @@ class PreferencesDialogPySide(QDialog):
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Save")
+		submit_button.setObjectName("important")
 		submit_button.clicked.connect(self.submitCommand)
 		buttons_layout.addWidget(submit_button)
 		cancel_button = QPushButton("Cancel")
