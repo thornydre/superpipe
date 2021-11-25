@@ -2,25 +2,28 @@
 
 #EXTERNAL LIBRARIES : pyside6, pillow, watchdog, numpy, opencv-python
 
+from PySide6.QtWidgets import *
+from PySide6.QtCore import Qt, QFile, QTextStream
+from PySide6.QtGui import *
 from Shot import *
 from Asset import *
 from Project import *
 from Resources import *
 from ListsObserver import *
-from PySide6.QtWidgets import *
-from PySide6.QtCore import Qt, QFile, QTextStream
-from PySide6.QtGui import *
 from os import path, mkdir
 from urllib.parse import urlsplit
 from PIL import ImageTk
 # from watchdog.observers import Observer
 
+import sys
+import PIL
+import subprocess
+import webbrowser
+# import queue
+
 from CustomSlider import *
 from CustomVideoPlayer import *
 # from StatisticsView import *
-
-import sys
-import PIL
 from NewProjectDialog import *
 from NewAssetDialog import *
 from NewShotDialog import *
@@ -29,9 +32,6 @@ from ProjectSettingsDialog import *
 from PreferencesDialog import *
 from AboutDialog import *
 from ManageBackupsDialog import *
-import subprocess
-import webbrowser
-# import queue
 
 
 class SuperPipe(QMainWindow):
@@ -179,7 +179,6 @@ class SuperPipe(QMainWindow):
 		main_widget = QWidget()
 
 		main_layout = QHBoxLayout()
-
 
 		#################
 		## LEFT COLUMN ##
@@ -1822,7 +1821,7 @@ def main():
 	app = QApplication(sys.argv)
 
 	file = QFile("./assets/dark.qss")
-	file.open(QFile.ReadOnly | QFile.Text)
+	file.open(QFile.ReadOnly|QFile.Text)
 	stream = QTextStream(file)
 	app.setStyleSheet(stream.readAll())
 
