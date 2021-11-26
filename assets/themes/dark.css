@@ -46,7 +46,7 @@ QListWidget::item:selected{
 }
 
 QScrollBar:vertical{
-	background-color: #2A2929;
+	background-color: transparent !important;
 	width: 15px;
 	margin: 15px 3px 15px 3px;
 	border: 1px transparent #2A2929;
@@ -54,7 +54,7 @@ QScrollBar:vertical{
 }
 
 QScrollBar::handle:vertical{
-	background-color: #605F5F;
+	background-color: #555555;
 	min-height: 5px;
 	border-radius: 4px;
 }
@@ -77,7 +77,7 @@ QScrollBar::add-line:vertical{
 	subcontrol-origin: margin;
 }
 
-QScrollBar::sub-line:vertical:hover,QScrollBar::sub-line:vertical:on{
+QScrollBar::sub-line:vertical:hover, QScrollBar::sub-line:vertical:on{
 	border-image: url(:/qss_icons/rc/up_arrow.png);
 	height: 10px;
 	width: 10px;
@@ -99,4 +99,29 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical{
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical{
 	background: none;
+}
+
+QTabWidget::pane{
+	background-color: #282828;
+	border: 2px solid #282828;
+}
+
+QTabBar::tab{
+	background: #333333;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	min-width: 8ex;
+	padding: 5px;
+}
+
+QTabBar::tab:selected{
+	background: #282828;
+}
+
+QTabBar::tab:!selected{
+	margin-top: 2px;
+}
+
+QMenuBar::item:selected{
+	background: #666666;
 }

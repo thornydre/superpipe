@@ -126,7 +126,7 @@ dmypy.json
 
 *.conf
 
-options.spi
+settings.spi
 *.pyc
 *.pyw
 *test*

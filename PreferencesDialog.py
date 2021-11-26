@@ -4,6 +4,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from Resources import *
 from os import listdir, path
+from Settings import *
 
 
 class PreferencesDialog(QDialog):
@@ -12,57 +13,93 @@ class PreferencesDialog(QDialog):
 
 		self.validate = True
 
-		self.setWindowTitle("Super Pipe || Preferences")
+		settings = Settings()
 
+		self.setWindowTitle("Super Pipe || Preferences")
+		
 		main_layout = QVBoxLayout()
 
+		tab_widget = QTabWidget()
+
+		softwares_widget = QWidget()
+		softwares_layout = QVBoxLayout()
+
 		maya_label = QLabel("Path to Maya :")
-		main_layout.addWidget(maya_label)
+		softwares_layout.addWidget(maya_label)
 
 		maya_layout = QHBoxLayout()
 		self.maya_path_textfield = QLineEdit()
-		self.maya_path_textfield.setText(Resources.readLine("assets/options.spi", 3))
+		self.maya_path_textfield.setText(settings.getSetting("maya_path"))
 		maya_layout.addWidget(self.maya_path_textfield)
 		maya_button = QPushButton("Browse")
 		maya_button.clicked.connect(self.mayaPathCommand)
 		maya_layout.addWidget(maya_button)
-		main_layout.addLayout(maya_layout)
+		softwares_layout.addLayout(maya_layout)
 
 		houdini_label = QLabel("Path to Houdini :")
-		main_layout.addWidget(houdini_label)
+		softwares_layout.addWidget(houdini_label)
 
 		houdini_layout = QHBoxLayout()
 		self.houdini_path_textfield = QLineEdit()
-		self.houdini_path_textfield.setText(Resources.readLine("assets/options.spi", 4))
+		self.houdini_path_textfield.setText(settings.getSetting("houdini_path"))
 		houdini_layout.addWidget(self.houdini_path_textfield)
 		houdini_button = QPushButton("Browse")
 		houdini_button.clicked.connect(self.houdiniPathCommand)
 		houdini_layout.addWidget(houdini_button)
-		main_layout.addLayout(houdini_layout)
+		softwares_layout.addLayout(houdini_layout)
 
 		blender_label = QLabel("Path to Blender :")
-		main_layout.addWidget(blender_label)
+		softwares_layout.addWidget(blender_label)
 
 		blender_layout = QHBoxLayout()
 		self.blender_path_textfield = QLineEdit()
-		self.blender_path_textfield.setText(Resources.readLine("assets/options.spi", 5))
+		self.blender_path_textfield.setText(settings.getSetting("blender_path"))
 		blender_layout.addWidget(self.blender_path_textfield)
 		blender_button = QPushButton("Browse")
 		blender_button.clicked.connect(self.blenderPathCommand)
 		blender_layout.addWidget(blender_button)
-		main_layout.addLayout(blender_layout)
+		softwares_layout.addLayout(blender_layout)
 
 		vlc_label = QLabel("Path to VLC :")
-		main_layout.addWidget(vlc_label)
+		softwares_layout.addWidget(vlc_label)
 
 		vlc_layout = QHBoxLayout()
 		self.vlc_path_textfield = QLineEdit()
-		self.vlc_path_textfield.setText(Resources.readLine("assets/options.spi", 6))
+		self.vlc_path_textfield.setText(settings.getSetting("video_player_path"))
 		vlc_layout.addWidget(self.vlc_path_textfield)
 		vlc_button = QPushButton("Browse")
 		vlc_button.clicked.connect(self.vlcPathCommand)
 		vlc_layout.addWidget(vlc_button)
-		main_layout.addLayout(vlc_layout)
+		softwares_layout.addLayout(vlc_layout)
+
+		softwares_widget.setLayout(softwares_layout)
+
+		tab_widget.addTab(softwares_widget, "Softwares")
+
+		themes_widget = QWidget()
+		themes_layout = QVBoxLayout()
+
+		themes_list = sorted(listdir("assets/themes/"))
+
+		current_theme = settings.getSetting("theme")
+
+		self.radio_buttons = []
+
+		for theme in themes_list:
+			theme_name = path.splitext(theme)[0]
+
+			radio_button = QRadioButton(theme_name)
+			self.radio_buttons.append(radio_button)
+			themes_layout.addWidget(radio_button)
+
+			if current_theme == theme_name:
+				radio_button.setChecked(True)
+
+		themes_widget.setLayout(themes_layout)
+
+		tab_widget.addTab(themes_widget, "Themes")
+
+		main_layout.addWidget(tab_widget)
 
 		buttons_layout = QHBoxLayout()
 		submit_button = QPushButton("Save")
@@ -117,18 +154,21 @@ class PreferencesDialog(QDialog):
 		self.houdini_path = self.houdini_path_textfield.text()
 		self.blender_path = self.blender_path_textfield.text()
 		self.vlc_path = self.vlc_path_textfield.text()
-		# theme = path.splitext(self.themes_list[self.rb_theme.get()])[0]
-		if self.maya_path and self.houdini_path and self.blender_path and self.vlc_path:
+		for radio_button in self.radio_buttons:
+			if radio_button.isChecked():
+				self.theme = radio_button.text()
+		if self.maya_path and self.houdini_path and self.blender_path and self.vlc_path and self.theme:
 			self.close()
 
 
 	def getData(self):
 		if self.validate:
-			if self.maya_path and self.houdini_path and self.blender_path and self.vlc_path:
+			if self.maya_path and self.houdini_path and self.blender_path and self.vlc_path and self.theme:
 				result = {}
 				result["maya_path"] = self.maya_path
 				result["houdini_path"] = self.houdini_path
 				result["blender_path"] = self.blender_path
 				result["vlc_path"] = self.vlc_path
+				result["theme"] = self.theme
 				return result
 		return None

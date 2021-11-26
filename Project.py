@@ -112,7 +112,7 @@ class Project:
 		for shot_name in listdir(self.directory + "/05_shot/"):
 			if re.match(r"s[0-9][0-9]p[0-9][0-9][0-9]", shot_name):
 				shot = Shot(self.directory, shot_name)
-				self.shot_list.append((shot.getShotNb(), shot.getShotName()))
+				self.shot_list.append(shot)
 
 
 	def updateAssetList(self):
@@ -120,11 +120,12 @@ class Project:
 
 		exclude = ["superpipe"]
 
-		for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset", topdown = True):
+		for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset", topdown=True):
 			if any([i in sub_dirs for i in exclude]):
 				sub_dirs[:] = []
 				if not "backup" in cur_dir:
-					self.asset_list.append((path.basename(cur_dir), path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset", "")))
+					asset = Asset(self.directory, path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset/", ""), path.basename(cur_dir))
+					self.asset_list.append(asset)
 
 
 	def getDirectory(self):
@@ -151,7 +152,7 @@ class Project:
 		current_sequence = 1
 
 		if self.shot_list:
-			current_sequence = Shot(self.directory, self.shot_list[-1][1]).getSequence()
+			current_sequence = Shot(self.directory, self.shot_list[-1].getShotName()).getSequence()
 
 		if shot_sequence >= current_sequence:
 			shot_nb = len(self.shot_list) + 1
@@ -164,21 +165,21 @@ class Project:
 			shots_to_rename = []
 
 			for shot in self.shot_list:
-				if Resources.makeShotNbs(shot[1])[1] > shot_sequence :
+				if Resources.makeShotNbs(shot.getShotName())[1] > shot_sequence :
 					shots_to_rename.append(shot)
 
 			shots_to_rename = shots_to_rename[::-1]
 
 			for shot_to_rename in shots_to_rename:
-				cur_shot = Shot(self.directory, shot_to_rename[1])
+				cur_shot = Shot(self.directory, shot_to_rename.getShotName())
 
-				cur_shot.renameShot(Resources.makeShotName(shot_to_rename[0] + 1, cur_shot.getSequence()))
+				cur_shot.renameShot(Resources.makeShotName(shot_to_rename.getShotNb() + 1, cur_shot.getSequence()))
 
-			shot_nb = shots_to_rename[-1][0]
+			shot_nb = shots_to_rename[-1].getShotNb()
 
 			shot = Shot(self.directory, Resources.makeShotName(shot_nb, shot_sequence), software = self.default_software)
 
-		self.shot_list.append((shot.getShotNb(), shot.getShotName()))
+		self.shot_list.append(shot)
 
 		self.updateShotList()
 
@@ -193,9 +194,9 @@ class Project:
 		for i in range(len(self.shot_list) - shot.getShotNb()):
 			n = i + shot.getShotNb()
 
-			cur_shot = Shot(self.directory, self.shot_list[n][1])
+			cur_shot = Shot(self.directory, self.shot_list[n].getShotName())
 
-			cur_shot.renameShot(Resources.makeShotName(self.shot_list[n - 1][0], cur_shot.getSequence()))
+			cur_shot.renameShot(Resources.makeShotName(self.shot_list[n - 1].getShotNb(), cur_shot.getSequence()))
 
 		self.updateShotList()
 
@@ -204,7 +205,7 @@ class Project:
 		shot = Shot(self.directory, shot_name)
 		shot_name_backup = shot.getShotName()
 
-		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb()][1])
+		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb()].getShotName())
 		swap_shot_name_backup = swap_shot.getShotName()
 
 		shot.renameShot("s00p000")
@@ -218,7 +219,7 @@ class Project:
 		shot = Shot(self.directory, shot_name)
 		shot_name_backup = shot.getShotName()
 
-		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb() - 2][1])
+		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb() - 2].getShotName())
 		swap_shot_name_backup = swap_shot.getShotName()
 
 		shot.renameShot("s00p000")
@@ -230,11 +231,11 @@ class Project:
 
 	def createAsset(self, asset_name, second_path, software):
 		for check_asset in self.asset_list:
-			if asset_name == check_asset[0]:
+			if asset_name == check_asset.getAssetName():
 				return False
 
 		asset = Asset(self.directory, second_path, asset_name, software)
-		self.asset_list.append((asset_name, second_path))
+		self.asset_list.append(asset)
 
 		return True
 
@@ -249,7 +250,7 @@ class Project:
 		filtered_asset_list = []
 
 		for asset in self.asset_list:
-			if re.search(filter_str, asset[0]):
+			if re.search(filter_str, asset.getAssetName()):
 				filtered_asset_list.append(asset)
 
 		return filtered_asset_list

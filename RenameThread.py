@@ -31,6 +31,6 @@ class UpdatePreviewShotsThread(threading.Thread):
 				if all_picts_path_array:
 					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), max(all_picts_path_array, key = path.getmtime)])
 				else:
-					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.jpg"])
+					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "assets/img/img_not_available.jpg"])
 
 		self.datas.put(all_shots_preview)

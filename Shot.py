@@ -78,7 +78,7 @@ class Shot:
 					makedirs(self.shot_directory + "/sourceimages/imagePlane")
 					makedirs(self.shot_directory + "/sourceimages/imageSequence")
 
-					copyfile("src/workspace.mel", self.shot_directory + "/workspace.mel")
+					copyfile("assets/src/workspace.mel", self.shot_directory + "/workspace.mel")
 
 				elif self.software == "houdini":
 					makedirs(self.shot_directory + "/abc")
@@ -215,10 +215,10 @@ class Shot:
 
 	def setShot(self, res):
 		if self.software == "maya":
-			copyfile("src/set_up_file_shot_maya.ma", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
+			copyfile("assets/src/set_up_file_shot_maya.ma", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma")
 			Resources.insertAtLine(self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.ma", "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + self.frame_range) + " -ast 1001 -aet " + str(1000 + self.frame_range) + "\";\nselect -ne :defaultResolution;\n\tsetAttr \".w\" " + str(res[0]) + ";\n\tsetAttr \".h\" " + str(res[1]) + ";", -1)
 		elif self.software == "blender":
-			copyfile("src/set_up_file_shot_blender.blend", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.blend")
+			copyfile("assets/src/set_up_file_shot_blender.blend", self.shot_directory + "/scenes/" + self.shot_name + "_01_layout_v01.blend")
 
 
 	def setFrameRange(self, frame_range):
@@ -437,7 +437,7 @@ class Shot:
 				if version != 0:
 					copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_02_blocking_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v01.jpg")
 			elif self.step == "Rendering":
-				copyfile("src/set_up_file_shot_" + self.software + ext, self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01" + ext)
+				copyfile("assets/src/set_up_file_shot_" + self.software + ext, self.shot_directory + "/scenes/" + self.shot_name + "_04_rendering_v01" + ext)
 				if version != 0:
 					copyfile(self.shot_directory + "/images/screenshots/" + self.shot_name + "_03_splining_v" + version_str + ".jpg", self.shot_directory + "/images/screenshots/" + self.shot_name + "_04_rendering_v01.jpg")
 			return True

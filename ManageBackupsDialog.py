@@ -4,6 +4,7 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from Resources import *
 from os import listdir
+from shutil import rmtree
 
 class ManageBackupsDialog(QDialog):
 	def __init__(self, parent=None, project=None):

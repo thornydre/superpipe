@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from os import makedirs, path, listdir
-from shutil import copyfile, copytree
+from shutil import copyfile, copytree, rmtree
 
 import time
 
@@ -30,8 +30,6 @@ class Asset:
 				f.close()
 
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
-
-				# print(self.software)
 
 				if self.software == "maya" or self.software == "blender":
 					makedirs(self.directory + "/assets")
@@ -79,7 +77,7 @@ class Asset:
 					makedirs(self.directory + "/sourceimages/imagePlane")
 					makedirs(self.directory + "/sourceimages/imageSequence")
 
-					copyfile("src/workspace.mel", self.directory + "/workspace.mel")
+					copyfile("assets/src/workspace.mel", self.directory + "/workspace.mel")
 
 				elif self.software == "houdini":
 					makedirs(self.directory + "/abc")
@@ -148,6 +146,10 @@ class Asset:
 		return self.asset_name
 
 
+	def getSecondPath(self):
+		return self.second_path
+
+
 	def getDirectory(self):
 		return self.directory
 
@@ -213,15 +215,15 @@ class Asset:
 
 	def setAsset(self):
 		if self.software == "maya":
-			copyfile("src/set_up_file_asset_maya_lookdev_renderman.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
-			copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
-			copyfile("src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya_lookdev_renderman.ma", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya.ma", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
 		elif self.software == "houdini":
-			copyfile("src/set_up_file_asset_houdini.hip", self.directory + "/" + self.asset_name + "_v01.hip")
+			copyfile("assets/src/set_up_file_asset_houdini.hip", self.directory + "/" + self.asset_name + "_v01.hip")
 		elif self.software == "blender":
-			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.blend")
-			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.blend")
-			copyfile("src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_02_rigging_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", self.directory + "/scenes/" + self.asset_name + "_01_modeling_v01.blend")
 
 
 	def isSet(self):

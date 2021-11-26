@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-#EXTERNAL LIBRARIES : pyside6, pillow, watchdog, numpy, opencv-python
-
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QFile, QTextStream
 from PySide6.QtGui import *
+from Settings import *
 from Shot import *
 from Asset import *
 from Project import *
@@ -36,28 +35,36 @@ from ManageBackupsDialog import *
 
 class SuperPipe(QMainWindow):
 	def __init__(self, app):
-		if not path.isfile("assets/options.spi"):
-			with open("assets/options.spi", "w") as f:
-				f.write("\ntheme_default\nC:/Program Files/Autodesk/Maya2017/bin/maya.exe\nC:/Program Files/Houdini/houdini.exe\nC:/Program Files/Blender/blender.exe\nC:/Program Files/VLC/vlc.exe\n\n")
-			f.close()
+		self.settings = Settings()
 
 		super(SuperPipe, self).__init__()
 
 		self.app = app
+
+		file = QFile("./assets/themes/" + self.settings.getSetting("theme") + ".css")
+		file.open(QFile.ReadOnly|QFile.Text)
+		stream = QTextStream(file)
+		self.app.setStyleSheet(stream.readAll())
 
 		self.app.setOverrideCursor(Qt.WaitCursor)
 
 		self.current_project = None
 		self.version_mode = True
 
-		self.maya_path = Resources.readLine("assets/options.spi", 3)
-		self.houdini_path = Resources.readLine("assets/options.spi", 4)
-		self.blender_path = Resources.readLine("assets/options.spi", 5)
-		self.vlc_path = Resources.readLine("assets/options.spi", 6)
+		self.maya_path = self.settings.getSetting("maya_path")
+		self.houdini_path = self.settings.getSetting("houdini_path")
+		self.blender_path = self.settings.getSetting("blender_path")
+		self.vlc_path = self.settings.getSetting("video_player_path")
 
 		self.initUI()
 
-		project_directory = Resources.readLine("assets/options.spi", 1)
+		project_directory = self.settings.getSetting("project_dir")
+
+		self.add_asset_action.setEnabled(False)
+		self.add_shot_action.setEnabled(False)
+		self.project_settings_action.setEnabled(False)
+		self.project_statistics_action.setEnabled(False)
+		self.clean_backups_action.setEnabled(False)
 
 		if project_directory:
 			if path.isdir(project_directory):
@@ -93,7 +100,7 @@ class SuperPipe(QMainWindow):
 
 
 	def initUI(self):
-		self.setWindowIcon(QIcon("img/icon.ico"))
+		self.setWindowIcon(QIcon("assets/img/icon.ico"))
 		self.setWindowTitle("Super Pipe")
 
 		######################
@@ -208,7 +215,7 @@ class SuperPipe(QMainWindow):
 		self.asset_list = QTreeWidget()
 		self.asset_list.setHeaderHidden(True)
 		self.asset_list.currentItemChanged.connect(self.assetListCommand)
-		self.categories = {"character":QTreeWidgetItem(["CHARACTER"]), "fx":QTreeWidgetItem(["FX"]), "props":QTreeWidgetItem(["PROPS"]), "set":QTreeWidgetItem(["SET"])}
+		self.categories = {"character": QTreeWidgetItem(["CHARACTER"]), "fx": QTreeWidgetItem(["FX"]), "props": QTreeWidgetItem(["PROPS"]), "set": QTreeWidgetItem(["SET"])}
 		for cat in self.categories:
 			self.asset_list.addTopLevelItem(self.categories[cat])
 
@@ -271,7 +278,7 @@ class SuperPipe(QMainWindow):
 
 		self.asset_label = QLabel("NO ASSET SELECTED")
 		self.delete_asset_button = QPushButton("")
-		self.delete_asset_button.setIcon(QIcon(QPixmap("img/red_cross.gif")))
+		self.delete_asset_button.setIcon(QIcon(QPixmap("assets/img/red_cross.gif")))
 		self.delete_asset_button.clicked.connect(self.deleteAssetCommand)
 		self.rename_asset_button = QPushButton("Rename asset")
 		self.rename_asset_button.clicked.connect(self.renameAssetCommand)
@@ -379,10 +386,10 @@ class SuperPipe(QMainWindow):
 
 		self.up_button = QPushButton("")
 		self.up_button.clicked.connect(self.moveShotUpCommand)
-		self.up_button.setIcon(QIcon(QPixmap("img/arrow_up.gif")))
+		self.up_button.setIcon(QIcon(QPixmap("assets/img/arrow_up.gif")))
 		self.down_button = QPushButton("")
 		self.down_button.clicked.connect(self.moveShotDownCommand)
-		self.down_button.setIcon(QIcon(QPixmap("img/arrow_down.gif")))
+		self.down_button.setIcon(QIcon(QPixmap("assets/img/arrow_down.gif")))
 		
 		dir_button_layout.addWidget(self.up_button)
 		dir_button_layout.addWidget(self.down_button)
@@ -391,7 +398,7 @@ class SuperPipe(QMainWindow):
 
 		self.shot_label = QLabel("NO SHOT SELECTED")
 		self.delete_shot_button = QPushButton("")
-		self.delete_shot_button.setIcon(QIcon(QPixmap("img/red_cross.gif")))
+		self.delete_shot_button.setIcon(QIcon(QPixmap("assets/img/red_cross.gif")))
 		self.delete_shot_button.clicked.connect(self.deleteShotCommand)
 		self.set_shot_button = QPushButton("Set shot")
 		self.set_shot_button.clicked.connect(self.setShotCommand)
@@ -648,7 +655,8 @@ class SuperPipe(QMainWindow):
 		if project:
 			self.current_project = Project(project["directory"])
 
-			Resources.writeAtLine("assets/options.spi", project["directory"], 1)
+			self.settings.setSetting("project_dir", project["directory"])
+			self.settings.saveSettings()
 
 			self.add_shot_button.setEnabled(True)
 			self.add_asset_button.setEnabled(True)
@@ -679,8 +687,8 @@ class SuperPipe(QMainWindow):
 				self.current_project = Project(directory)
 
 				if self.current_project.isValid():
-
-					Resources.writeAtLine("assets/options.spi", directory, 1)
+					self.settings.setSetting("project_dir", directory)
+					self.settings.saveSettings()
 
 					self.add_shot_button.setEnabled(True)
 					self.add_asset_button.setEnabled(True)
@@ -1343,40 +1351,40 @@ class SuperPipe(QMainWindow):
 		assets = self.current_project.filterAssetList(self.asset_filter_textfield.text())
 
 		for asset in assets:
-			if asset[0] != "backup":
-				if path.isdir(self.current_project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
-					cur_asset = Asset(self.current_project.getDirectory(), asset[1], asset[0])
+			if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
+				asset_subfolders = asset.getSecondPath().strip("/").split("/")
+				current_category = self.categories[asset_subfolders[0].lower()]
 
-					asset_subfolders = asset[1].strip("/").split("/")
-					current_category = self.categories[asset_subfolders[0].lower()]
 
-					for subfolder in asset_subfolders[1:]:
-						if not self.asset_list.findItems(subfolder.lower(), Qt.MatchExactly):
-							new_item = QTreeWidgetItem([subfolder.lower()])
-							current_category.addChild(new_item)
-							current_category = new_item
-
-					if self.asset_list.findItems(asset[0], Qt.MatchExactly):
-						self.dialog("ERROR", "W", "The asset \"" + asset[1].upper() + "/" + asset[0] + "\" already exists !")
+				for subfolder in asset_subfolders[1:]:
+					if not self.asset_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive):
+						new_item = QTreeWidgetItem([subfolder.upper()])
+						current_category.addChild(new_item)
+						current_category = new_item
 					else:
-						item = QTreeWidgetItem([asset[0]])
-						priority = cur_asset.getPriority()
+						current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive)[0]
 
-						if cur_asset.getDone():
-							item.setBackground(0, QBrush(QColor(137, 193, 127)))
-						elif priority == 0:
-							item.setBackground(0, QBrush())
-						elif priority == 1:
-							item.setBackground(0, QBrush(QColor(244, 226, 85)))
-						elif priority == 2:
-							item.setBackground(0, QBrush(QColor(239, 180, 98)))
-						elif priority == 3:
-							item.setBackground(0, QBrush(QColor(229, 82, 82)))
-
-						current_category.addChild(item)
-
+				if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly):
+					self.dialog("ERROR", "W", "The asset \"" + asset.getSecondPath().upper() + "/" + asset.getAssetName() + "\" already exists !")
 				else:
-					self.dialog("ERROR", "W", "The asset \"" + asset[0] + "\" has a problem !")
+					item = QTreeWidgetItem([asset.getAssetName()])
+					priority = asset.getPriority()
+
+					if asset.getDone():
+						item.setBackground(0, QBrush(QColor(137, 193, 127)))
+					elif priority == 0:
+						item.setBackground(0, QBrush())
+					elif priority == 1:
+						item.setBackground(0, QBrush(QColor(244, 226, 85)))
+					elif priority == 2:
+						item.setBackground(0, QBrush(QColor(239, 180, 98)))
+					elif priority == 3:
+						item.setBackground(0, QBrush(QColor(229, 82, 82)))
+
+					current_category.addChild(item)
+
+			else:
+				self.dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" has a problem !")
 
 
 	def updateShotListView(self):
@@ -1385,15 +1393,13 @@ class SuperPipe(QMainWindow):
 		shots = self.current_project.getShotList()
 
 		for shot in shots:
-			if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot[1] + "/superpipe"):
-				item = QListWidgetItem(shot[1])
-				self.shot_list.insertItem(shot[0], item)
+			if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot.getShotName() + "/superpipe"):
+				item = QListWidgetItem(shot.getShotName())
+				self.shot_list.insertItem(shot.getShotNb(), item)
 
-				cur_shot = Shot(self.current_project.getDirectory(), shot[1])
+				priority = shot.getPriority()
 
-				priority = cur_shot.getPriority()
-
-				if cur_shot.isDone():
+				if shot.isDone():
 					item.setBackground(QBrush(QColor(137, 193, 127)))
 				elif priority == 1:
 					item.setBackground(QBrush(QColor(244, 226, 85)))
@@ -1403,7 +1409,7 @@ class SuperPipe(QMainWindow):
 					item.setBackground(QBrush(QColor(229, 82, 82)))
 
 			else:
-				self.dialog("ERROR", "W", "The shot " + shot[1] + " has a problem !")
+				self.dialog("ERROR", "W", "The shot " + shot.getShotName() + " has a problem !")
 
 
 	def updateVersionListView(self, shot = None, asset = None):
@@ -1609,7 +1615,7 @@ class SuperPipe(QMainWindow):
 				if all_picts_path_array:
 					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), max(all_picts_path_array, key = path.getmtime)])
 				else:
-					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "img/img_not_available.jpg"])
+					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "assets/img/img_not_available.jpg"])
 
 		for nb, name, img in all_shots_preview:
 			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter)
@@ -1778,10 +1784,17 @@ class SuperPipe(QMainWindow):
 			self.blender_path = preferences["blender_path"]
 			self.vlc_path = preferences["vlc_path"]
 
-			Resources.writeAtLine("assets/options.spi", preferences["maya_path"], 3)
-			Resources.writeAtLine("assets/options.spi", preferences["houdini_path"], 4)
-			Resources.writeAtLine("assets/options.spi", preferences["blender_path"], 5)
-			Resources.writeAtLine("assets/options.spi", preferences["vlc_path"], 6)
+			self.settings.setSetting("maya_path", preferences["maya_path"])
+			self.settings.setSetting("houdini_path", preferences["houdini_path"])
+			self.settings.setSetting("blender_path", preferences["blender_path"])
+			self.settings.setSetting("video_player_path", preferences["vlc_path"])
+			self.settings.setSetting("theme", preferences["theme"])
+			self.settings.saveSettings()
+
+			file = QFile("./assets/themes/" + preferences["theme"] + ".css")
+			file.open(QFile.ReadOnly|QFile.Text)
+			stream = QTextStream(file)
+			self.app.setStyleSheet(stream.readAll())
 
 
 	def about(self):
@@ -1819,11 +1832,6 @@ class SuperPipe(QMainWindow):
 
 def main():
 	app = QApplication(sys.argv)
-
-	file = QFile("./assets/dark.qss")
-	file.open(QFile.ReadOnly|QFile.Text)
-	stream = QTextStream(file)
-	app.setStyleSheet(stream.readAll())
 
 	window = SuperPipe(app)
 	window.showMaximized()

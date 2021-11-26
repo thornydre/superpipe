@@ -54,23 +54,25 @@ class NewAssetDialog(QDialog):
 		assets = project.getAssetList()
 
 		for asset in assets:
-			if asset[0] != "backup":
-				if path.isdir(project.getDirectory() + "/04_asset" + asset[1] + "/" + asset[0] + "/superpipe"):
-					cur_asset = Asset(project.getDirectory(), asset[1], asset[0])
+			if asset.getAssetName() != "backup":
+				if path.isdir(project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
+					cur_asset = Asset(project.getDirectory(), asset.getSecondPath(), asset.getAssetName())
 
-					asset_subfolders = asset[1].strip("/").split("/")
+					asset_subfolders = asset.getSecondPath().strip("/").split("/")
 					current_category = self.categories[asset_subfolders[0].lower()]
 
 					for subfolder in asset_subfolders[1:]:
-						if not self.categories_list.findItems(subfolder.lower(), Qt.MatchExactly):
-							new_item = QTreeWidgetItem([subfolder.lower()])
+						if not self.categories_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive):
+							new_item = QTreeWidgetItem([subfolder.upper()])
 							current_category.addChild(new_item)
 							current_category = new_item
+						else:
+							current_category = self.categories_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive)[0]
 				else:
 					dialog = QMessageBox()
 					dialog.setWindowTitle("ERROR")
 					dialog.setIcon(QMessageBox.Warning)
-					dialog.setText("The asset \"" + asset[0] + "\" has a problem !")
+					dialog.setText("The asset \"" + asset.getAssetName() + "\" has a problem !")
 					dialog.exec_()
 
 		main_layout.addWidget(self.categories_list)
