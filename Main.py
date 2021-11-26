@@ -966,8 +966,8 @@ class SuperPipe(QMainWindow):
 									self.asset_version_comment_title_label.setVisible(False)
 									self.asset_version_comment_label.setVisible(False)
 
-						else:
-							dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" is not available !")
+							else:
+								self.dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" is not available !")
 
 				else:
 					self.asset_label.setText("NO ASSET SELECTED")
