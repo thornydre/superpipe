@@ -129,5 +129,6 @@ dmypy.json
 settings.spi
 *.pyc
 *.pyw
+*.blend1
 *test*
 build

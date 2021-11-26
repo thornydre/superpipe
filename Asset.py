@@ -2,6 +2,7 @@
 
 from os import makedirs, path, listdir
 from shutil import copyfile, copytree, rmtree
+from Resources import *
 
 import time
 
@@ -11,7 +12,7 @@ class Asset:
 		self.asset_name = asset_name
 		self.project_dir = directory
 		self.second_path = second_path
-		self.directory = directory + "/04_asset" + self.second_path + "/" + self.asset_name
+		self.directory = directory + "/04_asset/" + self.second_path + "/" + self.asset_name
 		self.priority = 0
 		self.modeling_done = 0
 		self.rig_done = 0

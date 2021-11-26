@@ -4,8 +4,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QFile, QTextStream
 from PySide6.QtGui import *
 from Settings import *
-from Shot import *
-from Asset import *
 from Project import *
 from Resources import *
 from ListsObserver import *
@@ -318,24 +316,30 @@ class SuperPipe(QMainWindow):
 
 		asset_state_line_layout.addWidget(self.priority_asset_label)
 		asset_state_line_layout.addWidget(self.priority_asset_menu)
+		asset_state_line_layout.addStretch(1)
 		asset_state_line_layout.addWidget(self.modeling_done_asset_button)
 		asset_state_line_layout.addWidget(self.rig_done_asset_button)
 		asset_state_line_layout.addWidget(self.lookdev_done_asset_button)
 		asset_state_line_layout.addWidget(self.done_asset_button)
+		asset_state_line_layout.addStretch(1)
 
 		main_asset_layout.addLayout(asset_state_line_layout)
 
 		## Asset pictures ##
+		asset_picture_widget = QWidget()
 		asset_picture_layout = QVBoxLayout()
 
 		self.asset_pict_title_label = QLabel("This asset :")
-
 		self.asset_pict_widget = QLabel()
 
 		asset_picture_layout.addWidget(self.asset_pict_title_label)
 		asset_picture_layout.addWidget(self.asset_pict_widget)
+		asset_picture_layout.addStretch(1)
 
-		main_asset_layout.addLayout(asset_picture_layout)
+		asset_picture_widget.setMinimumHeight(350)
+		asset_picture_widget.setLayout(asset_picture_layout)
+
+		main_asset_layout.addWidget(asset_picture_widget)
 
 		## Asset version actions ##
 		asset_actions_layout = QVBoxLayout()
@@ -453,10 +457,12 @@ class SuperPipe(QMainWindow):
 
 		shot_state_line_layout.addWidget(self.priority_shot_label)
 		shot_state_line_layout.addWidget(self.priority_shot_menu)
+		shot_state_line_layout.addStretch(1)
 		shot_state_line_layout.addWidget(self.downgrade_shot_button)
 		shot_state_line_layout.addWidget(self.step_slider)
 		shot_state_line_layout.addWidget(self.upgrade_shot_button)
 		shot_state_line_layout.addWidget(self.done_shot_button)
+		shot_state_line_layout.addStretch(1)
 
 		main_shot_layout.addLayout(shot_state_line_layout)
 
@@ -469,6 +475,7 @@ class SuperPipe(QMainWindow):
 		self.shot_prev_pict_widget = QLabel()
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_label)
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_widget)
+		shot_prev_picture_layout.addStretch(1)
 		shot_pictures_layout.addLayout(shot_prev_picture_layout)
 
 		shot_current_picture_layout = QVBoxLayout()
@@ -476,8 +483,10 @@ class SuperPipe(QMainWindow):
 		self.shot_pict_widget = QLabel()
 		shot_current_picture_layout.addWidget(self.shot_pict_label)
 		shot_current_picture_layout.addWidget(self.shot_pict_widget)
+		shot_current_picture_layout.addStretch(1)
 		shot_pictures_layout.addLayout(shot_current_picture_layout)
 
+		self.shot_pictures_widget.setMinimumHeight(350)
 		self.shot_pictures_widget.setLayout(shot_pictures_layout)
 
 		main_shot_layout.addWidget(self.shot_pictures_widget)
@@ -491,6 +500,7 @@ class SuperPipe(QMainWindow):
 		self.playblast_player = CustomVideoPlayer(512, 288)
 		shot_current_playblast_layout.addWidget(self.shot_playblast_label)
 		shot_current_playblast_layout.addWidget(self.playblast_player)
+		shot_current_playblast_layout.addStretch(1)
 		shot_playblasts_layout.addLayout(shot_current_playblast_layout)
 
 		self.shot_playblasts_widget.setLayout(shot_playblasts_layout)
@@ -895,7 +905,7 @@ class SuperPipe(QMainWindow):
 						else:
 							is_parent = False
 
-					self.current_project.setSelection(asset_name = selected_asset.text(0), second_path = "/" + "/".join(path_array))
+					self.current_project.setSelection(asset_name=selected_asset.text(0), second_path="/".join(path_array))
 					asset = self.current_project.getSelection()
 
 					if path.isdir(asset.getDirectory()):
@@ -1032,7 +1042,7 @@ class SuperPipe(QMainWindow):
 
 				self.delete_shot_button.setVisible(True)
 
-				self.current_project.setSelection(shot_name = selected_shot)
+				self.current_project.setSelection(shot_name=selected_shot)
 				shot = self.current_project.getSelection()
 
 				if Shot.validShot(shot.getDirectory()):
@@ -1065,10 +1075,10 @@ class SuperPipe(QMainWindow):
 						self.step_slider.setCurrentStep(shot.getStep())
 						if shot.isDone():
 							self.step_slider.setPercentage(100)
-							self.step_slider.setActive(active = False)
+							self.step_slider.setActive(active=False)
 						else:
 							self.step_slider.setPercentage(int(Resources.readLine(shot.getDirectory() + "/superpipe/shot_data.spi", 7)))
-							self.step_slider.setActive(active = True)
+							self.step_slider.setActive(active=True)
 						self.step_slider.setVisible(True)
 
 						self.upgrade_shot_button.setVisible(True)
@@ -1146,7 +1156,7 @@ class SuperPipe(QMainWindow):
 
 					if prev_shot_nb > 0:
 						for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-							if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
+							if re.match(r"s[0-9][0-9]p[0-9][0-9][0-9]", shot_dir):
 								if int(shot_dir[-2:]) == prev_shot_nb:
 									all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
 
@@ -1357,12 +1367,12 @@ class SuperPipe(QMainWindow):
 
 
 				for subfolder in asset_subfolders[1:]:
-					if not self.asset_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive):
+					if not self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive):
 						new_item = QTreeWidgetItem([subfolder.upper()])
 						current_category.addChild(new_item)
 						current_category = new_item
 					else:
-						current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchFixedString|Qt.MatchRecursive)[0]
+						current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive)[0]
 
 				if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly):
 					self.dialog("ERROR", "W", "The asset \"" + asset.getSecondPath().upper() + "/" + asset.getAssetName() + "\" already exists !")
@@ -1600,29 +1610,28 @@ class SuperPipe(QMainWindow):
 
 		all_shots_preview = []
 
-		for shot_dir in listdir(self.current_project.getDirectory() + "/05_shot/"):
-			if re.match(r"s[0-9][0-9]p[0-9][0-9]", shot_dir):
-				all_picts_path = self.current_project.getDirectory() + "/05_shot/" + shot_dir + "/images/screenshots/"
+		i = 0
+		for shot in self.current_project.getShotList():
+			all_picts_path = shot.getPictsPath()
 
-				all_picts_path_array = []
+			all_picts_path_array = []
 
-				for f in listdir(all_picts_path):
-					if path.splitext(f)[1] == ".jpg" or path.splitext(f)[1] == ".gif":
-						all_picts_path_array.append(all_picts_path + f)
+			for f in listdir(all_picts_path):
+				if path.splitext(f)[1] == ".jpg" or path.splitext(f)[1] == ".gif":
+					all_picts_path_array.append(all_picts_path + f)
 
-				cur_shot = Shot(self.current_project.getDirectory(), shot_dir)
+			img = "assets/img/img_not_available.jpg"
+			if all_picts_path_array:
+				img = max(all_picts_path_array, key = path.getmtime)
 
-				if all_picts_path_array:
-					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), max(all_picts_path_array, key = path.getmtime)])
-				else:
-					all_shots_preview.append([cur_shot.getShotNb(), cur_shot.getShotName(), "assets/img/img_not_available.jpg"])
-
-		for nb, name, img in all_shots_preview:
+			shot_name_widget = QLabel(shot.getShotName(), alignment=Qt.AlignHCenter)
 			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter)
 			preview_pixmap = QPixmap(img)
 			shot_preview_widget.setPixmap(preview_pixmap.scaledToWidth(230))
 
-			self.preview_scroll_layout.addWidget(shot_preview_widget, int((nb - 1)/5) * 2, (nb - 1) % 5)
+			self.preview_scroll_layout.addWidget(shot_name_widget, int(i/5) * 2, i % 5)
+			self.preview_scroll_layout.addWidget(shot_preview_widget, int(i/5) * 2, i % 5)
+			i += 1
 
 		self.app.restoreOverrideCursor()
 

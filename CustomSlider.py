@@ -17,7 +17,7 @@ class CustomSlider(QWidget):
 
 		super(CustomSlider, self).__init__()
 
-		self.setMinimumSize(1, 30)
+		self.setMinimumSize(width, height)
 		self.resize(width, height)    
 
 
@@ -44,34 +44,35 @@ class CustomSlider(QWidget):
 		w = size.width()
 		h = size.height()
 
-		qp.setPen(QColor(100, 100, 100))
-		qp.setBrush(QColor(100, 100, 100))
+		qp.setPen(QColor(68, 68, 68))
+		qp.setBrush(QColor(68, 68, 68))
 		qp.drawRect(0, 0, w, h)
 
 		qp.setPen(QColor(184, 184, 255))
 		qp.setBrush(QColor(184, 184, 255))
 		qp.drawRect(0, 0, w * self.percentage * 0.01, h)
 
-		pen = QPen(QColor(20, 20, 20), 1, Qt.SolidLine)
-
+		pen = QPen(QColor(10, 10, 10), 1, Qt.SolidLine)
 		qp.setPen(pen)
 
 		for i in range(self.steps - 1):
 			qp.drawLine(w/self.steps * (i + 1) + 1, 5, w/self.steps * (i + 1) + 1, h - 5)
 
-		i = 0
+		pen = QPen(QColor(255, 255, 255), 1, Qt.SolidLine)
+		qp.setPen(pen)
 
+		i = 0
 		for step_name in self.steps_name:
 			text_bounds = qp.fontMetrics().boundingRect(step_name)
 			fw = text_bounds.width()
 			fh = text_bounds.height()
-			qp.drawText(w/self.steps * i + w/self.steps/2 - fw/2, h/2 + fh/2, step_name)
+			qp.drawText(w/self.steps * i + w/self.steps/2 - fw/2, h/2 + fh/3, step_name)
 			i += 1
 
 		qp.end()
 
 
-	def update(self, e = None):
+	def update(self, e=None):
 		size = self.size()
 		w = size.width()
 		

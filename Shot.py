@@ -3,8 +3,10 @@
 from os import makedirs, path, listdir, rename, remove
 from shutil import copyfile, copytree, rmtree
 from Resources import *
+from Settings import *
 
 import time
+import subprocess
 
 
 class Shot:
@@ -19,6 +21,7 @@ class Shot:
 		self.step = "Layout"
 		self.frame_range = 200
 		self.software = software
+		self.settings = Settings()
 
 		if not path.isdir(self.shot_directory):
 			if self.software:
@@ -151,6 +154,10 @@ class Shot:
 		return self.shot_directory
 
 
+	def getPictsPath(self):
+		return self.shot_directory + "/images/screenshots/"
+
+
 	def getSequence(self):
 		return self.sequence
 
@@ -233,7 +240,15 @@ class Shot:
 			if path.splitext(file)[1] == ".ma":
 				Resources.insertAtLine(self.shot_directory + "/scenes/" + file, "setAttr \"sceneConfigurationScriptNode.b\" -type \"string\" \"playbackOptions -min 1001 -max " + str(1000 + frame_range) + " -ast 1001 -aet " + str(1000 + frame_range) + "\";", -1)
 			elif path.splitext(file)[1] == ".blend":
-				print("blender file")
+				text = ("import bpy\n"
+				"bpy.ops.wm.open_mainfile(filepath=\"{0}\")\n"
+				"bpy.context.scene.frame_start = {1}\n"
+				"bpy.context.scene.frame_end = {2}\n"
+				"bpy.context.scene.frame_current = {1}\n"
+				"bpy.ops.wm.save_mainfile()\n"
+				"bpy.ops.wm.quit_blender()").format(self.shot_directory + "/scenes/" + file, 1001, 1000 + frame_range)
+
+				subprocess.Popen([self.settings.getSetting("blender_path"), "-b", "--python-expr", text])
 
 
 	def setResolution(self, res):
