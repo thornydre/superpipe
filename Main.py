@@ -195,8 +195,10 @@ class SuperPipe(QMainWindow):
 		sidebar_left_header_layout = QHBoxLayout()
 
 		self.add_asset_button = QPushButton("Add asset")
+		self.add_asset_button.setObjectName("important")
 		self.add_asset_button.clicked.connect(self.addAssetCommand)
 		self.add_shot_button = QPushButton("Add shot")
+		self.add_shot_button.setObjectName("important")
 		self.add_shot_button.clicked.connect(self.addShotCommand)
 
 		sidebar_left_header_layout.addWidget(self.add_asset_button)
@@ -260,8 +262,7 @@ class SuperPipe(QMainWindow):
 		## // DEFAULT HOME PAGE \\ ##
 		main_home_page_layout = QVBoxLayout()
 
-		self.home_page_title_label = QLabel("PLEASE SET AN EXISTING PROJECT, OR CREATE A NEW ONE")
-		self.home_page_title_label.setAlignment(Qt.AlignCenter)
+		self.home_page_title_label = QLabel("PLEASE SET AN EXISTING PROJECT, OR CREATE A NEW ONE", alignment=Qt.AlignHCenter)
 		main_home_page_layout.addWidget(self.home_page_title_label)
 		self.main_home_page_widget = QWidget()
 		self.main_home_page_widget.setLayout(main_home_page_layout)
@@ -275,8 +276,10 @@ class SuperPipe(QMainWindow):
 		asset_info_layout = QHBoxLayout()
 
 		self.asset_label = QLabel("NO ASSET SELECTED")
+		self.asset_label.setFixedHeight(50)
 		self.delete_asset_button = QPushButton("")
 		self.delete_asset_button.setIcon(QIcon(QPixmap("assets/img/red_cross.gif")))
+		self.delete_asset_button.setObjectName("icons")
 		self.delete_asset_button.clicked.connect(self.deleteAssetCommand)
 		self.rename_asset_button = QPushButton("Rename asset")
 		self.rename_asset_button.clicked.connect(self.renameAssetCommand)
@@ -302,16 +305,21 @@ class SuperPipe(QMainWindow):
 		asset_state_line_layout = QHBoxLayout()
 
 		self.priority_asset_label = QLabel("Priority :")
+		self.priority_asset_label.setFixedHeight(30)
 		self.priority_asset_menu = QComboBox()
 		self.priority_asset_menu.addItems(["Low", "Medium", "High", "Urgent"])
 		self.priority_asset_menu.currentIndexChanged.connect(self.priorityAssetCommand)
 		self.modeling_done_asset_button = QCheckBox("Modeling done")
+		self.modeling_done_asset_button.setFixedWidth(140)
 		self.modeling_done_asset_button.clicked.connect(self.toggleAssetModelingDone)
 		self.rig_done_asset_button = QCheckBox("Rig done")
+		self.rig_done_asset_button.setFixedWidth(140)
 		self.rig_done_asset_button.clicked.connect(self.toggleAssetRigDone)
 		self.lookdev_done_asset_button = QCheckBox("Lookdev done")
+		self.lookdev_done_asset_button.setFixedWidth(140)
 		self.lookdev_done_asset_button.clicked.connect(self.toggleAssetLookdevDone)
 		self.done_asset_button = QCheckBox("Asset done")
+		self.done_asset_button.setFixedWidth(140)
 		self.done_asset_button.clicked.connect(self.toggleAssetDone)
 
 		asset_state_line_layout.addWidget(self.priority_asset_label)
@@ -327,10 +335,13 @@ class SuperPipe(QMainWindow):
 
 		## Asset pictures ##
 		asset_picture_widget = QWidget()
+		asset_picture_widget.setProperty("class", "darker");
 		asset_picture_layout = QVBoxLayout()
 
-		self.asset_pict_title_label = QLabel("This asset :")
-		self.asset_pict_widget = QLabel()
+		self.asset_pict_title_label = QLabel("This asset :", alignment=Qt.AlignHCenter)
+		self.asset_pict_title_label.setProperty("class", "darker");
+		self.asset_pict_widget = QLabel(alignment=Qt.AlignHCenter)
+		self.asset_pict_widget.setProperty("class", "darker");
 
 		asset_picture_layout.addWidget(self.asset_pict_title_label)
 		asset_picture_layout.addWidget(self.asset_pict_widget)
@@ -344,7 +355,9 @@ class SuperPipe(QMainWindow):
 		## Asset version actions ##
 		asset_actions_layout = QVBoxLayout()
 
-		self.open_asset_button = QPushButton("Open selected version")
+		self.open_asset_button = QPushButton("Open selected version", alignment=Qt.AlignHCenter)
+		self.open_asset_button.setObjectName("important")
+		self.open_asset_button.setMaximumWidth(200)
 		self.open_asset_button.clicked.connect(self.openAssetCommand)
 
 		asset_actions_layout.addWidget(self.open_asset_button)
@@ -389,11 +402,13 @@ class SuperPipe(QMainWindow):
 		dir_button_layout = QVBoxLayout()
 
 		self.up_button = QPushButton("")
-		self.up_button.clicked.connect(self.moveShotUpCommand)
 		self.up_button.setIcon(QIcon(QPixmap("assets/img/arrow_up.gif")))
+		self.up_button.setObjectName("icons")
+		self.up_button.clicked.connect(self.moveShotUpCommand)
 		self.down_button = QPushButton("")
-		self.down_button.clicked.connect(self.moveShotDownCommand)
 		self.down_button.setIcon(QIcon(QPixmap("assets/img/arrow_down.gif")))
+		self.down_button.setObjectName("icons")
+		self.down_button.clicked.connect(self.moveShotDownCommand)
 		
 		dir_button_layout.addWidget(self.up_button)
 		dir_button_layout.addWidget(self.down_button)
@@ -401,8 +416,10 @@ class SuperPipe(QMainWindow):
 		shot_info_layout.addLayout(dir_button_layout)
 
 		self.shot_label = QLabel("NO SHOT SELECTED")
+		self.shot_label.setFixedHeight(50)
 		self.delete_shot_button = QPushButton("")
 		self.delete_shot_button.setIcon(QIcon(QPixmap("assets/img/red_cross.gif")))
+		self.delete_shot_button.setObjectName("icons")
 		self.delete_shot_button.clicked.connect(self.deleteShotCommand)
 		self.set_shot_button = QPushButton("Set shot")
 		self.set_shot_button.clicked.connect(self.setShotCommand)
@@ -443,6 +460,7 @@ class SuperPipe(QMainWindow):
 		shot_state_line_layout = QHBoxLayout()
 
 		self.priority_shot_label = QLabel("Priority :")
+		self.priority_shot_label.setFixedHeight(30);
 		self.priority_shot_menu = QComboBox()
 		self.priority_shot_menu.addItems(["Low", "Medium", "High", "Urgent"])
 		self.priority_shot_menu.currentIndexChanged.connect(self.priorityShotCommand)
@@ -468,19 +486,24 @@ class SuperPipe(QMainWindow):
 
 		## Shot pictures ##
 		self.shot_pictures_widget = QWidget()
+		self.shot_pictures_widget.setProperty("class", "darker");
 		shot_pictures_layout = QHBoxLayout()
 
 		shot_prev_picture_layout = QVBoxLayout()
-		self.shot_prev_pict_label = QLabel("Previous shot :")
-		self.shot_prev_pict_widget = QLabel()
+		self.shot_prev_pict_label = QLabel("Previous shot :", alignment=Qt.AlignHCenter)
+		self.shot_prev_pict_label.setProperty("class", "darker");
+		self.shot_prev_pict_widget = QLabel(alignment=Qt.AlignHCenter)
+		self.shot_prev_pict_widget.setProperty("class", "darker");
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_label)
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_widget)
 		shot_prev_picture_layout.addStretch(1)
 		shot_pictures_layout.addLayout(shot_prev_picture_layout)
 
 		shot_current_picture_layout = QVBoxLayout()
-		self.shot_pict_label = QLabel("Current shot :")
-		self.shot_pict_widget = QLabel()
+		self.shot_pict_label = QLabel("Current shot :", alignment=Qt.AlignHCenter)
+		self.shot_pict_label.setProperty("class", "darker");
+		self.shot_pict_widget = QLabel(alignment=Qt.AlignHCenter)
+		self.shot_pict_widget.setProperty("class", "darker");
 		shot_current_picture_layout.addWidget(self.shot_pict_label)
 		shot_current_picture_layout.addWidget(self.shot_pict_widget)
 		shot_current_picture_layout.addStretch(1)
@@ -514,7 +537,9 @@ class SuperPipe(QMainWindow):
 		## Shot version actions ##
 		shot_actions_layout = QVBoxLayout()
 
-		self.open_shot_button = QPushButton("Open selected version")
+		self.open_shot_button = QPushButton("Open selected version", alignment=Qt.AlignHCenter)
+		self.open_shot_button.setObjectName("important")
+		self.open_shot_button.setMaximumWidth(200)
 		self.open_shot_button.clicked.connect(self.openShotCommand)
 
 		shot_actions_layout.addWidget(self.open_shot_button)
@@ -885,13 +910,14 @@ class SuperPipe(QMainWindow):
 
 			if selected_asset:
 				self.main_home_page_widget.setVisible(False)
-				self.main_asset_widget.setVisible(True)
 				self.main_shot_widget.setVisible(False)
 				self.main_preview_widget.setVisible(False)
+				self.main_asset_widget.setVisible(True)
 
 				self.shot_list.clearSelection()
 
 				categories = ["CHARACTER", "FX", "PROPS", "SET"]
+
 
 				if selected_asset.childCount() == 0 and selected_asset.text(0) not in categories:
 					cur_item = selected_asset

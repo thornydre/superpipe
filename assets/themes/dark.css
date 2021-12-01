@@ -9,14 +9,23 @@ QWidget::disabled{
 	color: #666666;
 }
 
+.darker{
+	background-color: #252525;
+}
+
 QPushButton{
 	background-color: #444444;
 	border: 0;
-	padding: 5px;
+	padding: 5px 20px;
 }
 
 QPushButton#important{
 	background-color: #337ab7;
+}
+
+QPushButton#icons{
+	background: none;
+	padding: 2px;
 }
 
 QPushButton::hover{
