@@ -44,21 +44,26 @@ QLineEdit{
 
 QTreeWidget{
 	background-color: #252525;
+	border: none;
 }
 
 QListWidget{
 	background-color: #252525;
+	border: none;
 }
 
 QListWidget::item:selected{
 	background-color: #116cb8;
 }
 
+QScrollBar{
+	background-color: #252525 !important;
+}
+
 QScrollBar:vertical{
-	background-color: transparent !important;
+	background-color: #252525;
 	width: 15px;
 	margin: 15px 3px 15px 3px;
-	border: 1px transparent #2A2929;
 	border-radius: 4px;
 }
 

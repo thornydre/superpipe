@@ -98,7 +98,13 @@ class SuperPipe(QMainWindow):
 
 
 	def initUI(self):
-		self.setWindowIcon(QIcon("assets/img/icon.ico"))
+		app_icon = QIcon()
+		app_icon.addFile("assets/img/icon16x16.ico", QSize(16,16))
+		app_icon.addFile("assets/img/icon24x24.ico", QSize(32,32))
+		app_icon.addFile("assets/img/icon32x32.ico", QSize(24,24))
+		app_icon.addFile("assets/img/icon48x48.ico", QSize(48,48))
+		app_icon.addFile("assets/img/icon256x256.ico", QSize(256,256))
+		self.setWindowIcon(app_icon)
 		self.setWindowTitle("Super Pipe")
 
 		######################
@@ -211,6 +217,7 @@ class SuperPipe(QMainWindow):
 
 		asset_label = QLabel("Assets", alignment=Qt.AlignHCenter)
 		self.asset_filter_textfield = QLineEdit()
+		self.asset_filter_textfield.setPlaceholderText("Filter")
 		self.asset_filter_textfield.textChanged.connect(self.updateAssetListView)
 		self.asset_list = QTreeWidget()
 		self.asset_list.setHeaderHidden(True)
@@ -335,13 +342,13 @@ class SuperPipe(QMainWindow):
 
 		## Asset pictures ##
 		asset_picture_widget = QWidget()
-		asset_picture_widget.setProperty("class", "darker");
+		asset_picture_widget.setProperty("class", "darker")
 		asset_picture_layout = QVBoxLayout()
 
 		self.asset_pict_title_label = QLabel("This asset :", alignment=Qt.AlignHCenter)
-		self.asset_pict_title_label.setProperty("class", "darker");
+		self.asset_pict_title_label.setProperty("class", "darker")
 		self.asset_pict_widget = QLabel(alignment=Qt.AlignHCenter)
-		self.asset_pict_widget.setProperty("class", "darker");
+		self.asset_pict_widget.setProperty("class", "darker")
 
 		asset_picture_layout.addWidget(self.asset_pict_title_label)
 		asset_picture_layout.addWidget(self.asset_pict_widget)
@@ -353,27 +360,40 @@ class SuperPipe(QMainWindow):
 		main_asset_layout.addWidget(asset_picture_widget)
 
 		## Asset version actions ##
-		asset_actions_layout = QVBoxLayout()
+		asset_actions_widget = QWidget()
+		asset_actions_layout = QHBoxLayout()
 
-		self.open_asset_button = QPushButton("Open selected version", alignment=Qt.AlignHCenter)
+		self.open_asset_button = QPushButton("Open selected version")
 		self.open_asset_button.setObjectName("important")
 		self.open_asset_button.setMaximumWidth(200)
 		self.open_asset_button.clicked.connect(self.openAssetCommand)
 
+		asset_actions_layout.addStretch(1)
 		asset_actions_layout.addWidget(self.open_asset_button)
+		asset_actions_layout.addStretch(1)
 
-		main_asset_layout.addLayout(asset_actions_layout)
+		asset_actions_widget.setMinimumHeight(60)
+		asset_actions_widget.setLayout(asset_actions_layout)
+
+		main_asset_layout.addWidget(asset_actions_widget)
 
 		## Asset version infos ##
+		asset_version_comment_widget = QWidget()
+		asset_version_comment_widget.setProperty("class", "darker")
 		asset_version_comment_layout = QVBoxLayout()
 
 		self.asset_version_comment_title_label = QLabel("Version comment :")
+		self.asset_version_comment_title_label.setProperty("class", "darker")
 		self.asset_version_comment_label = QLabel()
+		self.asset_version_comment_label.setProperty("class", "darker")
 
 		asset_version_comment_layout.addWidget(self.asset_version_comment_title_label)
 		asset_version_comment_layout.addWidget(self.asset_version_comment_label)
 
-		main_asset_layout.addLayout(asset_version_comment_layout)
+		asset_version_comment_widget.setMinimumHeight(80)
+		asset_version_comment_widget.setLayout(asset_version_comment_layout)
+
+		main_asset_layout.addWidget(asset_version_comment_widget)
 
 		## Asset version paths ##
 		asset_paths_layout = QVBoxLayout()
@@ -445,22 +465,28 @@ class SuperPipe(QMainWindow):
 		main_shot_layout.addLayout(shot_info_layout)
 
 		## Shot description ##
+		shot_description_widget = QWidget()
+		shot_description_widget.setProperty("class", "darker")
 		shot_description_layout = QVBoxLayout()
 
 		self.shot_description_title_label = QLabel("Shot description :")
+		self.shot_description_title_label.setProperty("class", "darker")
 		self.shot_description_textfield = QLineEdit()
 		self.shot_description_textfield.textChanged.connect(self.shotDescriptionCommand)
 
 		shot_description_layout.addWidget(self.shot_description_title_label)
 		shot_description_layout.addWidget(self.shot_description_textfield)
 
-		main_shot_layout.addLayout(shot_description_layout)
+		shot_description_widget.setMinimumHeight(80)
+		shot_description_widget.setLayout(shot_description_layout)
+
+		main_shot_layout.addWidget(shot_description_widget)
 
 		## Shot state ##
 		shot_state_line_layout = QHBoxLayout()
 
 		self.priority_shot_label = QLabel("Priority :")
-		self.priority_shot_label.setFixedHeight(30);
+		self.priority_shot_label.setFixedHeight(30)
 		self.priority_shot_menu = QComboBox()
 		self.priority_shot_menu.addItems(["Low", "Medium", "High", "Urgent"])
 		self.priority_shot_menu.currentIndexChanged.connect(self.priorityShotCommand)
@@ -486,14 +512,14 @@ class SuperPipe(QMainWindow):
 
 		## Shot pictures ##
 		self.shot_pictures_widget = QWidget()
-		self.shot_pictures_widget.setProperty("class", "darker");
+		self.shot_pictures_widget.setProperty("class", "darker")
 		shot_pictures_layout = QHBoxLayout()
 
 		shot_prev_picture_layout = QVBoxLayout()
 		self.shot_prev_pict_label = QLabel("Previous shot :", alignment=Qt.AlignHCenter)
-		self.shot_prev_pict_label.setProperty("class", "darker");
+		self.shot_prev_pict_label.setProperty("class", "darker")
 		self.shot_prev_pict_widget = QLabel(alignment=Qt.AlignHCenter)
-		self.shot_prev_pict_widget.setProperty("class", "darker");
+		self.shot_prev_pict_widget.setProperty("class", "darker")
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_label)
 		shot_prev_picture_layout.addWidget(self.shot_prev_pict_widget)
 		shot_prev_picture_layout.addStretch(1)
@@ -501,9 +527,9 @@ class SuperPipe(QMainWindow):
 
 		shot_current_picture_layout = QVBoxLayout()
 		self.shot_pict_label = QLabel("Current shot :", alignment=Qt.AlignHCenter)
-		self.shot_pict_label.setProperty("class", "darker");
+		self.shot_pict_label.setProperty("class", "darker")
 		self.shot_pict_widget = QLabel(alignment=Qt.AlignHCenter)
-		self.shot_pict_widget.setProperty("class", "darker");
+		self.shot_pict_widget.setProperty("class", "darker")
 		shot_current_picture_layout.addWidget(self.shot_pict_label)
 		shot_current_picture_layout.addWidget(self.shot_pict_widget)
 		shot_current_picture_layout.addStretch(1)
@@ -530,21 +556,42 @@ class SuperPipe(QMainWindow):
 		self.shot_playblasts_widget.setVisible(False)
 
 		main_shot_layout.addWidget(self.shot_playblasts_widget)
-		
-		## Shot version infos ##
-		self.shot_version_comment_label = QLabel()
 
 		## Shot version actions ##
-		shot_actions_layout = QVBoxLayout()
+		shot_actions_widget = QWidget()
+		shot_actions_layout = QHBoxLayout()
 
-		self.open_shot_button = QPushButton("Open selected version", alignment=Qt.AlignHCenter)
+		self.open_shot_button = QPushButton("Open selected version")
 		self.open_shot_button.setObjectName("important")
 		self.open_shot_button.setMaximumWidth(200)
 		self.open_shot_button.clicked.connect(self.openShotCommand)
 
+		shot_actions_layout.addStretch(1)
 		shot_actions_layout.addWidget(self.open_shot_button)
+		shot_actions_layout.addStretch(1)
 
-		main_shot_layout.addLayout(shot_actions_layout)
+		shot_actions_widget.setMinimumHeight(60)
+		shot_actions_widget.setLayout(shot_actions_layout)
+
+		main_shot_layout.addWidget(shot_actions_widget)
+		
+		## Shot version infos ##
+		shot_version_comment_widget = QWidget()
+		shot_version_comment_widget.setProperty("class", "darker")
+		shot_version_comment_layout = QVBoxLayout()
+
+		self.shot_version_comment_title_label = QLabel("Version comment :")
+		self.shot_version_comment_title_label.setProperty("class", "darker")
+		self.shot_version_comment_label = QLabel()
+		self.shot_version_comment_label.setProperty("class", "darker")
+
+		shot_version_comment_layout.addWidget(self.shot_version_comment_title_label)
+		shot_version_comment_layout.addWidget(self.shot_version_comment_label)
+
+		shot_version_comment_widget.setMinimumHeight(80)
+		shot_version_comment_widget.setLayout(shot_version_comment_layout)
+
+		main_shot_layout.addWidget(shot_version_comment_widget)
 
 		## Shot version paths ##
 		shot_paths_layout = QVBoxLayout()
@@ -905,6 +952,7 @@ class SuperPipe(QMainWindow):
 
 
 	def assetListCommand(self):
+		self.shot_list.clearSelection()
 		if self.current_project:
 			selected_asset = self.asset_list.currentItem()
 
@@ -1028,6 +1076,7 @@ class SuperPipe(QMainWindow):
 
 
 	def shotListCommand(self):
+		self.asset_list.clearSelection()
 		if self.shot_list.currentItem():
 			if self.shot_list.count() != 0:
 				self.main_home_page_widget.setVisible(False)
@@ -1381,6 +1430,11 @@ class SuperPipe(QMainWindow):
 
 
 	def updateAssetListView(self):
+		if self.asset_filter_textfield.text():
+			self.asset_filter_textfield.setStyleSheet("QLineEdit{color: #ffffff;}")
+		else:
+			self.asset_filter_textfield.setStyleSheet("QLineEdit{color: #888888;}")
+
 		for cat in self.categories:
 			self.categories[cat].takeChildren()
 
@@ -1390,7 +1444,6 @@ class SuperPipe(QMainWindow):
 			if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
 				asset_subfolders = asset.getSecondPath().strip("/").split("/")
 				current_category = self.categories[asset_subfolders[0].lower()]
-
 
 				for subfolder in asset_subfolders[1:]:
 					if not self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive):
