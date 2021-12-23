@@ -5,44 +5,54 @@
  Note, that two definitions of the same element are not allowed in
  a single file. -->
 
-  <toolshelf name="superpipe" label="Superpipe">
-    <memberTool name="save"/>
-  </toolshelf>
-
   <tool name="save" label="Save" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[from os import path, mkdir
+import toolutils
+import hou
 
 current_file_ext = hou.hipFile.name()
 current_file = path.splitext(current_file_ext)[0]
 directory = path.dirname(current_file_ext)
 file_name = path.basename(current_file)
 
-new_width = 512
-new_height = 288
-
 ## SAVE ##
 hou.hipFile.save()
 
 ## SCREENSHOT ##
-cur_desktop = hou.ui.curDesktop()
-desktop = cur_desktop.name()
-viewer = hou.paneTabType.SceneViewer
-panetab = cur_desktop.paneTabOfType(viewer).name()
-persp = cur_desktop.paneTabOfType(viewer).curViewport().name()
-camera_path = desktop + '.' + panetab + '.' + 'world.' + persp
-hn = hou.getenv('HIPNAME')
+viewer = toolutils.sceneViewer()
+viewport = viewer.curViewport()
+camera = hou.GeometryViewport.camera(viewport)
 
-if not path.isdir(directory + "/images/screenshots"):
-        mkdir(directory + "/images/screenshots")
+new_width = 512
+new_height = 288
 
-filename = directory + "/images/screenshots/" + file_name + ".jpg"
+if camera:
+    camera_path = camera.path()
+    
+    ori_width = camera.parm("resx").eval()
+    ori_height = camera.parm("resy").eval()
+    
+    new_width = 512.0
+    new_height = 512.0
+
+    if ori_width > ori_height:
+        new_height = round(new_width / ori_width * ori_height)
+    elif ori_height > ori_width:
+        new_width = round(new_height / ori_height * ori_width)
+
+if not path.isdir(directory + "/render/screenshots"):
+        mkdir(directory + "/render/screenshots")
+
+file_path = directory + "/render/screenshots/" + file_name + ".jpg"
 frame = hou.frame()
 
-hou.hscript("viewwrite -f %d %d -r %d %d %s '%s'" % (frame, frame, new_width, new_height, camera_path, filename))]]></script>
-  </tool>
+flipbook_options = viewer.flipbookSettings().stash()
 
-  <shelfSetEdit name="shelf_set_1" fileLocation="C:/PROGRA~1/SIDEEF~1/HOUDIN~1.383/houdini/toolbar/ShelfDefinitions.shelf">
-    <addMemberToolshelf name="labs_toolset" inPosition="15"/>
-    <addMemberToolshelf name="superpipe" inPosition="16"/>
-  </shelfSetEdit>
+flipbook_options.frameRange((frame, frame))
+flipbook_options.output(file_path)
+flipbook_options.outputToMPlay(False)
+flipbook_options.resolution((int(new_width), int(new_height)))
+
+viewer.flipbook(viewer.curViewport(), flipbook_options, False)viewwrite -f %d %d -r %d %d %s '%s'" % (frame, frame, new_width, new_height, camera_path, file_path))]]></script>
+  </tool>
 </shelfDocument>
