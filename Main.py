@@ -1027,7 +1027,7 @@ class SuperPipe(QMainWindow):
 									self.asset_version_comment_title_label.setVisible(True)
 									self.asset_version_comment_label.setVisible(True)
 
-									pict_path = asset.getDirectory() + "/images/screenshots/" + path.splitext(selected_version.text())[0] + ".jpg"
+									pict_path = asset.getPictsPath() + path.splitext(selected_version.text())[0] + ".jpg"
 
 									if path.isfile(pict_path):
 										self.asset_pict_widget.setPixmap(QPixmap(pict_path))
@@ -1280,7 +1280,7 @@ class SuperPipe(QMainWindow):
 
 			self.asset_file_path_label.setText(temp_path.replace("/", "\\"))
 
-			pict_path = self.current_project.getSelection().getDirectory() + "/images/screenshots/" + path.splitext(selected_version)[0] + ".jpg"
+			pict_path = self.current_project.getSelection().getPictsPath() + path.splitext(selected_version)[0] + ".jpg"
 
 			if self.current_project.getSelectionType() == "shot":
 				if self.version_mode:
@@ -1406,7 +1406,7 @@ class SuperPipe(QMainWindow):
 				valid_name = False
 			else:
 				for check_asset in self.current_project.getAssetList():
-					if settings["name"] == check_asset[0]:
+					if settings["name"] == check_asset.getAssetName():
 						valid_name = False
 						break
 

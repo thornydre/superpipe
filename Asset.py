@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from os import makedirs, path, listdir
+from os import makedirs, path, listdir, rename
 from shutil import copyfile, copytree, rmtree
 from Resources import *
 
@@ -155,6 +155,15 @@ class Asset:
 		return self.directory
 
 
+	def getPictsPath(self):
+		directory = self.directory + "/images/screenshots/"
+
+		if self.software == "houdini":
+			directory = self.directory + "/render/screenshots/"
+
+		return directory
+
+
 	def getCategory(self):
 		return self.category
 
@@ -235,7 +244,7 @@ class Asset:
 
 		elif self.software == "houdini":
 			for asset_file in listdir(self.directory):
-				if path.splitext(asset_file)[1] == ".hip":
+				if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
 					return True
 
 		elif self.software == "blender":
