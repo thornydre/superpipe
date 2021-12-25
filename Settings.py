@@ -6,12 +6,13 @@ import json
 
 
 class Settings:
-	def __init__(self):
-		self.loadSettings()
+	def __init__(self, settings_file):
+		self.settings = None
+		self.settings_file = settings_file
 
 
 	def setSetting(self, setting, value):
-		self.settings[setting] = str(value)
+		self.settings[setting] = value
 
 
 	def getSetting(self, setting):
@@ -19,14 +20,32 @@ class Settings:
 
 
 	def saveSettings(self):
-		with open("assets/settings.spi", "w") as file:
+		with open(self.settings_file, "w") as file:
 			json.dump(self.settings, file)
 
 
-	def loadSettings(self):
-		if not path.isfile("assets/settings.spi"):
-			self.settings = {"project_dir": "","theme": "dark", "maya_path": "C:/Program Files/Autodesk/Maya2022/bin/maya.exe", "houdini_path": "C:/Program Files/Houdini/houdini.exe", "blender_path": "C:/Program Files/Blender/blender.exe", "video_player_path": "C:/Program Files/VLC/vlc.exe"}
+	def loadGeneralSettings(self):
+		if not path.isfile(self.settings_file):
+			self.settings = {"project_dir": "", "theme": "dark", "maya_path": "C:/Program Files/Autodesk/Maya2022/bin/maya.exe", "houdini_path": "C:/Program Files/Houdini/houdini.exe", "blender_path": "C:/Program Files/Blender/blender.exe", "video_player_path": "C:/Program Files/VLC/vlc.exe"}
 			self.saveSettings()
 		else:
-			with open("assets/settings.spi", "r") as file:
+			with open(self.settings_file, "r") as file:
+				self.settings = json.load(file)
+
+
+	def loadAssetSettings(self):
+		if not path.isfile(self.settings_file):
+			self.settings = {"priority": 0, "modeling_done": False, "rig_done": False, "lookdev_done": False, "done": False, "software": "maya"}
+			self.saveSettings()
+		else:
+			with open(self.settings_file, "r") as file:
+				self.settings = json.load(file)
+
+
+	def loadShotSettings(self):
+		if not path.isfile(self.settings_file):
+			self.settings = {"project_dir": "", "theme": "dark", "maya_path": "C:/Program Files/Autodesk/Maya2022/bin/maya.exe", "houdini_path": "C:/Program Files/Houdini/houdini.exe", "blender_path": "C:/Program Files/Blender/blender.exe", "video_player_path": "C:/Program Files/VLC/vlc.exe"}
+			self.saveSettings()
+		else:
+			with open(self.settings_file, "r") as file:
 				self.settings = json.load(file)

@@ -273,7 +273,7 @@ class Project:
 		makedirs(self.directory + "/04_asset/set/backup")
 
 
-	def setSelection(self, shot_name = None, asset_name = None, second_path = None):
+	def setSelection(self, shot_name=None, asset_name=None, second_path=None):
 		if shot_name:
 			self.selected_shot = Shot(self.directory, shot_name)
 			self.selected_asset = None

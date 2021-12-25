@@ -21,7 +21,8 @@ class Shot:
 		self.step = "Layout"
 		self.frame_range = 200
 		self.software = software
-		self.settings = Settings()
+		self.general_settings = Settings()
+		self.general_settings.loadGeneralSettings()
 
 		if not path.isdir(self.shot_directory):
 			if self.software:
@@ -248,7 +249,7 @@ class Shot:
 				"bpy.ops.wm.save_mainfile()\n"
 				"bpy.ops.wm.quit_blender()").format(self.shot_directory + "/scenes/" + file, 1001, 1000 + frame_range)
 
-				subprocess.Popen([self.settings.getSetting("blender_path"), "-b", "--python-expr", text])
+				subprocess.Popen([self.general_settings.getSetting("blender_path"), "-b", "--python-expr", text])
 
 
 	def setResolution(self, res):

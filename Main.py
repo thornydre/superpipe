@@ -33,7 +33,8 @@ from ManageBackupsDialog import *
 
 class SuperPipe(QMainWindow):
 	def __init__(self, app):
-		self.settings = Settings()
+		self.settings = Settings("assets/settings.spi")
+		self.settings.loadGeneralSettings()
 
 		super(SuperPipe, self).__init__()
 
@@ -221,7 +222,7 @@ class SuperPipe(QMainWindow):
 		self.asset_filter_textfield.textChanged.connect(self.updateAssetListView)
 		self.asset_list = QTreeWidget()
 		self.asset_list.setHeaderHidden(True)
-		self.asset_list.currentItemChanged.connect(self.assetListCommand)
+		self.asset_list.itemSelectionChanged.connect(self.assetListCommand)
 		self.categories = {"character": QTreeWidgetItem(["CHARACTER"]), "fx": QTreeWidgetItem(["FX"]), "props": QTreeWidgetItem(["PROPS"]), "set": QTreeWidgetItem(["SET"])}
 		for cat in self.categories:
 			self.asset_list.addTopLevelItem(self.categories[cat])
@@ -237,7 +238,7 @@ class SuperPipe(QMainWindow):
 
 		shot_label = QLabel("Shots", alignment=Qt.AlignHCenter)
 		self.shot_list = QListWidget()
-		self.shot_list.currentItemChanged.connect(self.shotListCommand)
+		self.shot_list.itemSelectionChanged.connect(self.shotListCommand)
 
 		sidebar_shots_layout.addWidget(shot_label, alignment=Qt.AlignHCenter)
 		sidebar_shots_layout.addWidget(self.shot_list)
@@ -708,7 +709,7 @@ class SuperPipe(QMainWindow):
 		sidebar_right_bottom_layout = QVBoxLayout()
 
 		self.version_list = QListWidget()
-		self.version_list.currentItemChanged.connect(self.versionlistCommand)
+		self.version_list.itemSelectionChanged.connect(self.versionlistCommand)
 		sidebar_right_bottom_layout.addWidget(self.version_list)
 
 		sidebar_right_layout.addLayout(sidebar_right_bottom_layout)
@@ -962,8 +963,6 @@ class SuperPipe(QMainWindow):
 				self.main_preview_widget.setVisible(False)
 				self.main_asset_widget.setVisible(True)
 
-				self.shot_list.clearSelection()
-
 				categories = ["CHARACTER", "FX", "PROPS", "SET"]
 
 
@@ -1112,8 +1111,6 @@ class SuperPipe(QMainWindow):
 				self.main_asset_widget.setVisible(False)
 				self.main_preview_widget.setVisible(False)
 				# self.statistics_view.setVisible(False)
-
-				self.asset_list.clearSelection()
 
 				self.delete_shot_button.setVisible(True)
 

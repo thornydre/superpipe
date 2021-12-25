@@ -3,21 +3,17 @@
 from os import makedirs, path, listdir, rename
 from shutil import copyfile, copytree, rmtree
 from Resources import *
+from Settings import *
 
 import time
 
 
 class Asset:
-	def __init__(self, directory = None, second_path = None, asset_name = None, software = None):
+	def __init__(self, directory=None, second_path=None, asset_name=None, software=None):
 		self.asset_name = asset_name
 		self.project_dir = directory
 		self.second_path = second_path
 		self.directory = directory + "/04_asset/" + self.second_path + "/" + self.asset_name
-		self.priority = 0
-		self.modeling_done = 0
-		self.rig_done = 0
-		self.lookdev_done = 0
-		self.done = 0
 		self.software = software
 
 		if not path.isdir(self.directory):
@@ -26,121 +22,24 @@ class Asset:
 
 				makedirs(self.directory + "/superpipe")
 
-				with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
-						f.write(str(self.priority) + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
-				f.close()
-
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
-				if self.software == "maya" or self.software == "blender":
-					makedirs(self.directory + "/assets")
-					
-					makedirs(self.directory + "/autosave")
-					
-					makedirs(self.directory + "/cache")
-					makedirs(self.directory + "/cache/nCache")
-					makedirs(self.directory + "/cache/nCache/fluid")
-					makedirs(self.directory + "/cache/particles")
-
-					makedirs(self.directory + "/clips")
-					
-					makedirs(self.directory + "/data")
-					makedirs(self.directory + "/data/edits")
-					
-					makedirs(self.directory + "/images")
-					makedirs(self.directory + "/images/screenshots")
-					
-					makedirs(self.directory + "/movies")
-					
-					makedirs(self.directory + "/renderData")
-					makedirs(self.directory + "/renderData/depth")
-					makedirs(self.directory + "/renderData/fur")
-					makedirs(self.directory + "/renderData/fur/furAttrMap")
-					makedirs(self.directory + "/renderData/fur/furEqualMap")
-					makedirs(self.directory + "/renderData/fur/furFiles")
-					makedirs(self.directory + "/renderData/fur/furImages")
-					makedirs(self.directory + "/renderData/fur/furShadowMap")
-					makedirs(self.directory + "/renderData/iprImages")
-					makedirs(self.directory + "/renderData/shaders")
-					
-					makedirs(self.directory + "/scenes")
-					makedirs(self.directory + "/scenes/backup")
-					makedirs(self.directory + "/scenes/edits")
-
-					makedirs(self.directory + "/scripts")
-					
-					makedirs(self.directory + "/sound")
-					
-					makedirs(self.directory + "/sourceimages")
-					makedirs(self.directory + "/sourceimages/3dPaintTextures")
-					makedirs(self.directory + "/sourceimages/edits")
-					makedirs(self.directory + "/sourceimages/environment")
-					makedirs(self.directory + "/sourceimages/imagePlane")
-					makedirs(self.directory + "/sourceimages/imageSequence")
-
-					copyfile("assets/src/workspace.mel", self.directory + "/workspace.mel")
-
-				elif self.software == "houdini":
-					makedirs(self.directory + "/abc")
-					makedirs(self.directory + "/audio")
-					makedirs(self.directory + "/backup")
-					makedirs(self.directory + "/comp")
-					makedirs(self.directory + "/desk")
-					makedirs(self.directory + "/flip")
-					makedirs(self.directory + "/geo")
-					makedirs(self.directory + "/hda")
-					makedirs(self.directory + "/render")
-					makedirs(self.directory + "/scripts")
-					makedirs(self.directory + "/sim")
-					makedirs(self.directory + "/tex")
-					makedirs(self.directory + "/video")
-				else:
-					print("ERROR")
+				self.createFolderHierarchy()
 
 		else:
 			if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
-			if not path.isfile(self.directory + "/superpipe/asset_data.spi"):
-				with open(self.directory + "/superpipe/asset_data.spi", "w") as f:
-					f.write(str(self.priority) + "\n" + str(self.modeling_done) + "\n" + str(self.rig_done) + "\n" + str(self.lookdev_done) + "\n" + str(self.done) + "\n" + self.software + "\n")
-				f.close()
+		self.asset_settings = Settings(self.directory + "/superpipe/asset_data.spi")
+		self.asset_settings.loadAssetSettings()
 
-			asset_infos = []
-			with open(self.directory + "/superpipe/asset_data.spi", "r") as f:
-				for l in f:
-					asset_infos.append(l.strip("\n"))
-			f.close()
-
-			if len(asset_infos) > 0:
-				self.priority = int(asset_infos[0])
-			else:
-				self.priority = 0
-
-			if len(asset_infos) > 1:
-				self.modeling_done = int(asset_infos[1])
-			else:
-				self.modeling_done = "0"
-
-			if len(asset_infos) > 2:
-				self.rig_done = int(asset_infos[2])
-			else:
-				self.rig_done = "0"
-
-			if len(asset_infos) > 3:
-				self.lookdev_done = int(asset_infos[3])
-			else:
-				self.lookdev_done = "0"
-
-			if len(asset_infos) > 4:
-				self.done = int(asset_infos[4])
-			else:
-				self.done = "0"
-			
-			if len(asset_infos) > 5:
-				self.software = asset_infos[5]
-			else:
-				self.software = "maya"
+		self.priority = self.asset_settings.getSetting("priority")
+		self.modeling_done = self.asset_settings.getSetting("modeling_done")
+		self.rig_done = self.asset_settings.getSetting("rig_done")
+		self.lookdev_done = self.asset_settings.getSetting("lookdev_done")
+		self.done = self.asset_settings.getSetting("done")
+		if not self.software:
+			self.software = self.asset_settings.getSetting("software")
 
 
 	def getAssetName(self):
@@ -373,24 +272,96 @@ class Asset:
 
 	def setPriority(self, priority):
 		self.priority = int(priority)
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.priority), 1)
+		self.asset_settings.setSetting("priority", self.priority)
+		self.asset_settings.saveSettings()
 
 
 	def setModelingDone(self, modeling_done):
-		self.modeling_done = int(modeling_done)
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.modeling_done), 2)
+		self.modeling_done = modeling_done
+		self.asset_settings.setSetting("modeling_done", self.modeling_done)
+		self.asset_settings.saveSettings()
 
 
 	def setRigDone(self, rig_done):
-		self.rig_done = int(rig_done)
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.rig_done), 3)
+		self.rig_done = rig_done
+		self.asset_settings.setSetting("rig_done", self.rig_done)
+		self.asset_settings.saveSettings()
 
 
 	def setLookdevDone(self, lookdev_done):
-		self.lookdev_done = int(lookdev_done)
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.lookdev_done), 4)
+		self.lookdev_done = lookdev_done
+		self.asset_settings.setSetting("lookdev_done", self.lookdev_done)
+		self.asset_settings.saveSettings()
 
 
 	def setDone(self, done):
-		self.done = int(done)
-		Resources.writeAtLine(self.directory + "/superpipe/asset_data.spi", str(self.done), 5)
+		self.done = done
+		self.asset_settings.setSetting("done", self.done)
+		self.asset_settings.saveSettings()
+
+
+	def createFolderHierarchy(self):
+		if self.software == "maya" or self.software == "blender":
+			makedirs(self.directory + "/assets")
+			
+			makedirs(self.directory + "/autosave")
+			
+			makedirs(self.directory + "/cache")
+			makedirs(self.directory + "/cache/nCache")
+			makedirs(self.directory + "/cache/nCache/fluid")
+			makedirs(self.directory + "/cache/particles")
+
+			makedirs(self.directory + "/clips")
+			
+			makedirs(self.directory + "/data")
+			makedirs(self.directory + "/data/edits")
+			
+			makedirs(self.directory + "/images")
+			makedirs(self.directory + "/images/screenshots")
+			
+			makedirs(self.directory + "/movies")
+			
+			makedirs(self.directory + "/renderData")
+			makedirs(self.directory + "/renderData/depth")
+			makedirs(self.directory + "/renderData/fur")
+			makedirs(self.directory + "/renderData/fur/furAttrMap")
+			makedirs(self.directory + "/renderData/fur/furEqualMap")
+			makedirs(self.directory + "/renderData/fur/furFiles")
+			makedirs(self.directory + "/renderData/fur/furImages")
+			makedirs(self.directory + "/renderData/fur/furShadowMap")
+			makedirs(self.directory + "/renderData/iprImages")
+			makedirs(self.directory + "/renderData/shaders")
+			
+			makedirs(self.directory + "/scenes")
+			makedirs(self.directory + "/scenes/backup")
+			makedirs(self.directory + "/scenes/edits")
+
+			makedirs(self.directory + "/scripts")
+			
+			makedirs(self.directory + "/sound")
+			
+			makedirs(self.directory + "/sourceimages")
+			makedirs(self.directory + "/sourceimages/3dPaintTextures")
+			makedirs(self.directory + "/sourceimages/edits")
+			makedirs(self.directory + "/sourceimages/environment")
+			makedirs(self.directory + "/sourceimages/imagePlane")
+			makedirs(self.directory + "/sourceimages/imageSequence")
+
+			copyfile("assets/src/workspace.mel", self.directory + "/workspace.mel")
+
+		elif self.software == "houdini":
+			makedirs(self.directory + "/abc")
+			makedirs(self.directory + "/audio")
+			makedirs(self.directory + "/backup")
+			makedirs(self.directory + "/comp")
+			makedirs(self.directory + "/desk")
+			makedirs(self.directory + "/flip")
+			makedirs(self.directory + "/geo")
+			makedirs(self.directory + "/hda")
+			makedirs(self.directory + "/render")
+			makedirs(self.directory + "/scripts")
+			makedirs(self.directory + "/sim")
+			makedirs(self.directory + "/tex")
+			makedirs(self.directory + "/video")
+		else:
+			print("ERROR")
