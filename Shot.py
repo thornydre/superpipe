@@ -36,71 +36,7 @@ class Shot:
 
 				open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
-				if self.software == "maya" or self.software == "blender":
-					makedirs(self.shot_directory + "/assets")
-					
-					makedirs(self.shot_directory + "/autosave")
-					
-					makedirs(self.shot_directory + "/cache")
-					makedirs(self.shot_directory + "/cache/nCache")
-					makedirs(self.shot_directory + "/cache/nCache/fluid")
-					makedirs(self.shot_directory + "/cache/particles")
-
-					makedirs(self.shot_directory + "/clips")
-					
-					makedirs(self.shot_directory + "/data")
-					makedirs(self.shot_directory + "/data/edits")
-					
-					makedirs(self.shot_directory + "/images")
-					makedirs(self.shot_directory + "/images/screenshots")
-					
-					makedirs(self.shot_directory + "/movies")
-					
-					makedirs(self.shot_directory + "/renderData")
-					makedirs(self.shot_directory + "/renderData/depth")
-					makedirs(self.shot_directory + "/renderData/fur")
-					makedirs(self.shot_directory + "/renderData/fur/furAttrMap")
-					makedirs(self.shot_directory + "/renderData/fur/furEqualMap")
-					makedirs(self.shot_directory + "/renderData/fur/furFiles")
-					makedirs(self.shot_directory + "/renderData/fur/furImages")
-					makedirs(self.shot_directory + "/renderData/fur/furShadowMap")
-					makedirs(self.shot_directory + "/renderData/iprImages")
-					makedirs(self.shot_directory + "/renderData/shaders")
-					
-					makedirs(self.shot_directory + "/scenes")
-					makedirs(self.shot_directory + "/scenes/backup")
-					makedirs(self.shot_directory + "/scenes/edits")
-
-					makedirs(self.shot_directory + "/scripts")
-					
-					makedirs(self.shot_directory + "/sound")
-					
-					makedirs(self.shot_directory + "/sourceimages")
-					makedirs(self.shot_directory + "/sourceimages/3dPaintTextures")
-					makedirs(self.shot_directory + "/sourceimages/edits")
-					makedirs(self.shot_directory + "/sourceimages/environment")
-					makedirs(self.shot_directory + "/sourceimages/imagePlane")
-					makedirs(self.shot_directory + "/sourceimages/imageSequence")
-
-					copyfile("assets/src/workspace.mel", self.shot_directory + "/workspace.mel")
-
-				elif self.software == "houdini":
-					makedirs(self.shot_directory + "/abc")
-					makedirs(self.shot_directory + "/audio")
-					makedirs(self.shot_directory + "/backup")
-					makedirs(self.shot_directory + "/comp")
-					makedirs(self.shot_directory + "/desk")
-					makedirs(self.shot_directory + "/flip")
-					makedirs(self.shot_directory + "/geo")
-					makedirs(self.shot_directory + "/hda")
-					makedirs(self.shot_directory + "/render")
-					makedirs(self.shot_directory + "/scripts")
-					makedirs(self.shot_directory + "/sim")
-					makedirs(self.shot_directory + "/tex")
-					makedirs(self.shot_directory + "/video")
-
-			else:
-				print("ERROR1 : " + self.shot_name)
+				self.createFolderHierarchy()
 
 		elif Shot.validShot(self.shot_directory):
 			if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
@@ -499,3 +435,71 @@ class Shot:
 				return True
 
 		return False
+
+
+	def createFolderHierarchy(self):
+		if self.software == "maya" or self.software == "blender":
+			makedirs(self.shot_directory + "/assets")
+			
+			makedirs(self.shot_directory + "/autosave")
+			
+			makedirs(self.shot_directory + "/cache")
+			makedirs(self.shot_directory + "/cache/nCache")
+			makedirs(self.shot_directory + "/cache/nCache/fluid")
+			makedirs(self.shot_directory + "/cache/particles")
+
+			makedirs(self.shot_directory + "/clips")
+			
+			makedirs(self.shot_directory + "/data")
+			makedirs(self.shot_directory + "/data/edits")
+			
+			makedirs(self.shot_directory + "/images")
+			makedirs(self.shot_directory + "/images/screenshots")
+			
+			makedirs(self.shot_directory + "/movies")
+			
+			makedirs(self.shot_directory + "/renderData")
+			makedirs(self.shot_directory + "/renderData/depth")
+			makedirs(self.shot_directory + "/renderData/fur")
+			makedirs(self.shot_directory + "/renderData/fur/furAttrMap")
+			makedirs(self.shot_directory + "/renderData/fur/furEqualMap")
+			makedirs(self.shot_directory + "/renderData/fur/furFiles")
+			makedirs(self.shot_directory + "/renderData/fur/furImages")
+			makedirs(self.shot_directory + "/renderData/fur/furShadowMap")
+			makedirs(self.shot_directory + "/renderData/iprImages")
+			makedirs(self.shot_directory + "/renderData/shaders")
+			
+			makedirs(self.shot_directory + "/scenes")
+			makedirs(self.shot_directory + "/scenes/backup")
+			makedirs(self.shot_directory + "/scenes/edits")
+
+			makedirs(self.shot_directory + "/scripts")
+			
+			makedirs(self.shot_directory + "/sound")
+			
+			makedirs(self.shot_directory + "/sourceimages")
+			makedirs(self.shot_directory + "/sourceimages/3dPaintTextures")
+			makedirs(self.shot_directory + "/sourceimages/edits")
+			makedirs(self.shot_directory + "/sourceimages/environment")
+			makedirs(self.shot_directory + "/sourceimages/imagePlane")
+			makedirs(self.shot_directory + "/sourceimages/imageSequence")
+
+			copyfile("assets/src/workspace.mel", self.shot_directory + "/workspace.mel")
+
+		elif self.software == "houdini":
+			makedirs(self.shot_directory + "/abc")
+			makedirs(self.shot_directory + "/audio")
+			makedirs(self.shot_directory + "/backup")
+			makedirs(self.shot_directory + "/comp")
+			makedirs(self.shot_directory + "/desk")
+			makedirs(self.shot_directory + "/flip")
+			makedirs(self.shot_directory + "/geo")
+			makedirs(self.shot_directory + "/hda")
+			makedirs(self.shot_directory + "/render")
+			makedirs(self.shot_directory + "/scripts")
+			makedirs(self.shot_directory + "/sim")
+			makedirs(self.shot_directory + "/tex")
+			makedirs(self.shot_directory + "/video")
+
+	else:
+		print("ERROR1 : " + self.shot_name)
