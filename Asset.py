@@ -99,10 +99,7 @@ class Asset:
 
 
 	def isDone(self):
-		if self.done == 1:
-			return True
-		else:
-			return False
+		return self.done
 
 
 	def setAsset(self):

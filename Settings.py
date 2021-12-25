@@ -47,7 +47,7 @@ class Settings:
 
 	def loadShotSettings(self):
 		if not path.isfile(self.settings_file):
-			self.settings = {"project_dir": "", "theme": "dark", "maya_path": "C:/Program Files/Autodesk/Maya2022/bin/maya.exe", "houdini_path": "C:/Program Files/Houdini/houdini.exe", "blender_path": "C:/Program Files/Blender/blender.exe", "video_player_path": "C:/Program Files/VLC/vlc.exe"}
+			self.settings = {"priority": 0, "step": "Layout", "percentage": 0, "done": False, "frame_range": 200, "description": "", "software": "maya"}
 			self.saveSettings()
 		else:
 			with open(self.settings_file, "r") as file:

@@ -15,13 +15,8 @@ class Shot:
 		self.shot_nb, self.sequence = Resources.makeShotNbs(self.shot_name)
 		self.shot_directory = directory + "/05_shot/" + self.shot_name
 		self.postprod_directory = directory + "/06_postprod/" + self.shot_name
-		self.done = 0
-		self.priority = 0
-		self.description = ""
-		self.step = "Layout"
-		self.frame_range = 200
 		self.software = software
-		self.general_settings = Settings()
+		self.general_settings = Settings("assets/settings.spi")
 		self.general_settings.loadGeneralSettings()
 
 		if not path.isdir(self.shot_directory):
@@ -30,47 +25,34 @@ class Shot:
 
 				makedirs(self.shot_directory + "/superpipe")
 
-				with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
-					f.write(str(self.done) + "\n" + str(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
-				f.close()
+				# with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
+				# 	f.write(str(self.done) + "\n" + str(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
+				# f.close()
 
-				open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
+				# open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
 
 				self.createFolderHierarchy()
 
-		elif Shot.validShot(self.shot_directory):
-			if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
-				open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
-
-			if not path.isfile(self.shot_directory + "/superpipe/shot_data.spi"):
-				with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
-					f.write(str(self.done) + "\n" + int(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
-				f.close()
-
-			if not Resources.readLine(self.shot_directory + "/superpipe/shot_data.spi", 4):
-				Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", "200", 4)
-
-			shot_infos = []
-			with open(self.shot_directory + "/superpipe/shot_data.spi", "r") as f:
-				for l in f:
-					shot_infos.append(l.strip("\n"))
-			f.close()
-
-			self.done = int(shot_infos[0])
-			self.priority = int(shot_infos[1])
-			self.step = shot_infos[2]
-			self.frame_range = int(shot_infos[3])
-			if len(shot_infos) > 4:
-				self.software = shot_infos[4]
 			else:
-				self.software = "maya"
-			if len(shot_infos) > 5:
-				self.description = shot_infos[5]
-			else:
-				self.description = ""
+				print("ERROR1 : " + self.shot_name)
 
-		else:
+		elif not Shot.validShot(self.shot_directory):
 			print("ERROR2 : " + self.shot_name)
+
+		self.versions_settings = Settings(self.shot_directory + "/superpipe/versions_data.spi")
+		self.versions_settings.loadVersionSettings()
+
+		self.shot_settings = Settings(self.shot_directory + "/superpipe/shot_data.spi")
+		self.shot_settings.loadShotSettings()
+
+		self.done = self.shot_settings.getSetting("done")
+		self.priority = self.shot_settings.getSetting("priority")
+		self.step = self.shot_settings.getSetting("step")
+		self.percentage = self.shot_settings.getSetting("percentage")
+		self.frame_range = self.shot_settings.getSetting("frame_range")
+		self.description = self.shot_settings.getSetting("description")
+		if not self.software:
+			self.software = self.shot_settings.getSetting("software")
 
 		if not path.isdir(self.postprod_directory):
 			makedirs(self.postprod_directory)
@@ -117,6 +99,10 @@ class Shot:
 
 	def getStep(self):
 		return self.step
+
+
+	def getPercentage(self):
+		return self.percentage
 
 
 	def getFrameRange(self):
@@ -171,7 +157,8 @@ class Shot:
 		if path.isdir(self.shot_directory + "/scenes/.mayaSwatches"):
 					rmtree(self.shot_directory + "/scenes/.mayaSwatches")
 
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.frame_range), 4)
+		self.shot_settings.setSetting("frame_range", self.frame_range)
+		self.shot_settings.saveSettings()
 
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if path.splitext(file)[1] == ".ma":
@@ -334,17 +321,26 @@ class Shot:
 
 	def setDescription(self, description):
 		self.description = description
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.description), 6)
+		self.shot_settings.setSetting("description", self.description)
+		self.shot_settings.saveSettings()
 
 
 	def setDone(self, done):
 		self.done = done
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.done), 1)
+		self.shot_settings.setSetting("done", self.done)
+		self.shot_settings.saveSettings()
 
 
 	def setPriority(self, priority):
-		self.priority = priority
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", str(self.priority), 2)
+		self.priority = int(priority)
+		self.shot_settings.setSetting("priority", self.priority)
+		self.shot_settings.saveSettings()
+
+
+	def setPercentage(self, percentage):
+		self.percentage = percentage
+		self.shot_settings.setSetting("percentage", self.percentage)
+		self.shot_settings.saveSettings()
 
 
 	def upgrade(self):
@@ -378,7 +374,8 @@ class Shot:
 			elif self.step == "Splining":
 				self.step = "Rendering"
 
-			Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
+			self.shot_settings.setSetting("step", self.step)
+			self.shot_settings.saveSettings()
 
 			if self.step == "Blocking":
 				copyfile(self.shot_directory + "/scenes/" + file_to_upgrade, self.shot_directory + "/scenes/" + self.shot_name + "_02_blocking_v01" + ext)
@@ -423,10 +420,11 @@ class Shot:
 		elif self.step == "Rendering":
 			self.step = "Splining"
 
-		Resources.writeAtLine(self.shot_directory + "/superpipe/shot_data.spi", self.step, 3)
+		self.shot_settings.setSetting("step", self.step)
+		self.shot_settings.saveSettings()
 
 
-	def validShot(dir_to_check = None):
+	def validShot(dir_to_check=None):
 		if not path.isdir(dir_to_check):
 			return False
 
@@ -500,6 +498,3 @@ class Shot:
 			makedirs(self.shot_directory + "/sim")
 			makedirs(self.shot_directory + "/tex")
 			makedirs(self.shot_directory + "/video")
-
-	else:
-		print("ERROR1 : " + self.shot_name)
