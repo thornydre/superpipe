@@ -16,12 +16,13 @@ class Settings:
 
 
 	def getSetting(self, setting):
-		return self.settings[setting]
+		return self.settings.get(setting)
 
 
 	def saveSettings(self):
 		with open(self.settings_file, "w") as file:
 			json.dump(self.settings, file)
+		file.close()
 
 
 	def loadGeneralSettings(self):
@@ -31,6 +32,7 @@ class Settings:
 		else:
 			with open(self.settings_file, "r") as file:
 				self.settings = json.load(file)
+			file.close()
 
 
 	def loadAssetSettings(self):
@@ -40,6 +42,7 @@ class Settings:
 		else:
 			with open(self.settings_file, "r") as file:
 				self.settings = json.load(file)
+			file.close()
 
 
 	def loadShotSettings(self):
@@ -49,3 +52,14 @@ class Settings:
 		else:
 			with open(self.settings_file, "r") as file:
 				self.settings = json.load(file)
+			file.close()
+
+
+	def loadVersionSettings(self):
+		if not path.isfile(self.settings_file):
+			self.settings = {}
+			self.saveSettings()
+		else:
+			with open(self.settings_file, "r") as file:
+				self.settings = json.load(file)
+			file.close()

@@ -30,6 +30,9 @@ class Asset:
 			if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
 				open(self.directory + "/superpipe/versions_data.spi", "a").close()
 
+		self.versions_settings = Settings(self.directory + "/superpipe/versions_data.spi")
+		self.versions_settings.loadVersionSettings()
+
 		self.asset_settings = Settings(self.directory + "/superpipe/asset_data.spi")
 		self.asset_settings.loadAssetSettings()
 
@@ -92,25 +95,11 @@ class Asset:
 
 
 	def getComment(self, version_file):
-		if not path.isfile(self.directory + "/superpipe/versions_data.spi"):
-				open(self.directory + "/superpipe/versions_data.spi", "a").close()
-		else:
-			with open(self.directory + "/superpipe/versions_data.spi", "r") as f:
-				all_comments = f.read()
-			f.close()
+		self.versions_settings.loadVersionSettings()
+		comment = self.versions_settings.getSetting(version_file)
 
-			if all_comments == "":
-				return "No comment"
-
-			comment_list = all_comments.split("\n---\n")
-
-			i = 1
-
-			for comment in comment_list:
-				if comment == version_file:
-					return comment_list[i]
-
-				i += 1
+		if comment:
+			return comment
 
 		return "No comment"
 
