@@ -110,28 +110,11 @@ class Shot:
 
 
 	def getComment(self, version_file):
-		if not path.isfile(self.shot_directory + "/superpipe/versions_data.spi"):
-				open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
-		else:
-			with open(self.shot_directory + "/superpipe/versions_data.spi", "r") as f:
-				all_comments = f.read()
-			f.close()
+		self.versions_settings.loadVersionSettings()
+		comment = self.versions_settings.getSetting(version_file)
 
-			comment_list = all_comments.split("\n---\n")
-
-			if comment_list[0]:
-				i = 1
-
-				for comment in comment_list:
-					if comment == version_file:
-						if comment_list[i]:
-							return comment_list[i]
-						else:
-							return "No comment"
-
-					i += 1
-			else:
-				return "No comment"
+		if comment:
+			return comment
 
 		return "No comment"
 
