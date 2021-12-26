@@ -7,7 +7,7 @@ import json
 
 class Settings:
 	def __init__(self, settings_file):
-		self.settings = None
+		self.settings = {}
 		self.settings_file = settings_file
 
 
