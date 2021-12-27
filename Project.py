@@ -6,6 +6,7 @@ from Shot import *
 from Asset import *
 from Resources import *
 from Settings import *
+from XMLParser import *
 
 import re
 
@@ -23,46 +24,8 @@ class Project:
 		if not path.isdir(self.directory):
 			makedirs(self.directory)
 
-			makedirs(self.directory + "/01_donnee")
-
-			makedirs(self.directory + "/02_ressources")
-
-			makedirs(self.directory + "/03_preprod")
-			makedirs(self.directory + "/03_preprod/character")
-			makedirs(self.directory + "/03_preprod/colorscript")
-			makedirs(self.directory + "/03_preprod/figureFond")
-			makedirs(self.directory + "/03_preprod/lumascript")
-			makedirs(self.directory + "/03_preprod/props")
-			makedirs(self.directory + "/03_preprod/scenario")
-			makedirs(self.directory + "/03_preprod/set")
-			makedirs(self.directory + "/03_preprod/sound")
-			makedirs(self.directory + "/03_preprod/storyboard")
-
-			makedirs(self.directory + "/04_asset")
-			makedirs(self.directory + "/04_asset/character")
-			makedirs(self.directory + "/04_asset/character/backup")
-			makedirs(self.directory + "/04_asset/FX")
-			makedirs(self.directory + "/04_asset/FX/backup")
-			makedirs(self.directory + "/04_asset/props")
-			makedirs(self.directory + "/04_asset/props/backup")
-			makedirs(self.directory + "/04_asset/set")
-			makedirs(self.directory + "/04_asset/set/backup")
-
-			makedirs(self.directory + "/05_shot")
-			makedirs(self.directory + "/05_shot/backup")
-
-			makedirs(self.directory + "/06_postprod")
-
-			makedirs(self.directory + "/07_montage")
-			makedirs(self.directory + "/07_montage/input")
-			makedirs(self.directory + "/07_montage/inputSon")
-			makedirs(self.directory + "/07_montage/output")
-
-			makedirs(self.directory + "/08_linetest")
-
-			makedirs(self.directory + "/09_DEV")
-
-			makedirs(self.directory + "/10_print")
+			xml_parser = XMLParser("./assets/xml/project_struct.xml")
+			xml_parser.parseXML(self.directory)
 
 		elif path.isdir(self.directory + "/05_shot"):
 			self.updateShotList()

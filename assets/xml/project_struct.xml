@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<data>
+  <dir name="01_donnee"/>
+  <dir name="02_ressources"/>
+  <dir name="03_preprod">
+    <dir name="character"/>
+    <dir name="colorscript"/>
+    <dir name="figureFond"/>
+    <dir name="lumascript"/>
+    <dir name="props"/>
+    <dir name="scenario"/>
+    <dir name="set"/>
+    <dir name="sound"/>
+    <dir name="storyboard"/>
+  </dir>
+  <dir name="04_asset">
+    <dir name="character">
+      <dir name="backup"/>
+    </dir>
+    <dir name="FX">
+      <dir name="backup"/>
+    </dir>
+    <dir name="props">
+      <dir name="backup"/>
+    </dir>
+    <dir name="set">
+      <dir name="backup"/>
+    </dir>
+  </dir>
+  <dir name="05_shot">
+    <dir name="backup"/>
+  </dir>
+  <dir name="06_postprod"/>
+  <dir name="07_montage">
+    <dir name="input"/>
+    <dir name="inputSon"/>
+    <dir name="output"/>
+  </dir>
+  <dir name="08_linetest"/>
+  <dir name="09_DEV"/>
+  <dir name="10_print"/>
+</data>
