@@ -2,7 +2,6 @@
 
 from os import makedirs, path, listdir, rename
 from shutil import copyfile, copytree, rmtree
-from Resources import *
 from Settings import *
 
 import time
@@ -24,6 +23,7 @@ class Asset:
 
 				self.createFolderHierarchy()
 
+		## SETTINGS ##
 		self.versions_settings = Settings(self.asset_directory + "/superpipe/versions_data.spi")
 		self.versions_settings.loadVersionSettings()
 
@@ -35,7 +35,10 @@ class Asset:
 		self.rig_done = self.asset_settings.getSetting("rig_done")
 		self.lookdev_done = self.asset_settings.getSetting("lookdev_done")
 		self.done = self.asset_settings.getSetting("done")
-		if not self.software:
+		if self.software:
+			self.asset_settings.setSetting("software", self.software)
+			self.asset_settings.saveSettings()
+		else:
 			self.software = self.asset_settings.getSetting("software")
 
 

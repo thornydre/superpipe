@@ -1145,6 +1145,7 @@ class SuperPipe(QMainWindow):
 						self.downgrade_shot_button.setVisible(True)
 
 						self.step_slider.setCurrentStep(shot.getStep())
+						print(shot.getPercentage())
 						if shot.isDone():
 							self.step_slider.setPercentage(100)
 							self.step_slider.setActive(active=False)
@@ -1786,13 +1787,10 @@ class SuperPipe(QMainWindow):
 
 	def shotDescriptionCommand(self):
 		self.current_project.getSelection().setDescription(self.shot_description_textfield.text())
-		# if self.current_project:
-		# 	Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", self.shot_description_textfield.text(), 6)
 
 
 	def customSliderCommand(self):
 		self.current_project.getSelection().setPercentage(self.step_slider.getPercentage())
-		# Resources.writeAtLine(self.current_project.getSelection().getDirectory() + "/superpipe/shot_data.spi", str(self.step_slider.getPercentage()), 7)
 
 
 	def customButtonCommand(self):

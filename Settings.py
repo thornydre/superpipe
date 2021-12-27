@@ -35,6 +35,16 @@ class Settings:
 			file.close()
 
 
+	def loadProjectSettings(self):
+		if not path.isfile(self.settings_file):
+			self.settings = {"custom_link": "", "res_x": 1920, "res_y": 1080, "sequence_number": 1, "default_software": "maya"}
+			self.saveSettings()
+		else:
+			with open(self.settings_file, "r") as file:
+				self.settings = json.load(file)
+			file.close()
+
+
 	def loadAssetSettings(self):
 		if not path.isfile(self.settings_file):
 			self.settings = {"priority": 0, "modeling_done": False, "rig_done": False, "lookdev_done": False, "done": False, "software": "maya"}

@@ -25,12 +25,6 @@ class Shot:
 
 				makedirs(self.shot_directory + "/superpipe")
 
-				# with open(self.shot_directory + "/superpipe/shot_data.spi", "w") as f:
-				# 	f.write(str(self.done) + "\n" + str(self.priority) + "\n" + self.step + "\n" + str(self.frame_range) + "\n" + self.software + "\n")
-				# f.close()
-
-				# open(self.shot_directory + "/superpipe/versions_data.spi", "a").close()
-
 				self.createFolderHierarchy()
 
 			else:
@@ -39,6 +33,7 @@ class Shot:
 		elif not Shot.validShot(self.shot_directory):
 			print("ERROR2 : " + self.shot_name)
 
+		## SETTINGS ##
 		self.versions_settings = Settings(self.shot_directory + "/superpipe/versions_data.spi")
 		self.versions_settings.loadVersionSettings()
 

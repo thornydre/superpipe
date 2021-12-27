@@ -3,7 +3,7 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from PySide6.QtGui import *
-from Resources import *
+from Settings import *
 from os import listdir
 
 
@@ -12,7 +12,9 @@ class ProjectSettingsDialog(QDialog):
 		super(ProjectSettingsDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		self.project = project
-		project_options_path = self.project.getDirectory() + "/project_option.spi"
+
+		project_settings = Settings(self.project.getDirectory() + "/project_option.spi")
+		project_settings.loadProjectSettings()
 
 		self.validate = True
 
@@ -28,10 +30,7 @@ class ProjectSettingsDialog(QDialog):
 		self.softwares_list = ("maya", "houdini", "blender")
 		i = 0
 
-		default_software = "maya"
-
-		if project_options_path:
-			default_software = Resources.readLine(project_options_path, 4)
+		default_software = project_settings.getSetting("default_software")
 
 		for software in self.softwares_list:
 			software_radiobutton = QRadioButton(software)
@@ -48,24 +47,19 @@ class ProjectSettingsDialog(QDialog):
 		resolution_label = QLabel("Default shots resolution :")
 		main_layout.addWidget(resolution_label)
 
-		res_str = Resources.readLine(self.project.getDirectory() + "/project_option.spi", 2)
-
-		if res_str:
-			res = res_str.split("x")
-		else:
-			res = (0, 0)
+		res = (project_settings.getSetting("res_x"), project_settings.getSetting("res_y"))
 
 		resolution_layout = QHBoxLayout()
 		x_label = QLabel("x :")
 		resolution_layout.addWidget(x_label)
 		self.x_textfield = QLineEdit()
-		self.x_textfield.setText(res[0])
+		self.x_textfield.setText(str(res[0]))
 		self.x_textfield.setValidator(QIntValidator(0, 9999))
 		resolution_layout.addWidget(self.x_textfield)
 		y_label = QLabel("y :")
 		resolution_layout.addWidget(y_label)
 		self.y_textfield = QLineEdit()
-		self.y_textfield.setText(res[1])
+		self.y_textfield.setText(str(res[1]))
 		self.y_textfield.setValidator(QIntValidator(0, 9999))
 		resolution_layout.addWidget(self.y_textfield)
 		apply_res_button = QPushButton("Apply to all shots")

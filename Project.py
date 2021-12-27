@@ -5,6 +5,7 @@ from shutil import rmtree
 from Shot import *
 from Asset import *
 from Resources import *
+from Settings import *
 
 import re
 
@@ -14,15 +15,10 @@ class Project:
 		self.shot_list = []
 		self.asset_list = []
 
-		self.sequence_number = 1
 		self.selected_shot = None
 		self.selected_asset = None
 		self.directory = directory
-		self.res_x = 1920
-		self.res_y = 1080
 		self.valid = True
-		self.default_software = "maya"
-		self.custom_link = ""
 
 		if not path.isdir(self.directory):
 			makedirs(self.directory)
@@ -68,35 +64,22 @@ class Project:
 
 			makedirs(self.directory + "/10_print")
 
-			with open(self.directory + "/project_option.spi", "w") as f:
-				f.write("www.google.fr\n")
-				f.write("1920x1080\n")
-			f.close()
-
 		elif path.isdir(self.directory + "/05_shot"):
 			self.updateShotList()
 			self.updateAssetList()
 
-			if not Resources.readLine(self.directory + "/project_option.spi", 2):
-				Resources.writeAtLine(self.directory + "/project_option.spi", self.res_x + "x" + self.res_y, 2)
-
-			if not Resources.readLine(self.directory + "/project_option.spi", 3):
-				Resources.writeAtLine(self.directory + "/project_option.spi", str(self.sequence_number), 3)
-
-			if not Resources.readLine(self.directory + "/project_option.spi", 4):
-				Resources.writeAtLine(self.directory + "/project_option.spi", self.default_software, 4)
-
-			res = Resources.readLine(self.directory + "/project_option.spi", 2).split("x")
-
-			self.res_x = res[0]
-			self.res_y = res[1]
-
-			self.custom_link = Resources.readLine(self.directory + "/project_option.spi", 1)
-			self.sequence_number = int(Resources.readLine(self.directory + "/project_option.spi", 3))
-			self.default_software = Resources.readLine(self.directory + "/project_option.spi", 4)
-
 		else:
 			self.valid = False
+
+		## SETTINGS ##
+		self.project_settings = Settings(self.directory + "/project_option.spi")
+		self.project_settings.loadProjectSettings()
+
+		self.custom_link = self.project_settings.getSetting("custom_link")
+		self.res_x = self.project_settings.getSetting("res_x")
+		self.res_y = self.project_settings.getSetting("res_y")
+		self.sequence_number = self.project_settings.getSetting("sequence_number")
+		self.default_software = self.project_settings.getSetting("default_software")
 
 
 	def getShotList(self):
@@ -300,7 +283,9 @@ class Project:
 		self.res_x = res[0]
 		self.res_y = res[1]
 
-		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.res_x + "x" + self.res_y, 2)
+		self.project_settings.setSetting("res_x", self.res_x)
+		self.project_settings.setSetting("res_y", self.res_y)
+		self.project_settings.saveSettings()
 
 
 	def setAllShotsRes(self):
@@ -316,7 +301,9 @@ class Project:
 
 	def setDefaultSoftware(self, default_software):
 		self.default_software = default_software
-		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.default_software, 4)
+
+		self.project_settings.setSetting("default_software", self.default_software)
+		self.project_settings.saveSettings()
 
 
 	def getDefaultSoftware(self):
@@ -325,7 +312,9 @@ class Project:
 
 	def setCustomLink(self, custom_link):
 		self.custom_link = custom_link
-		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", self.custom_link, 1)
+
+		self.project_settings.setSetting("custom_link", self.custom_link)
+		self.project_settings.saveSettings()
 
 
 	def getCustomLink(self):
@@ -334,4 +323,6 @@ class Project:
 
 	def addSequence(self):
 		self.sequence_number += 1
-		Resources.writeAtLine(self.getDirectory() + "/project_option.spi", str(self.sequence_number), 3)
+
+		self.project_settings.setSetting("sequence_number", self.sequence_number)
+		self.project_settings.saveSettings()
