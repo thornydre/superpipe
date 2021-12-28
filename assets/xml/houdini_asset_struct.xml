@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<data>
+  <dir name="abc"/>
+  <dir name="audio"/>
+  <dir name="backup"/>
+  <dir name="comp"/>
+  <dir name="desk"/>
+  <dir name="flip"/>
+  <dir name="geo"/>
+  <dir name="hda"/>
+  <dir name="render"/>
+  <dir name="scripts"/>
+  <dir name="sim"/>
+  <dir name="tex"/>
+  <dir name="video"/>
+</data>

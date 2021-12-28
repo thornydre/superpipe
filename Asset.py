@@ -3,6 +3,7 @@
 from os import makedirs, path, listdir, rename
 from shutil import copyfile, copytree, rmtree
 from Settings import *
+from XMLParser import *
 
 import time
 
@@ -285,66 +286,11 @@ class Asset:
 
 	def createFolderHierarchy(self):
 		if self.software == "maya" or self.software == "blender":
-			makedirs(self.asset_directory + "/assets")
-			
-			makedirs(self.asset_directory + "/autosave")
-			
-			makedirs(self.asset_directory + "/cache")
-			makedirs(self.asset_directory + "/cache/nCache")
-			makedirs(self.asset_directory + "/cache/nCache/fluid")
-			makedirs(self.asset_directory + "/cache/particles")
-
-			makedirs(self.asset_directory + "/clips")
-			
-			makedirs(self.asset_directory + "/data")
-			makedirs(self.asset_directory + "/data/edits")
-			
-			makedirs(self.asset_directory + "/images")
-			makedirs(self.asset_directory + "/images/screenshots")
-			
-			makedirs(self.asset_directory + "/movies")
-			
-			makedirs(self.asset_directory + "/renderData")
-			makedirs(self.asset_directory + "/renderData/depth")
-			makedirs(self.asset_directory + "/renderData/fur")
-			makedirs(self.asset_directory + "/renderData/fur/furAttrMap")
-			makedirs(self.asset_directory + "/renderData/fur/furEqualMap")
-			makedirs(self.asset_directory + "/renderData/fur/furFiles")
-			makedirs(self.asset_directory + "/renderData/fur/furImages")
-			makedirs(self.asset_directory + "/renderData/fur/furShadowMap")
-			makedirs(self.asset_directory + "/renderData/iprImages")
-			makedirs(self.asset_directory + "/renderData/shaders")
-			
-			makedirs(self.asset_directory + "/scenes")
-			makedirs(self.asset_directory + "/scenes/backup")
-			makedirs(self.asset_directory + "/scenes/edits")
-
-			makedirs(self.asset_directory + "/scripts")
-			
-			makedirs(self.asset_directory + "/sound")
-			
-			makedirs(self.asset_directory + "/sourceimages")
-			makedirs(self.asset_directory + "/sourceimages/3dPaintTextures")
-			makedirs(self.asset_directory + "/sourceimages/edits")
-			makedirs(self.asset_directory + "/sourceimages/environment")
-			makedirs(self.asset_directory + "/sourceimages/imagePlane")
-			makedirs(self.asset_directory + "/sourceimages/imageSequence")
-
-			copyfile("assets/src/workspace.mel", self.asset_directory + "/workspace.mel")
+			xml_parser = XMLParser("./assets/xml/default_asset_struct.xml")
+			xml_parser.parseXML(self.asset_directory)
 
 		elif self.software == "houdini":
-			makedirs(self.asset_directory + "/abc")
-			makedirs(self.asset_directory + "/audio")
-			makedirs(self.asset_directory + "/backup")
-			makedirs(self.asset_directory + "/comp")
-			makedirs(self.asset_directory + "/desk")
-			makedirs(self.asset_directory + "/flip")
-			makedirs(self.asset_directory + "/geo")
-			makedirs(self.asset_directory + "/hda")
-			makedirs(self.asset_directory + "/render")
-			makedirs(self.asset_directory + "/scripts")
-			makedirs(self.asset_directory + "/sim")
-			makedirs(self.asset_directory + "/tex")
-			makedirs(self.asset_directory + "/video")
+			xml_parser = XMLParser("./assets/xml/houdini_asset_struct.xml")
+			xml_parser.parseXML(self.asset_directory)
 		else:
 			print("ERROR")

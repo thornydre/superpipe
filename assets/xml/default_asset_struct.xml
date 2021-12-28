@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<data>
+  <dir name="assets"/>
+  <dir name="autosave"/>
+  <dir name="cache">
+    <dir name="nCache">
+      <dir name="fluid"/>
+    </dir>
+    <dir name="particles"/>
+  </dir>
+  <dir name="clips"/>
+  <dir name="data">
+    <dir name="edits"/>
+  </dir>
+  <dir name="images">
+    <dir name="screenshots"/>
+  </dir>
+  <dir name="movies"/>
+  <dir name="renderData">
+    <dir name="depth"/>
+    <dir name="fur">
+      <dir name="furAttrMap"/>
+      <dir name="furEqualMap"/>
+      <dir name="furFiles"/>
+      <dir name="furImages"/>
+      <dir name="furShadowMap"/>
+    </dir>
+    <dir name="iprImages"/>
+    <dir name="shaders"/>
+  </dir>
+  <dir name="scenes">
+    <dir name="backup"/>
+    <dir name="edits"/>
+  </dir>
+  <dir name="scripts"/>
+  <dir name="sound"/>
+  <dir name="sourceimages">
+    <dir name="3dPaintTextures"/>
+    <dir name="edits"/>
+    <dir name="environment"/>
+    <dir name="imagePlane"/>
+    <dir name="imageSequence"/>
+  </dir>
+</data>
