@@ -118,6 +118,7 @@ class CustomSlider(QWidget):
 
 	def setPercentage(self, percentage):
 		self.percentage = percentage
+		self.repaint()
 
 
 	def getPercentage(self):

@@ -53,11 +53,9 @@ class NewAssetDialog(QDialog):
 
 		assets = project.getAssetList()
 
-		for asset in assets:
+		for asset in assets.values():
 			if asset.getAssetName() != "backup":
 				if path.isdir(project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
-					cur_asset = Asset(project.getDirectory(), asset.getSecondPath(), asset.getAssetName())
-
 					asset_subfolders = asset.getSecondPath().strip("/").split("/")
 					current_category = self.categories[asset_subfolders[0].lower()]
 

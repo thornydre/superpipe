@@ -13,8 +13,10 @@ import re
 
 class Project:
 	def __init__(self, directory):
-		self.shot_list = []
-		self.asset_list = []
+		self.shot_list = {}
+		self.asset_list = {}
+
+		self.last_used_sequence = 1
 
 		self.selected_shot = None
 		self.selected_asset = None
@@ -54,15 +56,18 @@ class Project:
 
 
 	def updateShotList(self):
-		self.shot_list = []
+		self.shot_list = {}
 		for shot_name in listdir(self.directory + "/05_shot/"):
 			if re.match(r"s[0-9][0-9]p[0-9][0-9][0-9]", shot_name):
 				shot = Shot(self.directory, shot_name)
-				self.shot_list.append(shot)
+				shot_sequence = shot.getSequence()
+				if shot_sequence > self.last_used_sequence:
+					self.last_used_sequence = shot_sequence
+				self.shot_list[shot_name] = shot
 
 
 	def updateAssetList(self):
-		self.asset_list = []
+		self.asset_list = {}
 
 		exclude = ["superpipe"]
 
@@ -70,8 +75,10 @@ class Project:
 			if any([i in sub_dirs for i in exclude]):
 				sub_dirs[:] = []
 				if not "backup" in cur_dir:
-					asset = Asset(self.directory, path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset/", ""), path.basename(cur_dir))
-					self.asset_list.append(asset)
+					secondary_path = path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset/", "")
+					asset_name = path.basename(cur_dir)
+					asset = Asset(self.directory, secondary_path, asset_name)
+					self.asset_list[asset_name] = asset
 
 
 	def getDirectory(self):
@@ -95,22 +102,15 @@ class Project:
 
 
 	def createShot(self, shot_sequence):
-		current_sequence = 1
-
-		if self.shot_list:
-			current_sequence = Shot(self.directory, self.shot_list[-1].getShotName()).getSequence()
-
-		if shot_sequence >= current_sequence:
+		if shot_sequence >= self.last_used_sequence:
 			shot_nb = len(self.shot_list) + 1
 
 			shot_name = Resources.makeShotName(shot_nb, shot_sequence)
 
-			shot = Shot(self.directory, shot_name, software = self.default_software)
-
 		else:
 			shots_to_rename = []
 
-			for shot in self.shot_list:
+			for shot in self.shot_list.values():
 				if Resources.makeShotNbs(shot.getShotName())[1] > shot_sequence :
 					shots_to_rename.append(shot)
 
@@ -123,9 +123,11 @@ class Project:
 
 			shot_nb = shots_to_rename[-1].getShotNb()
 
-			shot = Shot(self.directory, Resources.makeShotName(shot_nb, shot_sequence), software = self.default_software)
+			shot_name = Resources.makeShotName(shot_nb, shot_sequence)
 
-		self.shot_list.append(shot)
+		shot = Shot(self.directory, shot_name, software=self.default_software)
+
+		self.shot_list[shot_name] = shot
 
 		self.updateShotList()
 
@@ -133,55 +135,75 @@ class Project:
 
 
 	def removeShot(self, shot_name):
-		shot = Shot(self.directory, shot_name)
+		shot = self.shot_list[shot_name]
 
 		shot.deleteShot()
 
 		for i in range(len(self.shot_list) - shot.getShotNb()):
 			n = i + shot.getShotNb()
 
-			cur_shot = Shot(self.directory, self.shot_list[n].getShotName())
+			#cur_shot = Shot(self.directory, self.shot_list[n].getShotName())
+			cur_shot = self.shot_list.values()[n]
 
-			cur_shot.renameShot(Resources.makeShotName(self.shot_list[n - 1].getShotNb(), cur_shot.getSequence()))
+			cur_shot.renameShot(Resources.makeShotName(self.shot_list.values()[n - 1].getShotNb(), cur_shot.getSequence()))
 
 		self.updateShotList()
 
 
 	def moveShotUp(self, shot_name):
-		shot = Shot(self.directory, shot_name)
+		shot = self.shot_list[shot_name]
 		shot_name_backup = shot.getShotName()
 
-		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb()].getShotName())
+		swap_shot = self.getShotFromNumber(shot.getShotNb() + 1)
 		swap_shot_name_backup = swap_shot.getShotName()
 
-		shot.renameShot("s00p000")
+		try:
+			shot.renameShot("s00p000")
+			self.shot_list["s00p000"] = self.shot_list.pop(shot_name_backup)
 
-		swap_shot.renameShot(shot_name_backup)
+			swap_shot.renameShot(shot_name_backup)
+			self.shot_list[shot_name_backup] = self.shot_list.pop(swap_shot_name_backup)
 
-		shot.renameShot(swap_shot_name_backup)
+			shot.renameShot(swap_shot_name_backup)
+			self.shot_list[swap_shot_name_backup] = self.shot_list.pop("s00p000")
+		except:
+			print("ERROR : Could not rename the shots")
 
 
 	def moveShotDown(self, shot_name):
-		shot = Shot(self.directory, shot_name)
+		shot = self.shot_list[shot_name]
 		shot_name_backup = shot.getShotName()
 
-		swap_shot = Shot(self.directory, self.shot_list[shot.getShotNb() - 2].getShotName())
+		swap_shot = self.getShotFromNumber(shot.getShotNb() - 1)
 		swap_shot_name_backup = swap_shot.getShotName()
 
-		shot.renameShot("s00p000")
+		try:
+			shot.renameShot("s00p000")
+			self.shot_list["s00p000"] = self.shot_list.pop(shot_name_backup)
 
-		swap_shot.renameShot(shot_name_backup)
+			swap_shot.renameShot(shot_name_backup)
+			self.shot_list[shot_name_backup] = self.shot_list.pop(swap_shot_name_backup)
 
-		shot.renameShot(swap_shot_name_backup)
+			shot.renameShot(swap_shot_name_backup)
+			self.shot_list[swap_shot_name_backup] = self.shot_list.pop("s00p000")
+		except:
+			print("ERROR : Could not rename the shots")
+
+
+	def getShotFromNumber(self, nb):
+		for shot in self.shot_list.values():
+			if shot.getShotNb() == nb:
+				return shot
+
+		return None
 
 
 	def createAsset(self, asset_name, second_path, software):
-		for check_asset in self.asset_list:
-			if asset_name == check_asset.getAssetName():
-				return False
+		if self.asset_list.get(asset_name):
+			return False
 
 		asset = Asset(self.directory, second_path, asset_name, software)
-		self.asset_list.append(asset)
+		self.asset_list[asset_name] = asset
 
 		return True
 
@@ -195,7 +217,7 @@ class Project:
 	def filterAssetList(self, filter_str):
 		filtered_asset_list = []
 
-		for asset in self.asset_list:
+		for asset in self.asset_list.values():
 			if re.search(filter_str, asset.getAssetName()):
 				filtered_asset_list.append(asset)
 
@@ -221,10 +243,10 @@ class Project:
 
 	def setSelection(self, shot_name=None, asset_name=None, second_path=None):
 		if shot_name:
-			self.selected_shot = Shot(self.directory, shot_name)
+			self.selected_shot = self.shot_list[shot_name]
 			self.selected_asset = None
 		elif asset_name:
-			self.selected_asset = Asset(self.directory, second_path, asset_name)
+			self.selected_asset = self.asset_list[asset_name]
 			self.selected_shot = None
 
 

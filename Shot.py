@@ -271,24 +271,25 @@ class Shot:
 
 		if not path.isdir(new_dir):
 			try:
-				os.rename(self.shot_directory, new_dir)
+				rename(self.shot_directory, new_dir)
 
 				for f in listdir(new_dir + "/scenes/"):
 					if self.shot_name in f:
-						os.rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f .replace(self.shot_name, new_name))
+						rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f .replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/scenes/edits/"):
 					if self.shot_name in f:
-						os.rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.shot_name, new_name))
+						rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/scenes/backup/"):
 					if self.shot_name in f:
-						os.rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.shot_name, new_name))
+						rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.shot_name, new_name))
 
 				for f in listdir(new_dir + "/images/screenshots/"):
 					if self.shot_name in f:
-						os.rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
+						rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.shot_name, new_name))
 			except Exception as e:
+				print(e)
 				return False
 
 		self.shot_name = new_name
@@ -382,11 +383,11 @@ class Shot:
 
 		for file in listdir(self.shot_directory + "/scenes/"):
 			if self.step.lower() in file:
-				os.rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
+				rename(self.shot_directory +"/scenes/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
 		for file in listdir(self.shot_directory + "/scenes/edits/"):
 			if self.step.lower() in file:
-				os.rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
+				rename(self.shot_directory +"/scenes/edits/" + file, self.shot_directory +"/scenes/backup/" + path.splitext(file)[0] + "_" + time.strftime("%Y_%m_%d_%H_%M_%S") + ext)
 
 		for file in listdir(self.shot_directory + "/images/screenshots/"):
 			if self.step.lower() in file:

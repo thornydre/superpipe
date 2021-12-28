@@ -1118,7 +1118,7 @@ class SuperPipe(QMainWindow):
 				shot = self.current_project.getSelection()
 
 				if Shot.validShot(shot.getDirectory()):
-					self.updateVersionListView(shot = shot)
+					self.updateVersionListView(shot=shot)
 					self.version_list.setCurrentRow(0)
 					if self.version_list.currentItem():
 						self.shot_version_comment_label.setText(self.current_project.getSelection().getComment(self.version_list.currentItem().text()))
@@ -1145,13 +1145,12 @@ class SuperPipe(QMainWindow):
 						self.downgrade_shot_button.setVisible(True)
 
 						self.step_slider.setCurrentStep(shot.getStep())
-						print(shot.getPercentage())
 						if shot.isDone():
 							self.step_slider.setPercentage(100)
-							self.step_slider.setActive(active=False)
+							self.step_slider.setActive(False)
 						else:
+							self.step_slider.setActive(True)
 							self.step_slider.setPercentage(shot.getPercentage())
-							self.step_slider.setActive(active=True)
 						self.step_slider.setVisible(True)
 
 						self.upgrade_shot_button.setVisible(True)
@@ -1479,7 +1478,8 @@ class SuperPipe(QMainWindow):
 
 		shots = self.current_project.getShotList()
 
-		for shot in shots:
+		for shot_name in sorted(shots):
+			shot = shots[shot_name]
 			if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot.getShotName() + "/superpipe"):
 				item = QListWidgetItem(shot.getShotName())
 				self.shot_list.insertItem(shot.getShotNb(), item)
@@ -1564,9 +1564,6 @@ class SuperPipe(QMainWindow):
 		self.updateShotListView()
 		self.shot_list.setCurrentRow(new_selection)
 
-		self.up_button.setEnabled(True)
-		self.down_button.setEnabled(True)
-
 		self.app.restoreOverrideCursor()
 
 
@@ -1581,9 +1578,6 @@ class SuperPipe(QMainWindow):
 		new_selection = self.shot_list.currentRow() - 1
 		self.updateShotListView()
 		self.shot_list.setCurrentRow(new_selection)
-
-		self.up_button.setEnabled(True)
-		self.down_button.setEnabled(True)
 
 		self.app.restoreOverrideCursor()
 
