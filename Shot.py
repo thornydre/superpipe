@@ -416,10 +416,10 @@ class Shot:
 
 
 	def createFolderHierarchy(self):
-		if self.software == "maya" or self.software == "blender":
-			xml_parser = XMLParser("./assets/xml/default_asset_struct.xml")
-			xml_parser.parseXML(self.shot_directory)
+		# if self.software == "maya" or self.software == "blender":
+		xml_parser = XMLParser("./assets/xml/default_asset_struct.xml")
+		xml_parser.parseXML(self.shot_directory)
 
-		elif self.software == "houdini":
-			xml_parser = XMLParser("./assets/xml/houdini_asset_struct.xml")
-			xml_parser.parseXML(self.shot_directory)
+		# elif self.software == "houdini":
+		# 	xml_parser = XMLParser("./assets/xml/houdini_asset_struct.xml")
+		# 	xml_parser.parseXML(self.shot_directory)

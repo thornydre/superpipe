@@ -730,7 +730,7 @@ class SuperPipe(QMainWindow):
 		self.setCentralWidget(main_widget)
 
 
-	def newProjectCommand(self, event = None):
+	def newProjectCommand(self):
 		dialog = NewProjectDialog(self)
 		dialog.exec()
 		project = dialog.getData()

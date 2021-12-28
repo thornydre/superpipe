@@ -109,7 +109,7 @@ class ProjectSettingsDialog(QDialog):
 
 	def getData(self):
 		if self.validate:
-			if self.res_x and self.res_y and self.software and self.custom_link:
+			if self.res_x and self.res_y and self.software:
 				result = {}
 				result["res"] = (self.res_x, self.res_y)
 				result["software"] = self.software

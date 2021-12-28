@@ -8,12 +8,13 @@ from Settings import *
 
 
 class PreferencesDialog(QDialog):
-	def __init__(self, parent=None,):
+	def __init__(self, parent=None):
 		super(PreferencesDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
 		self.validate = True
 
-		settings = Settings()
+		settings = Settings("assets/settings.spi")
+		settings.loadGeneralSettings()
 
 		self.setWindowTitle("Super Pipe || Preferences")
 		
