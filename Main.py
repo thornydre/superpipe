@@ -1402,10 +1402,8 @@ class SuperPipe(QMainWindow):
 			if settings["name"] == "superpipe":
 				valid_name = False
 			else:
-				for check_asset in self.current_project.getAssetList():
-					if settings["name"] == check_asset.getAssetName():
-						valid_name = False
-						break
+				if self.current_project.getAssetList().get(settings["name"]):
+					valid_name = False
 
 		if valid_name:
 			self.app.setOverrideCursor(Qt.WaitCursor)
@@ -1682,7 +1680,7 @@ class SuperPipe(QMainWindow):
 		all_shots_preview = []
 
 		i = 0
-		for shot in self.current_project.getShotList():
+		for shot in self.current_project.getShotList().values():
 			all_picts_path = shot.getPictsPath()
 
 			all_picts_path_array = []
