@@ -3,17 +3,21 @@
   <dir name="assets"/>
   <dir name="autosave"/>
   <dir name="cache">
-    <dir name="nCache">
-      <dir name="fluid"/>
+    <dir name="inputCaches">
+      <dir name="abc"/>
+      <dir name="vdb"/>
     </dir>
-    <dir name="particles"/>
+    <dir name="outputCaches">
+      <dir name="abc"/>
+      <dir name="vdb"/>
+    </dir>
   </dir>
   <dir name="clips"/>
   <dir name="data">
     <dir name="edits"/>
   </dir>
   <dir name="images">
-    <dir name="screenshots"/>
+    <dir name="screenshots" tag="screenSave"/>
   </dir>
   <dir name="movies"/>
   <dir name="renderData">

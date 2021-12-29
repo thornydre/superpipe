@@ -254,7 +254,7 @@ class Shot:
 								if "layout" not in shot_file and "blocking" not in shot_file and "splining" not in shot_file and "rendering" not in shot_file:
 									versions_list.append((path.getmtime(self.shot_directory + "/scenes/edits/" + shot_file), shot_file))
 
-		return sorted(versions_list, reverse = True)
+		return sorted(versions_list, reverse=True)
 
 
 	def getPlayblastsList(self):
@@ -263,7 +263,7 @@ class Shot:
 			if path.splitext(playblast_file)[1] in (".mov", ".avi"):
 				playblasts_list.append((path.getmtime(self.shot_directory + "/movies/" + playblast_file), playblast_file))
 
-		return sorted(playblasts_list, reverse = True)
+		return sorted(playblasts_list, reverse=True)
 
 
 	def renameShot(self, new_name):
