@@ -30,7 +30,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/thornydre/superpipe">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="assets/img/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">superpipe</h3>
@@ -45,7 +45,7 @@
     ·
     <a href="https://github.com/thornydre/superpipe/issues">Report Bug</a>
     ·
-    <a href="https://github.com/thornydre/superpipe/issues">Request Feature</a>
+    <a href="https://github.com/thornydre/superpipe/pulls">Request Feature</a>
   </p>
 </div>
 
@@ -82,9 +82,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `thornydre`, `superpipe`, `linkedin_username`, `email`, `email_client`, `superpipe`, `project_description`
+Superpipe is CG project pipeline toolset. It allows creation of a folder hierarchy from pre-production (character design, colorscript, storyboard...) to post-production (compositing, editing...), and managing a project during the production through ah easy to use user interface.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -92,14 +90,13 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 
 ### Built With
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
+The project is built with python 3.10 and PySide6:
+* [Python](https://python.org/)
+* [PySide6](https://python.org/)
+
+Additional Libraries:
+* [OpenCV](https://opencv.org/)
+* [Pillow](https://python-pillow.org/)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -108,9 +105,10 @@ Here's a blank template to get started: To avoid retyping too much info. Do a se
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+You can <a href="https://github.com/thornydre/superpipe/releases">install Superpipe via the Releases page</a>.
+Then you can start by clicking `superpipe.exe` and create a new project via the `File` drop down menu : `File > New Project`.
 
+<!--
 ### Prerequisites
 
 This is an example of how to list things you need to use the software and how to install them.
@@ -134,6 +132,7 @@ This is an example of how to list things you need to use the software and how to
    ```js
    const API_KEY = 'ENTER YOUR API';
    ```
+-->
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -153,10 +152,9 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 <!-- ROADMAP -->
 ## Roadmap
 
-- [] Feature 1
+- [x] From TKinter to PySide
 - [] Feature 2
 - [] Feature 3
-    - [] Nested Feature
 
 See the [open issues](https://github.com/thornydre/superpipe/issues) for a full list of proposed features (and known issues).
 
@@ -194,7 +192,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
+Lucas BOUTROT - [@lboutrot]([linkedin-url]) - lucas.boutrot@gmail.com
 
 Project Link: [https://github.com/thornydre/superpipe](https://github.com/thornydre/superpipe)
 
@@ -226,5 +224,5 @@ Project Link: [https://github.com/thornydre/superpipe](https://github.com/thorny
 [license-shield]: https://img.shields.io/github/license/thornydre/superpipe.svg?style=for-the-badge
 [license-url]: https://github.com/thornydre/superpipe/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
+[linkedin-url]: https://linkedin.com/in/lboutrot
 [product-screenshot]: images/screenshot.png
