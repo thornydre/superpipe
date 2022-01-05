@@ -81,9 +81,6 @@
 
 Superpipe is CG project pipeline toolset. It allows creation of a folder hierarchy from pre-production (character design, colorscript, storyboard...) to post-production (compositing, editing...), and managing a project during the production through ah easy to use user interface.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 ### Built With
 
@@ -113,7 +110,7 @@ Add shelfs to your software by copying
 #### Maya:
 `scripts/maya_scripts/shelf_Superpipe.mel` to `Documents/maya/20**/prefs/shelves/`
 #### Houdini:
-`scripts/houdini_scripts/superpipe_shelf.shelf` to `Documents/houdini19.0/toolbar/`
+`scripts/houdini_scripts/superpipe_shelf.shelf` to `Documents/houdini**.**/toolbar/`
 #### Blender:
 You can add the Superpipe add-on for Blender by going into `File > User Preferences > Add-ons` and click on `Install Add-on from file` and pick `scripts/blender_scripts/superpipe_addon.py`.
 
