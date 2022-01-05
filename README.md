@@ -143,8 +143,8 @@ COMING
 ## Roadmap
 
 - [x] From TKinter to PySide
-- [] Statistics view
-- [] Cutomize project hierarchy
+- [ ] Statistics view
+- [ ] Cutomize project hierarchy
 
 See the [open issues](https://github.com/thornydre/superpipe/issues) for a full list of proposed features (and known issues).
 
