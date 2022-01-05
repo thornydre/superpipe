@@ -103,6 +103,18 @@ Additional Libraries:
 You can <a href="https://github.com/thornydre/superpipe/releases">install Superpipe via the Releases page</a>.
 Then you can start by clicking `superpipe.exe` and create a new project via the `File` drop down menu : `File > New Project`.
 
+
+### Scripts Installation
+Add shelfs to your software boy copying:
+#### Maya:
+`scripts/maya_scripts/shelf_Superpipe.mel` to `Documents/maya/20**/prefs/shelves/`
+#### Houdini:
+`scripts/houdini_scripts/superpipe_shelf.shelf` to `Documents/houdini19.0/toolbar/`
+#### Blender:
+You can add the Superpipe add-on for Blender by going into `File > User Preferences > Add-ons` and click on `Install Add-on from file` and pick `scripts/blender_scripts/superpipe_addon.py`.
+
+The ".ma" files in the "src" folder can be modified if you want a different default files as you create a new asset or shot in Superpipe.
+
 <!--
 ### Prerequisites
 
