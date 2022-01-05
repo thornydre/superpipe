@@ -1433,42 +1433,43 @@ class SuperPipe(QMainWindow):
 		for cat in self.categories:
 			self.categories[cat].takeChildren()
 
-		assets = self.current_project.filterAssetList(self.asset_filter_textfield.text())
+		if self.current_project:
+			assets = self.current_project.filterAssetList(self.asset_filter_textfield.text())
 
-		for asset in assets:
-			if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
-				asset_subfolders = asset.getSecondPath().strip("/").split("/")
-				current_category = self.categories[asset_subfolders[0].lower()]
+			for asset in assets:
+				if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
+					asset_subfolders = asset.getSecondPath().strip("/").split("/")
+					current_category = self.categories[asset_subfolders[0].lower()]
 
-				for subfolder in asset_subfolders[1:]:
-					if not self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive):
-						new_item = QTreeWidgetItem([subfolder.upper()])
-						current_category.addChild(new_item)
-						current_category = new_item
+					for subfolder in asset_subfolders[1:]:
+						if not self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive):
+							new_item = QTreeWidgetItem([subfolder.upper()])
+							current_category.addChild(new_item)
+							current_category = new_item
+						else:
+							current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive)[0]
+
+					if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly):
+						self.dialog("ERROR", "W", "The asset \"" + asset.getSecondPath().upper() + "/" + asset.getAssetName() + "\" already exists !")
 					else:
-						current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive)[0]
+						item = QTreeWidgetItem([asset.getAssetName()])
+						priority = asset.getPriority()
 
-				if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly):
-					self.dialog("ERROR", "W", "The asset \"" + asset.getSecondPath().upper() + "/" + asset.getAssetName() + "\" already exists !")
+						if asset.getDone():
+							item.setBackground(0, QBrush(QColor(137, 193, 127)))
+						elif priority == 0:
+							item.setBackground(0, QBrush())
+						elif priority == 1:
+							item.setBackground(0, QBrush(QColor(244, 226, 85)))
+						elif priority == 2:
+							item.setBackground(0, QBrush(QColor(239, 180, 98)))
+						elif priority == 3:
+							item.setBackground(0, QBrush(QColor(229, 82, 82)))
+
+						current_category.addChild(item)
+
 				else:
-					item = QTreeWidgetItem([asset.getAssetName()])
-					priority = asset.getPriority()
-
-					if asset.getDone():
-						item.setBackground(0, QBrush(QColor(137, 193, 127)))
-					elif priority == 0:
-						item.setBackground(0, QBrush())
-					elif priority == 1:
-						item.setBackground(0, QBrush(QColor(244, 226, 85)))
-					elif priority == 2:
-						item.setBackground(0, QBrush(QColor(239, 180, 98)))
-					elif priority == 3:
-						item.setBackground(0, QBrush(QColor(229, 82, 82)))
-
-					current_category.addChild(item)
-
-			else:
-				self.dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" has a problem !")
+					self.dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" has a problem !")
 
 
 	def updateShotListView(self):
