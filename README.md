@@ -33,10 +33,10 @@
     <img src="assets/img/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">superpipe</h3>
+<h3 align="center">Superpipe</h3>
 
   <p align="center">
-    project_description
+    CG project pipeline toolset
     <br />
     <a href="https://github.com/thornydre/superpipe"><strong>Explore the docs »</strong></a>
     <br />
