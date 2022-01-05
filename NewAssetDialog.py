@@ -8,6 +8,7 @@ from Asset import *
 
 
 class NewAssetDialog(QDialog):
+# Class: Creates a window with options to create a new asset
 	def __init__(self, parent=None, project=None):
 		super(NewAssetDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
@@ -96,6 +97,7 @@ class NewAssetDialog(QDialog):
 
 
 	def submitCommand(self):
+		# method: Submit, validate the data and close the window
 		parent = self.categories_list.currentItem()
 		category_list = []
 		
@@ -114,11 +116,13 @@ class NewAssetDialog(QDialog):
 
 
 	def cancelCommand(self):
+		# method: Close the window and set the validate flag to False
 		self.validate = False
 		self.close()
 
 
 	def getData(self):
+		# method: Query the data that has previously been submitted
 		if self.validate:
 			if self.name and self.category and self.software:
 				result = {}
