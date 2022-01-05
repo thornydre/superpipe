@@ -121,6 +121,10 @@ class SuperPipe(QMainWindow):
 		set_project_action.setShortcut("Ctrl+O")
 		set_project_action.triggered.connect(self.setProjectCommand)
 
+		refresh_action = QAction("Refresh", self)
+		refresh_action.setShortcut("F5")
+		refresh_action.triggered.connect(self.refresh)
+
 		exit_action = QAction("Quit", self)
 		exit_action.setShortcut("Alt+F4")
 		exit_action.triggered.connect(self.close)
@@ -162,6 +166,8 @@ class SuperPipe(QMainWindow):
 		file_menu = menu_bar.addMenu("File")
 		file_menu.addAction(new_project_action)
 		file_menu.addAction(set_project_action)
+		file_menu.addSeparator()
+		file_menu.addAction(refresh_action)
 		file_menu.addSeparator()
 		file_menu.addAction(exit_action)
 
@@ -1881,15 +1887,15 @@ class SuperPipe(QMainWindow):
 
 
 	def refresh(self, event):
-		if self.version_list.curselection():
-			selected_version = self.version_list.curselection()[0]
+		if self.version_list.currentItem():
+			selected_version = self.version_list.currentItem()
 			
 			if self.current_project.getSelectionType() == "shot":
-				self.updateVersionListView(shot = self.current_project.getSelection())
+				self.updateVersionListView(shot=self.current_project.getSelection())
 			elif self.current_project.getSelectionType() == "asset":
-				self.updateVersionListView(asset = self.current_project.getSelection())
+				self.updateVersionListView(asset=self.current_project.getSelection())
 
-			self.version_list.select_set(selected_version)
+			self.version_list.setCurrentItem(selected_version)
 
 			self.versionlistCommand()
 
