@@ -61,19 +61,11 @@
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
+    <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -141,9 +133,7 @@ This is an example of how to list things you need to use the software and how to
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+COMING
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -153,8 +143,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Roadmap
 
 - [x] From TKinter to PySide
-- [] Feature 2
-- [] Feature 3
+- [] Statistics view
+- [] Cutomize project hierarchy
 
 See the [open issues](https://github.com/thornydre/superpipe/issues) for a full list of proposed features (and known issues).
 
@@ -163,6 +153,7 @@ See the [open issues](https://github.com/thornydre/superpipe/issues) for a full 
 
 
 <!-- CONTRIBUTING -->
+<!--
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -177,7 +168,7 @@ Don't forget to give the project a star! Thanks again!
 5. Open a Pull Request
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
+-->
 
 
 <!-- LICENSE -->
@@ -192,7 +183,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Lucas BOUTROT - [@lboutrot]([linkedin-url]) - lucas.boutrot@gmail.com
+Lucas BOUTROT - [linkedin@lboutrot](https://linkedin.com/in/lboutrot) - lucas.boutrot@gmail.com
 
 Project Link: [https://github.com/thornydre/superpipe](https://github.com/thornydre/superpipe)
 
@@ -201,6 +192,7 @@ Project Link: [https://github.com/thornydre/superpipe](https://github.com/thorny
 
 
 <!-- ACKNOWLEDGMENTS -->
+<!--
 ## Acknowledgments
 
 * []()
@@ -208,7 +200,7 @@ Project Link: [https://github.com/thornydre/superpipe](https://github.com/thorny
 * []()
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
+-->
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
