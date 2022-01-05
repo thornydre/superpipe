@@ -4,7 +4,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
 from PySide6.QtGui import *
 from Resources import *
-from os import listdir, path
 
 
 class AboutDialog(QDialog):

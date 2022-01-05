@@ -7,10 +7,11 @@ from Settings import *
 from Project import *
 from Resources import *
 from ListsObserver import *
-from os import path, mkdir
+from os import path, mkdir, listdir
 from urllib.parse import urlsplit
 from PIL import ImageTk
-# from watchdog.observers import Observer
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 import sys
 import PIL
@@ -59,25 +60,19 @@ class SuperPipe(QMainWindow):
 
 		project_directory = self.settings.getSetting("project_dir")
 
-		self.add_asset_action.setEnabled(False)
-		self.add_shot_action.setEnabled(False)
-		self.project_settings_action.setEnabled(False)
-		self.project_statistics_action.setEnabled(False)
-		self.clean_backups_action.setEnabled(False)
-
 		if project_directory:
 			if path.isdir(project_directory):
+				self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
+				
 				self.current_project = Project(project_directory)
 				self.add_shot_button.setEnabled(True)
 				self.add_asset_button.setEnabled(True)
 				self.shots_preview_button.setEnabled(True)
 				self.custom_button.setEnabled(True)
-
-				self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
-
 				self.add_asset_action.setEnabled(True)
 				self.add_shot_action.setEnabled(True)
 				self.project_settings_action.setEnabled(True)
+
 				if self.current_project.getShotList():
 					self.project_statistics_action.setEnabled(True)
 				else:
@@ -89,11 +84,12 @@ class SuperPipe(QMainWindow):
 
 		if self.current_project:
 			self.home_page_title_label.setText("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
+
+			observer_thread = threading.Thread(target=self.runObserver, args=())
+			observer_thread.daemon = True
+			observer_thread.start()
+
 			# self.statistics_view.set(self.current_project)
-			# event_handler = ListsObserver(self.shot_list, self.current_project.getDirectory() + "/05_shot/")
-			# self.observer = Observer()
-			# self.observer.schedule(event_handler, path = self.current_project.getDirectory() + "/05_shot/", recursive = False)
-			# self.observer.start()
 
 		self.app.restoreOverrideCursor()
 
@@ -137,20 +133,26 @@ class SuperPipe(QMainWindow):
 		## Project menu actions ##
 		self.add_asset_action = QAction("Add asset", self)
 		self.add_asset_action.setShortcut("Ctrl+A")
+		self.add_asset_action.setEnabled(False)
 		self.add_asset_action.triggered.connect(self.addAssetCommand)
 
 		self.add_shot_action = QAction("Add shot", self)
 		self.add_shot_action.setShortcut("Ctrl+S")
+		self.add_shot_action.setEnabled(False)
 		self.add_shot_action.triggered.connect(self.addShotCommand)
 
 		self.project_settings_action = QAction("Project settings", self)
+		self.project_settings_action.setEnabled(False)
 		self.project_settings_action.triggered.connect(self.projectSettingsCommand)
 
 		self.project_statistics_action = QAction("Project statistics", self)
+		self.project_statistics_action.setEnabled(False)
 		self.project_statistics_action.triggered.connect(self.projectStatisticsCommand)
 
 		self.clean_backups_action = QAction("Clean backups", self)
+		self.clean_backups_action.setEnabled(False)
 		self.clean_backups_action.triggered.connect(self.cleanBackupsCommand)
+
 
 		## Help menu actions ##
 		about_action = QAction("About", self)
@@ -970,7 +972,6 @@ class SuperPipe(QMainWindow):
 				self.main_asset_widget.setVisible(True)
 
 				categories = ["CHARACTER", "FX", "PROPS", "SET"]
-
 
 				if selected_asset.childCount() == 0 and selected_asset.text(0) not in categories:
 					cur_item = selected_asset
@@ -1898,6 +1899,26 @@ class SuperPipe(QMainWindow):
 			self.version_list.setCurrentItem(selected_version)
 
 			self.versionlistCommand()
+
+
+	def runObserver(self):
+		my_event_handler = FileSystemEventHandler()
+		my_event_handler.on_created = self.dirChange
+		my_event_handler.on_deleted = self.dirChange
+		my_event_handler.on_moved = self.dirChange
+
+		go_recursively = True
+		my_observer = Observer()
+		my_observer.schedule(my_event_handler, self.main_path, recursive=go_recursively)
+
+		my_observer.start()
+
+		try:
+			while True:
+				time.sleep(1)
+		except KeyboardInterrupt:
+			my_observer.stop()
+			my_observer.join()
 
 
 	def dialog(self, title, purpose, message):
