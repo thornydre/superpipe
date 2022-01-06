@@ -1272,6 +1272,8 @@ class SuperPipe(QMainWindow):
 
 			selected_version = self.version_list.currentItem().text()
 
+			temp_path = self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version
+
 			if path.isfile(self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version):
 				if self.current_project.getSelectionType() == "shot":
 					temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
@@ -1281,8 +1283,6 @@ class SuperPipe(QMainWindow):
 					temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
 				elif self.current_project.getSelection().getSoftware() == "houdini":
 					temp_path = self.current_project.getSelection().getDirectory() + "/" + selected_version
-			else:
-				temp_path = self.current_project.getSelection().getDirectory() + "/scenes/edits/" + selected_version
 
 			self.asset_file_path_label.setText(temp_path.replace("/", "\\"))
 
@@ -1324,10 +1324,10 @@ class SuperPipe(QMainWindow):
 			if self.version_mode:
 				if asset.getSoftware() == "maya":
 					try:
+						maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+						
 						if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
 							maya_file = asset.getDirectory() + "/scenes/" + selected_asset_version
-						else:
-							maya_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
 						maya_args = [self.maya_path, "-file", maya_file, "-proj", asset.getDirectory()]
 						subprocess.Popen(maya_args)
@@ -1336,10 +1336,10 @@ class SuperPipe(QMainWindow):
 
 				elif asset.getSoftware() == "houdini":
 					try:
+						houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
+
 						if path.isfile(asset.getDirectory() + "/" + selected_asset_version):
 							houdini_file = asset.getDirectory() + "/" + selected_asset_version
-						else:
-							houdini_file = asset.getDirectory() + "/backup/" + selected_asset_version
 
 						subprocess.Popen("%s %s" % (self.houdini_path, houdini_file))
 					except:
@@ -1347,10 +1347,10 @@ class SuperPipe(QMainWindow):
 
 				elif asset.getSoftware() == "blender":
 					try:
+						blender_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
+						
 						if path.isfile(asset.getDirectory() + "/scenes/" + selected_asset_version):
 							blender_file = asset.getDirectory() + "/scenes/" + selected_asset_version
-						else:
-							blender_file = asset.getDirectory() + "/scenes/edits/" + selected_asset_version
 
 						subprocess.Popen("%s %s" % (self.blender_path, blender_file))
 					except:
