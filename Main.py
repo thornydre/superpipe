@@ -17,6 +17,7 @@ import sys
 import PIL
 import subprocess
 import webbrowser
+import threading
 # import queue
 
 from CustomSlider import *
@@ -62,9 +63,10 @@ class SuperPipe(QMainWindow):
 
 		if project_directory:
 			if path.isdir(project_directory):
+				self.current_project = Project(project_directory)
+				
 				self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
 				
-				self.current_project = Project(project_directory)
 				self.add_shot_button.setEnabled(True)
 				self.add_asset_button.setEnabled(True)
 				self.shots_preview_button.setEnabled(True)
@@ -85,7 +87,7 @@ class SuperPipe(QMainWindow):
 		if self.current_project:
 			self.home_page_title_label.setText("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
 
-			observer_thread = threading.Thread(target=self.runObserver, args=())
+			observer_thread = threading.Thread(target=self.runObserver, args=(self.current_project.getDirectory()))
 			observer_thread.daemon = True
 			observer_thread.start()
 
@@ -1901,7 +1903,7 @@ class SuperPipe(QMainWindow):
 			self.versionlistCommand()
 
 
-	def runObserver(self):
+	def runObserver(self, path):
 		my_event_handler = FileSystemEventHandler()
 		my_event_handler.on_created = self.dirChange
 		my_event_handler.on_deleted = self.dirChange
@@ -1909,7 +1911,7 @@ class SuperPipe(QMainWindow):
 
 		go_recursively = True
 		my_observer = Observer()
-		my_observer.schedule(my_event_handler, self.main_path, recursive=go_recursively)
+		my_observer.schedule(my_event_handler, path, recursive=go_recursively)
 
 		my_observer.start()
 
@@ -1919,6 +1921,10 @@ class SuperPipe(QMainWindow):
 		except KeyboardInterrupt:
 			my_observer.stop()
 			my_observer.join()
+
+
+	def dirChange(self, event):
+		print("toto")
 
 
 	def dialog(self, title, purpose, message):

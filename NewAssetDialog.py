@@ -105,7 +105,7 @@ class NewAssetDialog(QDialog):
 			category_list.insert(0, parent.text(0))
 			parent = parent.parent()
 
-		self.category = "/" + "/".join(category_list)
+		self.category = "/".join(category_list).lower()
 
 		self.name = self.asset_name_textfield.text()
 		self.name = Resources.normString(self.name)
