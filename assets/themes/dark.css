@@ -23,6 +23,11 @@ QPushButton#important{
 	background-color: #337ab7;
 }
 
+QPushButton#important::disabled{
+	background-color: #27435c;
+	color: #666666;
+}
+
 QPushButton#icons{
 	background: none;
 	padding: 2px;

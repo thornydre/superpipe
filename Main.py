@@ -49,6 +49,8 @@ class SuperPipe(QMainWindow):
 
 		self.app.setOverrideCursor(Qt.WaitCursor)
 
+		self.project_observer = None
+
 		self.current_project = None
 		self.version_mode = True
 
@@ -71,6 +73,11 @@ class SuperPipe(QMainWindow):
 				self.add_asset_button.setEnabled(True)
 				self.shots_preview_button.setEnabled(True)
 				self.custom_button.setEnabled(True)
+				self.toggle_versions_playblasts_button.setEnabled(True)
+				self.display_modeling_asset_button.setEnabled(True)
+				self.display_rigging_asset_button.setEnabled(True)
+				self.display_lookdev_asset_button.setEnabled(True)
+				self.display_other_asset_button.setEnabled(True)
 				self.add_asset_action.setEnabled(True)
 				self.add_shot_action.setEnabled(True)
 				self.project_settings_action.setEnabled(True)
@@ -87,9 +94,7 @@ class SuperPipe(QMainWindow):
 		if self.current_project:
 			self.home_page_title_label.setText("THE PROJECT \"" + self.current_project.getName() + "\" IS SET")
 
-			observer_thread = threading.Thread(target=self.runObserver, args=(self.current_project.getDirectory()))
-			observer_thread.daemon = True
-			observer_thread.start()
+			self.startObserverThread()
 
 			# self.statistics_view.set(self.current_project)
 
@@ -213,9 +218,11 @@ class SuperPipe(QMainWindow):
 
 		self.add_asset_button = QPushButton("Add asset")
 		self.add_asset_button.setObjectName("important")
+		self.add_asset_button.setEnabled(False)
 		self.add_asset_button.clicked.connect(self.addAssetCommand)
 		self.add_shot_button = QPushButton("Add shot")
 		self.add_shot_button.setObjectName("important")
+		self.add_shot_button.setEnabled(False)
 		self.add_shot_button.clicked.connect(self.addShotCommand)
 
 		sidebar_left_header_layout.addWidget(self.add_asset_button)
@@ -259,8 +266,10 @@ class SuperPipe(QMainWindow):
 		sidebar_left_footer_layout = QVBoxLayout()
 
 		self.shots_preview_button = QPushButton("Shots preview")
+		self.shots_preview_button.setEnabled(False)
 		self.shots_preview_button.clicked.connect(self.shotsPreviewCommand)
 		self.custom_button = QPushButton("Custom link")
+		self.custom_button.setEnabled(False)
 		self.custom_button.clicked.connect(self.customButtonCommand)
 
 		sidebar_left_footer_layout.addWidget(self.shots_preview_button)
@@ -651,6 +660,7 @@ class SuperPipe(QMainWindow):
 		## // TOP \\ ##
 		sidebar_right_top_layout = QVBoxLayout()
 		self.toggle_versions_playblasts_button = QPushButton("Show playblasts")
+		self.toggle_versions_playblasts_button.setEnabled(False)
 		self.toggle_versions_playblasts_button.clicked.connect(self.toggleVersionsPlayblastsCommand)
 		self.versions_playblasts_label = QLabel("Versions", alignment=Qt.AlignHCenter)
 
@@ -665,15 +675,19 @@ class SuperPipe(QMainWindow):
 		display_checkbox_asset_layout = QGridLayout()
 
 		self.display_modeling_asset_button = QCheckBox("Display modeling")
+		self.display_modeling_asset_button.setEnabled(False)
 		self.display_modeling_asset_button.setChecked(True)
 		self.display_modeling_asset_button.clicked.connect(self.toggleAssetDisplay)
 		self.display_rigging_asset_button = QCheckBox("Display rigging")
+		self.display_rigging_asset_button.setEnabled(False)
 		self.display_rigging_asset_button.setChecked(True)
 		self.display_rigging_asset_button.clicked.connect(self.toggleAssetDisplay)
 		self.display_lookdev_asset_button = QCheckBox("Display lookdev")
+		self.display_lookdev_asset_button.setEnabled(False)
 		self.display_lookdev_asset_button.setChecked(True)
 		self.display_lookdev_asset_button.clicked.connect(self.toggleAssetDisplay)
 		self.display_other_asset_button = QCheckBox("Display other")
+		self.display_other_asset_button.setEnabled(False)
 		self.display_other_asset_button.setChecked(True)
 		self.display_other_asset_button.clicked.connect(self.toggleAssetDisplay)
 		self.display_checkbox_asset_widget = QWidget()
@@ -755,6 +769,11 @@ class SuperPipe(QMainWindow):
 			self.add_asset_button.setEnabled(True)
 			self.shots_preview_button.setEnabled(True)
 			self.custom_button.setEnabled(True)
+			self.toggle_versions_playblasts_button.setEnabled(True)
+			self.display_modeling_asset_button.setEnabled(True)
+			self.display_rigging_asset_button.setEnabled(True)
+			self.display_lookdev_asset_button.setEnabled(True)
+			self.display_other_asset_button.setEnabled(True)
 
 			self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
 
@@ -771,7 +790,10 @@ class SuperPipe(QMainWindow):
 
 
 	def setProjectCommand(self):
-		directory = QFileDialog.getExistingDirectory(caption="Set project")
+		if self.current_project:
+			directory = QFileDialog.getExistingDirectory(caption="Set project", dir=self.current_project.getDirectory() + "/..")
+		else:
+			directory = QFileDialog.getExistingDirectory(caption="Set project")
 
 		self.app.setOverrideCursor(Qt.WaitCursor)
 
@@ -787,6 +809,11 @@ class SuperPipe(QMainWindow):
 					self.add_asset_button.setEnabled(True)
 					self.shots_preview_button.setEnabled(True)
 					self.custom_button.setEnabled(True)
+					self.toggle_versions_playblasts_button.setEnabled(True)
+					self.display_modeling_asset_button.setEnabled(True)
+					self.display_rigging_asset_button.setEnabled(True)
+					self.display_lookdev_asset_button.setEnabled(True)
+					self.display_other_asset_button.setEnabled(True)
 
 					self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
 
@@ -1903,24 +1930,31 @@ class SuperPipe(QMainWindow):
 			self.versionlistCommand()
 
 
-	def runObserver(self, path):
+	def startObserverThread(self):
+		observer_thread = threading.Thread(target=self.runObserver, args=())
+		observer_thread.daemon = True
+		observer_thread.start()
+
+
+	def runObserver(self):
+		self.current_project.getDirectory()
+
 		my_event_handler = FileSystemEventHandler()
 		my_event_handler.on_created = self.dirChange
 		my_event_handler.on_deleted = self.dirChange
 		my_event_handler.on_moved = self.dirChange
 
-		go_recursively = True
-		my_observer = Observer()
-		my_observer.schedule(my_event_handler, path, recursive=go_recursively)
+		self.project_observer = Observer()
+		self.project_observer.schedule(my_event_handler, self.current_project.getDirectory(), recursive=True)
 
-		my_observer.start()
+		self.project_observer.start()
 
 		try:
 			while True:
 				time.sleep(1)
 		except KeyboardInterrupt:
-			my_observer.stop()
-			my_observer.join()
+			self.project_observer.stop()
+			self.project_observer.join()
 
 
 	def dirChange(self, event):
@@ -1939,6 +1973,13 @@ class SuperPipe(QMainWindow):
 			dialog.critical(self, title, message)
 
 		return None
+
+
+	def closeEvent(self, event):
+		self.deleteLater()
+		if self.project_observer:
+			self.project_observer.stop()
+			self.project_observer.join()
 
 
 def main():
