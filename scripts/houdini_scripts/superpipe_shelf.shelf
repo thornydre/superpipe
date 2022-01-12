@@ -5,7 +5,12 @@
  Note, that two definitions of the same element are not allowed in
  a single file. -->
 
-  <tool name="save" label="Save" icon="PLASMA_App">
+  <toolshelf name="superpipe" label="Superpipe">
+    <memberTool name="superpipe_save"/>
+    <memberTool name="superpipe_incremental_save"/>
+  </toolshelf>
+
+  <tool name="superpipe_save" label="Superpipe Save" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[from os import path, mkdir
 import toolutils
 import hou
@@ -41,7 +46,7 @@ if camera:
         new_width = round(new_height / ori_height * ori_width)
 
 if not path.isdir(directory + "/render/screenshots"):
-        mkdir(directory + "/render/screenshots")
+    mkdir(directory + "/render/screenshots")
 
 file_path = directory + "/render/screenshots/" + file_name + ".jpg"
 frame = hou.frame()
@@ -53,6 +58,118 @@ flipbook_options.output(file_path)
 flipbook_options.outputToMPlay(False)
 flipbook_options.resolution((int(new_width), int(new_height)))
 
-viewer.flipbook(viewer.curViewport(), flipbook_options, False)viewwrite -f %d %d -r %d %d %s '%s'" % (frame, frame, new_width, new_height, camera_path, file_path))]]></script>
+viewer.flipbook(viewer.curViewport(), flipbook_options, False)]]></script>
+  </tool>
+
+  <tool name="superpipe_incremental_save" label="Superpipe Incremental Save" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[import hou
+from PySide2.QtCore import *
+from PySide2 import QtUiTools
+from PySide2.QtWidgets import *
+import json
+from os import path, remove, listdir, mkdir
+from shutil import copyfile
+import toolutils
+
+
+class SuperpipeSave(QWidget):
+    def __init__(self):
+        super(SuperpipeSave, self).__init__()
+
+        main_layout = QVBoxLayout()
+
+        self.comment_textfield = QTextEdit()
+
+        submit_button = QPushButton("Submit")
+        submit_button.clicked.connect(self.submitCommand)
+
+        main_layout.addWidget(self.comment_textfield)
+        main_layout.addWidget(submit_button)
+
+        self.setLayout(main_layout)
+
+        self.setParent(hou.ui.mainQtWindow(), Qt.Window)
+
+
+    def submitCommand(self):
+        current_file_ext = hou.hipFile.name()
+        current_file = path.splitext(current_file_ext)[0]
+        file_extension = path.splitext(current_file_ext)[1]
+        directory = path.dirname(current_file_ext)
+        file_name = path.basename(current_file)
+
+        version = int(file_name[-2:])
+
+        comment = self.comment_textfield.toPlainText()
+
+        for f in listdir(directory):
+            if file_name[:-2] in f:
+                current_file_ext = f
+                current_file = path.splitext(current_file_ext)[0]
+                new_version = int(current_file[-2:])
+                if new_version > version:
+                    version = new_version
+
+        version += 1
+
+        new_file_name = file_name[:-2] + str(version).zfill(2)
+
+        ## COMMENT ##
+        versions_file = directory + "/superpipe/versions_data.spi"
+
+        with open(versions_file, "r") as f:
+            all_comments = json.load(f)
+        f.close()
+
+        all_comments[new_file_name + file_extension] = comment
+
+        with open(versions_file, "w") as f:
+            json.dump(all_comments, f)
+        f.close()
+
+        ## SCREENSHOT ##
+        viewer = toolutils.sceneViewer()
+        viewport = viewer.curViewport()
+        camera = hou.GeometryViewport.camera(viewport)
+
+        new_width = 512
+        new_height = 288
+
+        if camera:
+            camera_path = camera.path()
+            
+            ori_width = camera.parm("resx").eval()
+            ori_height = camera.parm("resy").eval()
+            
+            new_width = 512.0
+            new_height = 512.0
+
+            if ori_width > ori_height:
+                new_height = round(new_width / ori_width * ori_height)
+            elif ori_height > ori_width:
+                new_width = round(new_height / ori_height * ori_width)
+
+        if not path.isdir(directory + "/render/screenshots"):
+            mkdir(directory + "/render/screenshots")
+
+        file_path = directory + "/render/screenshots/" + new_file_name + ".jpg"
+        frame = hou.frame()
+
+        flipbook_options = viewer.flipbookSettings().stash()
+
+        flipbook_options.frameRange((frame, frame))
+        flipbook_options.output(file_path)
+        flipbook_options.outputToMPlay(False)
+        flipbook_options.resolution((int(new_width), int(new_height)))
+
+        viewer.flipbook(viewer.curViewport(), flipbook_options, False)
+
+        ## SAVE ##
+        self.close()
+        hou.hipFile.save(directory + "/" + new_file_name + file_extension)
+
+
+win = SuperpipeSave()
+win.show()]]></script>
   </tool>
 </shelfDocument>
