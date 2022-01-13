@@ -419,6 +419,7 @@ class SuperPipe(QMainWindow):
 		asset_paths_layout = QVBoxLayout()
 
 		self.asset_file_path_label = QLabel()
+		self.asset_file_path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
 		asset_paths_layout.addWidget(self.asset_file_path_label)
 
@@ -617,7 +618,9 @@ class SuperPipe(QMainWindow):
 		shot_paths_layout = QVBoxLayout()
 
 		self.shot_file_path_label = QLabel()
+		self.shot_file_path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
 		self.shot_abc_path_label = QLabel()
+		self.shot_abc_path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
 		shot_paths_layout.addWidget(self.shot_file_path_label)
 		shot_paths_layout.addWidget(self.shot_abc_path_label)
