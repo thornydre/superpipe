@@ -13,7 +13,7 @@
     <dir name="sound"/>
     <dir name="storyboard"/>
   </dir>
-  <dir name="04_asset">
+  <dir name="04_asset" tag="asset_dir">
     <dir name="character">
       <dir name="backup"/>
     </dir>
@@ -27,7 +27,7 @@
       <dir name="backup"/>
     </dir>
   </dir>
-  <dir name="05_shot">
+  <dir name="05_shot" tag="shot_dir">
     <dir name="backup"/>
   </dir>
   <dir name="06_postprod"/>

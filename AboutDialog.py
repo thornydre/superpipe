@@ -10,7 +10,7 @@ class AboutDialog(QDialog):
 	def __init__(self, parent=None):
 		super(AboutDialog, self).__init__(parent=parent, f=Qt.WindowTitleHint|Qt.WindowSystemMenuHint)
 
-		version = 2.0
+		version = 2.1
 
 		self.setWindowTitle("Super Pipe || About")
 
@@ -22,7 +22,6 @@ class AboutDialog(QDialog):
 
 		button = QPushButton("OK")
 		button.clicked.connect(self.submitCommand)
-		# button.setFlat(True)
 		f = QFont("Arial", 10)
 		text.setFont(f)
 		main_layout.addWidget(button)

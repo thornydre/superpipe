@@ -8,6 +8,7 @@ from Project import *
 from Resources import *
 from ListsObserver import *
 from os import path, mkdir, listdir
+from pathlib import Path
 from urllib.parse import urlsplit
 from PIL import ImageTk
 from watchdog.observers import Observer
@@ -66,7 +67,7 @@ class SuperPipe(QMainWindow):
 			if path.isdir(project_directory):
 				self.current_project = Project(project_directory)
 				
-				self.setWindowTitle("Super Pipe || " + self.current_project.getDirectory())
+				self.setWindowTitle(f"Super Pipe || {self.current_project.getDirectory()}")
 				
 				self.add_shot_button.setEnabled(True)
 				self.add_asset_button.setEnabled(True)
@@ -1485,8 +1486,8 @@ class SuperPipe(QMainWindow):
 			if self.asset_list.currentItem():
 				print("4 : ", self.asset_list.currentItem().text(0))
 			for asset in assets:
-				if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
-					asset_subfolders = asset.getSecondPath().strip("/").split("/")
+				if path.isdir(f"{self.current_project.getDirectory()}/04_asset/{asset.getSecondPath()}/{asset.getAssetName()}/superpipe"):
+					asset_subfolders = asset.getSecondPath().parts
 					current_category = self.categories[asset_subfolders[0].lower()]
 
 					for subfolder in asset_subfolders[1:]:
@@ -1529,7 +1530,7 @@ class SuperPipe(QMainWindow):
 
 		for shot_name in sorted(shots):
 			shot = shots[shot_name]
-			if path.isdir(self.current_project.getDirectory() + "/05_shot/" + shot.getShotName() + "/superpipe"):
+			if path.isdir(f"{self.current_project.getDirectory()}/05_shot/{shot.getShotName()}/superpipe"):
 				item = QListWidgetItem(shot.getShotName())
 				self.shot_list.insertItem(shot.getShotNb(), item)
 

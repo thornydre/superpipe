@@ -24,9 +24,9 @@ class XMLParser:
 			self.recursiveParser(child, root_folder + "/" + child.attrib["name"])
 
 
-	def pathToTag(self, tag):
+	def pathToTag(self, root_folder):
 		root = xml.etree.ElementTree.parse(self.xml_file).getroot()
-		self.recursivePathToTag(root, "")
+		self.recursivePathToTag(root, root_folder)
 
 		return self.tags
 

@@ -9,10 +9,10 @@
   <dir name="geo"/>
   <dir name="hda"/>
   <dir name="render">
-    <dir name="screenshots" tag="screenSave"/>
+    <dir name="screenshots" tag="screenshot_dir"/>
   </dir>
   <dir name="scripts"/>
   <dir name="sim"/>
   <dir name="tex"/>
-  <dir name="video"/>
+  <dir name="video" tag="playblast_dir"/>
 </data>

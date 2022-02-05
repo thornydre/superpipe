@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-from os import makedirs, listdir, path, rename, walk
+from os import makedirs
+from pathlib import Path
 from shutil import rmtree
 from Shot import *
 from Asset import *
@@ -20,16 +21,22 @@ class Project:
 
 		self.selected_shot = None
 		self.selected_asset = None
-		self.directory = directory
 		self.valid = True
 
-		if not path.isdir(self.directory):
-			makedirs(self.directory)
+		self.project_dir_path = Path(directory)
 
-			xml_parser = XMLParser("./assets/xml/project_struct.xml")
-			xml_parser.parseXML(self.directory)
+		xml_parser = XMLParser("./assets/xml/project_struct.xml")
+		tagged_paths = xml_parser.pathToTag(str(self.project_dir_path))
 
-		elif path.isdir(self.directory + "/05_shot"):
+		self.asset_dir_path = Path(tagged_paths["asset_dir"])
+		self.shot_dir_path = Path(tagged_paths["shot_dir"])
+			
+		if not self.project_dir_path.is_dir():
+			makedirs(self.project_dir_path)
+
+			xml_parser.parseXML(str(self.project_dir_path))
+
+		elif self.asset_dir_path.is_dir():
 			self.updateShotList()
 			self.updateAssetList()
 
@@ -37,7 +44,7 @@ class Project:
 			self.valid = False
 
 		## SETTINGS ##
-		self.project_settings = Settings(self.directory + "/project_option.spi")
+		self.project_settings = Settings(f"{self.project_dir_path}/project_option.spi")
 		self.project_settings.loadProjectSettings()
 
 		self.custom_link = self.project_settings.getSetting("custom_link")
@@ -57,9 +64,10 @@ class Project:
 
 	def updateShotList(self):
 		self.shot_list = {}
-		for shot_name in listdir(self.directory + "/05_shot/"):
+		for shot_path in self.shot_dir_path.iterdir():
+			shot_name = shot_path.name
 			if re.match(r"s[0-9][0-9]p[0-9][0-9][0-9]", shot_name):
-				shot = Shot(self.directory, shot_name)
+				shot = Shot(self.project_dir_path, shot_name)
 				shot_sequence = shot.getSequence()
 				if shot_sequence > self.last_used_sequence:
 					self.last_used_sequence = shot_sequence
@@ -71,22 +79,32 @@ class Project:
 
 		exclude = ["superpipe"]
 
-		for cur_dir, sub_dirs, files in walk(self.directory + "/04_asset", topdown=True):
-			if any([i in sub_dirs for i in exclude]):
-				sub_dirs[:] = []
-				if not "backup" in cur_dir:
-					secondary_path = path.dirname(cur_dir.replace("\\", "/")).replace(self.directory + "/04_asset/", "")
-					asset_name = path.basename(cur_dir)
-					asset = Asset(self.directory, secondary_path, asset_name)
-					self.asset_list[asset_name] = asset
+		for superpipe_dir in self.asset_dir_path.rglob("superpipe"):
+			if not "backup" in superpipe_dir.parts:
+				temp_path = superpipe_dir.relative_to(self.asset_dir_path).parent
+				secondary_path = temp_path.parent
+				asset_name = temp_path.name
+				asset = Asset(self.project_dir_path, secondary_path, asset_name)
+				self.asset_list[asset_name] = asset
+
+
+		# for cur_dir, sub_dirs, files in walk(self.asset_dir_path, topdown=True):
+		# 	if any([i in sub_dirs for i in exclude]):
+		# 		print(cur_dir)
+		# 		sub_dirs[:] = []
+		# 		if not "backup" in cur_dir:
+		# 			secondary_path = path.dirname(cur_dir.replace("\\", "/")).replace(str(self.project_dir_path) + "/04_asset/", "")
+		# 			asset_name = path.basename(cur_dir)
+		# 			asset = Asset(self.project_dir_path, secondary_path, asset_name)
+		# 			self.asset_list[asset_name] = asset
 
 
 	def getDirectory(self):
-		return self.directory
+		return str(self.project_dir_path)
 
 
 	def getName(self):
-		return self.directory.split("/")[-1]
+		return self.project_dir_path.name
 
 
 	def getSequenceNumber(self):
@@ -94,7 +112,7 @@ class Project:
 
 
 	def getShot(self, shot_name):
-		return Shot(self.directory, shot_name)
+		return Shot(self.project_dir_path, shot_name)
 
 
 	def isValid(self):
@@ -117,7 +135,7 @@ class Project:
 			shots_to_rename = shots_to_rename[::-1]
 
 			for shot_to_rename in shots_to_rename:
-				cur_shot = Shot(self.directory, shot_to_rename.getShotName())
+				cur_shot = Shot(self.project_dir_path, shot_to_rename.getShotName())
 
 				cur_shot.renameShot(Resources.makeShotName(shot_to_rename.getShotNb() + 1, cur_shot.getSequence()))
 
@@ -125,7 +143,7 @@ class Project:
 
 			shot_name = Resources.makeShotName(shot_nb, shot_sequence)
 
-		shot = Shot(self.directory, shot_name, software=self.default_software)
+		shot = Shot(self.project_dir_path, shot_name, software=self.default_software)
 
 		self.shot_list[shot_name] = shot
 
@@ -142,7 +160,6 @@ class Project:
 		for i in range(len(self.shot_list) - shot.getShotNb()):
 			n = i + shot.getShotNb()
 
-			#cur_shot = Shot(self.directory, self.shot_list[n].getShotName())
 			cur_shot = self.shot_list.values()[n]
 
 			cur_shot.renameShot(Resources.makeShotName(self.shot_list.values()[n - 1].getShotNb(), cur_shot.getSequence()))
@@ -202,14 +219,14 @@ class Project:
 		if self.asset_list.get(asset_name):
 			return False
 
-		asset = Asset(self.directory, second_path, asset_name, software)
+		asset = Asset(self.project_dir_path, Path(second_path), asset_name, software)
 		self.asset_list[asset_name] = asset
 
 		return True
 
 
 	def removeAsset(self, asset_name, second_path):
-		asset = Asset(self.directory, second_path, asset_name)
+		asset = Asset(self.project_dir_path, Path(second_path), asset_name)
 		asset.deleteAsset()
 		self.updateAssetList()
 
@@ -225,20 +242,20 @@ class Project:
 
 
 	def cleanBackups(self):
-		rmtree(self.directory + "/05_shot/backup")
-		makedirs(self.directory + "/05_shot/backup")
+		rmtree(f"{self.shot_dir_path}/backup")
+		makedirs(f"{self.shot_dir_path}/backup")
 
-		rmtree(self.directory + "/04_asset/character/backup")
-		makedirs(self.directory + "/04_asset/character/backup")
+		rmtree(f"{self.asset_dir_path}/character/backup")
+		makedirs(f"{self.asset_dir_path}/character/backup")
 
-		rmtree(self.directory + "/04_asset/FX/backup")
-		makedirs(self.directory + "/04_asset/FX/backup")
+		rmtree(f"{self.asset_dir_path}/FX/backup")
+		makedirs(f"{self.asset_dir_path}/FX/backup")
 
-		rmtree(self.directory + "/04_asset/props/backup")
-		makedirs(self.directory + "/04_asset/props/backup")
+		rmtree(f"{self.asset_dir_path}/props/backup")
+		makedirs(f"{self.asset_dir_path}/props/backup")
 
-		rmtree(self.directory + "/04_asset/set/backup")
-		makedirs(self.directory + "/04_asset/set/backup")
+		rmtree(f"{self.asset_dir_path}/set/backup")
+		makedirs(f"{self.asset_dir_path}/set/backup")
 
 
 	def setSelection(self, shot_name=None, asset_name=None, second_path=None):
@@ -274,10 +291,10 @@ class Project:
 
 
 	def setAllShotsRes(self):
-		for shot in listdir(self.getDirectory() + "/05_shot/"):
-			if shot != "backup":
-				cur_shot = Shot(self.getDirectory(), shot)
-				cur_shot.setResolution(self.getResolution())
+		for shot in Path(f"{self.project_dir_path}/05_shot/").iterdir():
+			if shot.name != "backup":
+				cur_shot = Shot(self.project_dir_path, shot)
+				cur_shot.setResolution((self.res_x, self.res_y))
 
 
 	def getResolution(self):

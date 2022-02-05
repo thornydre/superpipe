@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-from os import makedirs, path, listdir, rename
+from os import makedirs
 from shutil import copyfile, copytree, rmtree
+from pathlib import Path
 from Settings import *
 from XMLParser import *
 
@@ -9,26 +10,27 @@ import time
 
 
 class Asset:
-	def __init__(self, directory=None, second_path=None, asset_name=None, software=None):
+	def __init__(self, project_dir=None, second_path=None, asset_name=None, software=None):
 		self.asset_name = asset_name
-		self.project_dir = directory
+		self.project_dir = project_dir
 		self.second_path = second_path
-		self.asset_directory = directory + "/04_asset/" + self.second_path + "/" + self.asset_name
+		self.asset_dir = Path(f"{project_dir}/04_asset/{self.second_path}/{self.asset_name}")
+		self.superpipe_dir = Path(f"{self.asset_dir}/superpipe")
 		self.software = software
 
-		if not path.isdir(self.asset_directory):
+		if not self.asset_dir.is_dir():
 			if self.software:
-				makedirs(self.asset_directory)
+				makedirs(self.asset_dir)
 
-				makedirs(self.asset_directory + "/superpipe")
+				makedirs(self.superpipe_dir)
 
 				self.createFolderHierarchy()
 
 		## SETTINGS ##
-		self.versions_settings = Settings(self.asset_directory + "/superpipe/versions_data.spi")
+		self.versions_settings = Settings(f"{self.superpipe_dir}/versions_data.spi")
 		self.versions_settings.loadVersionSettings()
 
-		self.asset_settings = Settings(self.asset_directory + "/superpipe/asset_data.spi")
+		self.asset_settings = Settings(f"{self.superpipe_dir}/asset_data.spi")
 		self.asset_settings.loadAssetSettings()
 
 		self.priority = self.asset_settings.getSetting("priority")
@@ -41,6 +43,8 @@ class Asset:
 			self.asset_settings.saveSettings()
 		else:
 			self.software = self.asset_settings.getSetting("software")
+		
+		self.setTaggedPaths()
 
 
 	def getAssetName(self):
@@ -52,16 +56,11 @@ class Asset:
 
 
 	def getDirectory(self):
-		return self.asset_directory
+		return str(self.asset_dir)
 
 
 	def getPictsPath(self):
-		directory = self.asset_directory + "/images/screenshots/"
-
-		if self.software == "houdini":
-			directory = self.asset_directory + "/render/screenshots/"
-
-		return directory
+		return str(self.screenshot_dir)
 
 
 	def getCategory(self):
@@ -108,39 +107,39 @@ class Asset:
 
 	def setAsset(self):
 		if self.software == "maya":
-			copyfile("assets/src/set_up_file_asset_maya_lookdev_renderman.ma", self.asset_directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.ma")
-			copyfile("assets/src/set_up_file_asset_maya.ma", self.asset_directory + "/scenes/" + self.asset_name + "_02_rigging_v01.ma")
-			copyfile("assets/src/set_up_file_asset_maya.ma", self.asset_directory + "/scenes/" + self.asset_name + "_01_modeling_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya_lookdev_renderman.ma", f"{self.asset_dir}/scenes/{self.asset_name}_03_lookdev_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya.ma", f"{self.asset_dir}/scenes/{self.asset_name}_02_rigging_v01.ma")
+			copyfile("assets/src/set_up_file_asset_maya.ma", f"{self.asset_dir}/scenes/{self.asset_name}_01_modeling_v01.ma")
 		elif self.software == "houdini":
-			copyfile("assets/src/set_up_file_asset_houdini.hip", self.asset_directory + "/" + self.asset_name + "_v01.hip")
+			copyfile("assets/src/set_up_file_asset_houdini.hip", f"{self.asset_dir}/{self.asset_name}_v01.hip")
 		elif self.software == "blender":
-			copyfile("assets/src/set_up_file_asset_blender.blend", self.asset_directory + "/scenes/" + self.asset_name + "_03_lookdev_v01.blend")
-			copyfile("assets/src/set_up_file_asset_blender.blend", self.asset_directory + "/scenes/" + self.asset_name + "_02_rigging_v01.blend")
-			copyfile("assets/src/set_up_file_asset_blender.blend", self.asset_directory + "/scenes/" + self.asset_name + "_01_modeling_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", f"{self.asset_dir}/scenes/{self.asset_name}_03_lookdev_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", f"{self.asset_dir}/scenes/{self.asset_name}_02_rigging_v01.blend")
+			copyfile("assets/src/set_up_file_asset_blender.blend", f"{self.asset_dir}/scenes/{self.asset_name}_01_modeling_v01.blend")
 
 
 	def isSet(self):
 		if self.software == "maya":
-			for asset_file in listdir(self.asset_directory + "/scenes/"):
-				if path.splitext(asset_file)[1] == ".ma":
+			for asset_file in Path(f"{self.asset_dir}/scenes/").iterdir():
+				if asset_file.suffix == ".ma":
 					return True
 
 		elif self.software == "houdini":
-			for asset_file in listdir(self.asset_directory):
-				if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
+			for asset_file in self.asset_dir.iterdir():
+				if asset_file.suffix in (".hip", ".hipnc"):
 					return True
 
 		elif self.software == "blender":
-			for asset_file in listdir(self.asset_directory + "/scenes/"):
-				if path.splitext(asset_file)[1] == ".blend":
+			for asset_file in Path(f"{self.asset_dir}/scenes/").iterdir():
+				if asset_file.suffix == ".blend":
 					return True
 
 		return False
 
 
 	def deleteAsset(self):
-		copytree(self.asset_directory, self.project_dir +"/04_asset/" + self.second_path.split("/")[1] + "/backup/" + self.asset_name + "_" + time.strftime("%Y_%m_%d_%H_%M_%S"))
-		rmtree(self.asset_directory)
+		copytree(self.asset_dir, f"{self.project_dir}/04_asset/{self.second_path.parts[1]}/backup/{self.asset_name}_{time.strftime('%Y_%m_%d_%H_%M_%S')}")
+		rmtree(self.asset_dir)
 
 
 	def getVersionsList(self, last_only, modeling, rigging, lookdev, other):
@@ -155,103 +154,103 @@ class Asset:
 			display.append("lookdev")
 
 		if self.software == "maya":
-			for asset_file in listdir(self.asset_directory + "/scenes/"):
-				if not "reference" in asset_file:
-					if not asset_file[0] == "_":
-						if path.splitext(asset_file)[1] == ".ma":
+			for asset_file in Path(f"{self.asset_dir}/scenes/").iterdir():
+				if not "reference" in asset_file.name:
+					if not asset_file.name[0] == "_":
+						if asset_file.suffix == ".ma":
 							for disp in display:
-								if disp in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/" + asset_file), asset_file))
+								if disp in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 							if other:
-								if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/" + asset_file), asset_file))
+								if "modeling" not in asset_file.name and "rigging" not in asset_file.name and "lookdev" not in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 			if not last_only:
-				for asset_file in listdir(self.asset_directory + "/scenes/edits/"):
-					if not asset_file[0] == "_":
-						if path.splitext(asset_file)[1] == ".ma":
+				for asset_file in Path(f"{self.asset_dir}/scenes/edits/").iterdir():
+					if not asset_file.name[0] == "_":
+						if asset_file.suffix == ".ma":
 							for disp in display:
-								if disp in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/edits/" + asset_file), asset_file))
+								if disp in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 							if other:
-								if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/edits/" + asset_file), asset_file))
+								if "modeling" not in asset_file.name and "rigging" not in asset_file.name and "lookdev" not in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 		elif self.software == "houdini":
-			for asset_file in listdir(self.asset_directory + "/"):
-				if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
-					versions_list.append((path.getmtime(self.asset_directory + "/" + asset_file), asset_file))
+			for asset_file in self.asset_dir.iterdir():
+				if asset_file.suffix in (".hip", ".hipnc"):
+					versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 			if not last_only:
-				for asset_file in listdir(self.asset_directory + "/backup/"):
-					if path.splitext(asset_file)[1] in (".hip", ".hipnc"):
-						versions_list.append((path.getmtime(self.asset_directory + "/backup/" + asset_file), asset_file))
+				for asset_file in Path(f"{self.asset_dir}/backup/").iterdir():
+					if asset_file.suffix in (".hip", ".hipnc"):
+						versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 		elif self.software == "blender":
-			for asset_file in listdir(self.asset_directory + "/scenes/"):
-				if not "reference" in asset_file:
-					if not asset_file[0] == "_":
-						if path.splitext(asset_file)[1] == ".blend":
+			for asset_file in Path(f"{self.asset_dir}/scenes/").iterdir():
+				if not "reference" in asset_file.name:
+					if not asset_file.name[0] == "_":
+						if asset_file.suffix == ".blend":
 							for disp in display:
-								if disp in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/" + asset_file), asset_file))
+								if disp in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 							if other:
-								if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/" + asset_file), asset_file))
+								if "modeling" not in asset_file.name and "rigging" not in asset_file.name and "lookdev" not in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 			if not last_only:
-				for asset_file in listdir(self.asset_directory + "/scenes/edits/"):
-					if not asset_file[0] == "_":
-						if path.splitext(asset_file)[1] == ".blend":
+				for asset_file in Path(f"{self.asset_dir}/scenes/edits/").iterdir():
+					if not asset_file.name[0] == "_":
+						if asset_file.suffix == ".blend":
 							for disp in display:
-								if disp in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/edits/" + asset_file), asset_file))
+								if disp in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 							if other:
-								if "modeling" not in asset_file and "rigging" not in asset_file and "lookdev" not in asset_file:
-									versions_list.append((path.getmtime(self.asset_directory + "/scenes/edits/" + asset_file), asset_file))
+								if "modeling" not in asset_file.name and "rigging" not in asset_file.name and "lookdev" not in asset_file.name:
+									versions_list.append((asset_file.stat().st_mtime, asset_file.name))
 
 		return sorted(versions_list, reverse = True)
 
 
 	def getPlayblastsList(self):
 		playblasts_list = []
-		for playblast_file in listdir(self.asset_directory + "/movies/"):
-			if path.splitext(playblast_file)[1] in (".mov", ".avi"):
-				playblasts_list.append((path.getmtime(self.asset_directory + "/movies/" + playblast_file), playblast_file))
+		for playblast_file in self.playblast_dir.iterdir():
+			if playblast_file.suffix in (".mov", ".avi"):
+				playblasts_list.append((playblast_file.stat().st_mtime, playblast_file.name))
 
-		return sorted(playblasts_list, reverse = True)
+		return sorted(playblasts_list, reverse=True)
 
 
 	def renameAsset(self, new_name):
-		new_dir = path.dirname(self.asset_directory) + "/" + new_name
+		new_dir = f"{self.asset_dir.parent}/{new_name}"
 
-		rename(self.asset_directory, new_dir)
+		self.asset_dir.rename(new_dir)
 
 		if self.software == "maya" or self.software == "blender":
-			for f in listdir(new_dir + "/scenes/"):
-				if self.asset_name in f:
-					rename(new_dir + "/scenes/" + f, new_dir + "/scenes/" + f.replace(self.asset_name, new_name))
+			for f in Path(f"{new_dir}/scenes/").iterdir():
+				if self.asset_name in f.parts:
+					f.rename(str(f).replace(self.asset_name, new_name))
 
-			for f in listdir(new_dir + "/scenes/edits/"):
-				if self.asset_name in f:
-					rename(new_dir + "/scenes/edits/" + f, new_dir + "/scenes/edits/" + f.replace(self.asset_name, new_name))
+			for f in Path(f"{new_dir}/scenes/edits/").iterdir():
+				if self.asset_name in f.parts:
+					f.rename(str(f).replace(self.asset_name, new_name))
 
-			for f in listdir(new_dir + "/scenes/backup/"):
-				if self.asset_name in f:
-					rename(new_dir + "/scenes/backup/" + f, new_dir + "/scenes/backup/" + f.replace(self.asset_name, new_name))
+			for f in Path(f"{new_dir}/scenes/backup/").iterdir():
+				if self.asset_name in f.parts:
+					f.rename(str(f).replace(self.asset_name, new_name))
 
-			for f in listdir(new_dir + "/images/screenshots/"):
-				if self.asset_name in f:
-					rename(new_dir + "/images/screenshots/" + f, new_dir + "/images/screenshots/" + f.replace(self.asset_name, new_name))
+			for f in Path(f"{new_dir}/images/screenshots/").iterdir():
+				if self.asset_name in f.parts:
+					f.rename(str(f).replace(self.asset_name, new_name))
 
 		elif self.software == "houdini":
-			for f in listdir(new_dir):
-				if self.asset_name in f:
-					rename(new_dir + "/" + f, new_dir + "/" + f.replace(self.asset_name, new_name))
+			for f in Path(new_dir).iterdir():
+				if self.asset_name in f.parts:
+					f.rename(str(f).replace(self.asset_name, new_name))
 
 
 	def setPriority(self, priority):
@@ -287,10 +286,23 @@ class Asset:
 	def createFolderHierarchy(self):
 		if self.software == "maya" or self.software == "blender":
 			xml_parser = XMLParser("./assets/xml/default_asset_struct.xml")
-			xml_parser.parseXML(self.asset_directory)
-
 		elif self.software == "houdini":
 			xml_parser = XMLParser("./assets/xml/houdini_asset_struct.xml")
-			xml_parser.parseXML(self.asset_directory)
 		else:
 			print("ERROR")
+		
+		xml_parser.parseXML(str(self.asset_dir))
+
+
+	def setTaggedPaths(self):
+		if self.software == "maya" or self.software == "blender":
+			xml_parser = XMLParser("./assets/xml/default_asset_struct.xml")
+		elif self.software == "houdini":
+			xml_parser = XMLParser("./assets/xml/houdini_asset_struct.xml")
+		else:
+			print("ERROR")
+
+		tagged_paths = xml_parser.pathToTag(str(self.asset_dir))
+
+		self.screenshot_dir = Path(tagged_paths["screenshot_dir"])
+		self.playblast_dir = Path(tagged_paths["playblast_dir"])

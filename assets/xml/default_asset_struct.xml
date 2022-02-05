@@ -21,9 +21,9 @@
     <dir name="edits"/>
   </dir>
   <dir name="images">
-    <dir name="screenshots" tag="screenSave"/>
+    <dir name="screenshots" tag="screenshot_dir"/>
   </dir>
-  <dir name="movies"/>
+  <dir name="movies" tag="playblast_dir"/>
   <dir name="renderData">
     <dir name="depth"/>
     <dir name="fur">
@@ -36,7 +36,7 @@
     <dir name="iprImages"/>
     <dir name="shaders"/>
   </dir>
-  <dir name="scenes">
+  <dir name="scenes" tag="scenes_dir">
     <dir name="backup"/>
     <dir name="edits"/>
   </dir>
