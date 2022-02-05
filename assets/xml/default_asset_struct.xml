@@ -2,13 +2,17 @@
 <data>
   <dir name="assets"/>
   <dir name="autosave"/>
-  <dir name="cache">
+  <dir name="cache" tag="caches">
     <dir name="inputCaches">
       <dir name="abc"/>
+      <dir name="fbx"/>
+      <dir name="obj"/>
       <dir name="vdb"/>
     </dir>
     <dir name="outputCaches">
       <dir name="abc"/>
+      <dir name="fbx"/>
+      <dir name="obj"/>
       <dir name="vdb"/>
     </dir>
   </dir>

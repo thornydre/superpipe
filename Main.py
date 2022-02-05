@@ -18,7 +18,6 @@ import PIL
 import subprocess
 import webbrowser
 import threading
-# import queue
 
 from CustomSlider import *
 from CustomVideoPlayer import *
@@ -764,6 +763,7 @@ class SuperPipe(QMainWindow):
 
 		if project:
 			self.current_project = Project(project["directory"])
+			self.startObserverThread()
 
 			self.settings.setSetting("project_dir", project["directory"])
 			self.settings.saveSettings()
@@ -803,6 +803,7 @@ class SuperPipe(QMainWindow):
 		if directory:
 			if path.isdir(directory):
 				self.current_project = Project(directory)
+				self.startObserverThread()
 
 				if self.current_project.isValid():
 					self.settings.setSetting("project_dir", directory)
@@ -1464,17 +1465,25 @@ class SuperPipe(QMainWindow):
 
 
 	def updateAssetListView(self):
+		if self.asset_list.currentItem():
+			print("1 : ", self.asset_list.currentItem().text(0))
 		if self.asset_filter_textfield.text():
 			self.asset_filter_textfield.setStyleSheet("QLineEdit{color: #ffffff;}")
 		else:
 			self.asset_filter_textfield.setStyleSheet("QLineEdit{color: #888888;}")
 
+		if self.asset_list.currentItem():
+			print("2 : ", self.asset_list.currentItem().text(0))
 		for cat in self.categories:
 			self.categories[cat].takeChildren()
 
 		if self.current_project:
+			if self.asset_list.currentItem():
+				print("3 : ", self.asset_list.currentItem().text(0))
 			assets = self.current_project.filterAssetList(self.asset_filter_textfield.text())
 
+			if self.asset_list.currentItem():
+				print("4 : ", self.asset_list.currentItem().text(0))
 			for asset in assets:
 				if path.isdir(self.current_project.getDirectory() + "/04_asset/" + asset.getSecondPath() + "/" + asset.getAssetName() + "/superpipe"):
 					asset_subfolders = asset.getSecondPath().strip("/").split("/")
@@ -1488,7 +1497,7 @@ class SuperPipe(QMainWindow):
 						else:
 							current_category = self.asset_list.findItems(subfolder.upper(), Qt.MatchExactly|Qt.MatchRecursive)[0]
 
-					if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly):
+					if self.asset_list.findItems(asset.getAssetName(), Qt.MatchExactly|Qt.MatchRecursive):
 						self.dialog("ERROR", "W", "The asset \"" + asset.getSecondPath().upper() + "/" + asset.getAssetName() + "\" already exists !")
 					else:
 						item = QTreeWidgetItem([asset.getAssetName()])
@@ -1509,6 +1518,8 @@ class SuperPipe(QMainWindow):
 
 				else:
 					self.dialog("ERROR", "W", "The asset \"" + asset.getAssetName() + "\" has a problem !")
+		if self.asset_list.currentItem():
+			print("5 : ", self.asset_list.currentItem().text(0))
 
 
 	def updateShotListView(self):
@@ -1920,20 +1931,39 @@ class SuperPipe(QMainWindow):
 
 
 	def refresh(self, event):
+		selection_type = self.current_project.getSelectionType()
+		# selected_item = None
+
+		# if selection_type == "asset":
+		# 	selected_item = self.asset_list.currentItem().text(0)
+		# elif selection_type == "shot":
+		# 	selected_item = self.shot_list.currentItem().text()
+
+		# self.updateAssetListView()
+		# self.updateShotListView()
+
+		# if selected_item:
+		# 	if selection_type == "asset":
+		# 		item = self.asset_list.findItems(selected_item, Qt.MatchExactly|Qt.MatchRecursive)[0]
+		# 		self.asset_list.setCurrentItem(item)
+		# 	elif selection_type == "shot":
+		# 		item = self.shot_list.findItems(selected_item, Qt.MatchExactly)[0]
+		# 		self.shot_list.setCurrentItem(item)
+
 		if self.version_list.currentItem():
-			selected_version = self.version_list.currentItem()
-			
-			if self.current_project.getSelectionType() == "shot":
-				self.updateVersionListView(shot=self.current_project.getSelection())
-			elif self.current_project.getSelectionType() == "asset":
+			if selection_type == "asset":
 				self.updateVersionListView(asset=self.current_project.getSelection())
+			elif selection_type == "shot":
+				self.updateVersionListView(shot=self.current_project.getSelection())
 
-			self.version_list.setCurrentItem(selected_version)
-
-			self.versionlistCommand()
+		self.versionlistCommand()
 
 
 	def startObserverThread(self):
+		if self.project_observer:
+			self.project_observer.stop()
+			self.project_observer.join()
+
 		observer_thread = threading.Thread(target=self.runObserver, args=())
 		observer_thread.daemon = True
 		observer_thread.start()
@@ -1943,9 +1973,9 @@ class SuperPipe(QMainWindow):
 		self.current_project.getDirectory()
 
 		my_event_handler = FileSystemEventHandler()
-		my_event_handler.on_created = self.dirChange
-		my_event_handler.on_deleted = self.dirChange
-		my_event_handler.on_moved = self.dirChange
+		my_event_handler.on_created = self.refresh
+		my_event_handler.on_deleted = self.refresh
+		my_event_handler.on_moved = self.refresh
 
 		self.project_observer = Observer()
 		self.project_observer.schedule(my_event_handler, self.current_project.getDirectory(), recursive=True)
@@ -1958,10 +1988,6 @@ class SuperPipe(QMainWindow):
 		except KeyboardInterrupt:
 			self.project_observer.stop()
 			self.project_observer.join()
-
-
-	def dirChange(self, event):
-		print("toto")
 
 
 	def dialog(self, title, purpose, message):
