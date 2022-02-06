@@ -306,3 +306,5 @@ class Asset:
 
 		self.screenshot_dir = Path(tagged_paths["screenshot_dir"])
 		self.playblast_dir = Path(tagged_paths["playblast_dir"])
+		self.backup_dir = Path(tagged_paths["backup_dir"])
+		self.edit_dir = Path(tagged_paths["edit_dir"])

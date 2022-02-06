@@ -37,8 +37,8 @@
     <dir name="shaders"/>
   </dir>
   <dir name="scenes" tag="scenes_dir">
-    <dir name="backup"/>
-    <dir name="edits"/>
+    <dir name="backup" tag="backup_dir"/>
+    <dir name="edits" tag="edit_dir"/>
   </dir>
   <dir name="scripts"/>
   <dir name="sound"/>

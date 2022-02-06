@@ -14,16 +14,16 @@
     <dir name="storyboard"/>
   </dir>
   <dir name="04_asset" tag="asset_dir">
-    <dir name="character">
+    <dir name="character" tag="category_dir">
       <dir name="backup"/>
     </dir>
-    <dir name="FX">
+    <dir name="FX" tag="category_dir">
       <dir name="backup"/>
     </dir>
-    <dir name="props">
+    <dir name="props" tag="category_dir">
       <dir name="backup"/>
     </dir>
-    <dir name="set">
+    <dir name="set" tag="category_dir">
       <dir name="backup"/>
     </dir>
   </dir>
@@ -31,6 +31,8 @@
     <dir name="backup"/>
   </dir>
   <dir name="06_postprod"/>
+    <dir name="input"/>
+    <dir name="output"/>
   <dir name="07_montage">
     <dir name="input"/>
     <dir name="inputSon"/>

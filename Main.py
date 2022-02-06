@@ -34,6 +34,7 @@ from ManageBackupsDialog import *
 
 
 class SuperPipe(QMainWindow):
+# Class: Main class of Superpipe, containing mostly UI
 	def __init__(self, app):
 		self.settings = Settings("assets/settings.spi")
 		self.settings.loadGeneralSettings()

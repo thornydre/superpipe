@@ -36,7 +36,7 @@ class Project:
 
 			xml_parser.parseXML(str(self.project_dir_path))
 
-		elif self.asset_dir_path.is_dir():
+		elif self.asset_dir_path.is_dir() and self.shot_dir_path.is_dir():
 			self.updateShotList()
 			self.updateAssetList()
 
@@ -44,14 +44,15 @@ class Project:
 			self.valid = False
 
 		## SETTINGS ##
-		self.project_settings = Settings(f"{self.project_dir_path}/project_option.spi")
-		self.project_settings.loadProjectSettings()
+		if self.valid:
+			self.project_settings = Settings(f"{self.project_dir_path}/project_option.spi")
+			self.project_settings.loadProjectSettings()
 
-		self.custom_link = self.project_settings.getSetting("custom_link")
-		self.res_x = self.project_settings.getSetting("res_x")
-		self.res_y = self.project_settings.getSetting("res_y")
-		self.sequence_number = self.project_settings.getSetting("sequence_number")
-		self.default_software = self.project_settings.getSetting("default_software")
+			self.custom_link = self.project_settings.getSetting("custom_link")
+			self.res_x = self.project_settings.getSetting("res_x")
+			self.res_y = self.project_settings.getSetting("res_y")
+			self.sequence_number = self.project_settings.getSetting("sequence_number")
+			self.default_software = self.project_settings.getSetting("default_software")
 
 
 	def getShotList(self):
