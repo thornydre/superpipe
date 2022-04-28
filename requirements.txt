@@ -1,6 +1,6 @@
-numpy==1.21.4
-opencv-python==4.5.4.60
-Pillow==9.0.0
-PySide6==6.2.1
-shiboken6==6.2.1
-watchdog==2.1.6
+numpy==1.22.3
+opencv-python==4.5.5.64
+Pillow==9.1.0
+PySide6==6.3.0
+shiboken6==6.3.0
+watchdog==2.1.7
