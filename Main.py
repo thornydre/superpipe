@@ -1068,7 +1068,7 @@ class SuperPipe(QMainWindow):
 									self.asset_version_comment_title_label.setVisible(True)
 									self.asset_version_comment_label.setVisible(True)
 
-									pict_path = asset.getPictsPath() + path.splitext(selected_version.text())[0] + ".jpg"
+									pict_path = f"{asset.getPictsPath()}/{path.splitext(selected_version.text())[0]}.jpg"
 
 									if path.isfile(pict_path):
 										self.asset_pict_widget.setPixmap(QPixmap(pict_path))
@@ -1283,7 +1283,7 @@ class SuperPipe(QMainWindow):
 													all_picts_path_array.append(all_picts_path + f)
 
 											if all_picts_path_array:
-												prev_pict_path = max(all_picts_path_array, key = path.getmtime)
+												prev_pict_path = max(all_picts_path_array, key=path.getmtime)
 
 										else:
 											mkdir(all_picts_path)
@@ -1315,11 +1315,11 @@ class SuperPipe(QMainWindow):
 				elif self.current_project.getSelection().getSoftware() == "blender":
 					temp_path = self.current_project.getSelection().getDirectory() + "/scenes/" + selected_version
 				elif self.current_project.getSelection().getSoftware() == "houdini":
-					temp_path = self.current_project.getSelection().getDirectory() + "/" + selected_version
+					temp_path = f"{self.current_project.getSelection().getDirectory()}/{selected_version}"
 
 			self.asset_file_path_label.setText(temp_path.replace("/", "\\"))
 
-			pict_path = self.current_project.getSelection().getPictsPath() + path.splitext(selected_version)[0] + ".jpg"
+			pict_path = f"{self.current_project.getSelection().getPictsPath()}/{path.splitext(selected_version)[0]}.jpg"
 
 			if self.current_project.getSelectionType() == "shot":
 				if self.version_mode:
@@ -1744,7 +1744,7 @@ class SuperPipe(QMainWindow):
 
 			img = "assets/img/img_not_available.jpg"
 			if all_picts_path_array:
-				img = max(all_picts_path_array, key = path.getmtime)
+				img = max(all_picts_path_array, key=path.getmtime)
 
 			shot_name_widget = QLabel(shot.getShotName(), alignment=Qt.AlignHCenter)
 			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter)

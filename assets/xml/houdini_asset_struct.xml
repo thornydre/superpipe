@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <data>
-  <dir tag="scene_dir">
+  <dir name="" tag="scenes_dir">
     <dir name="abc"/>
     <dir name="audio"/>
-    <dir name="backup"/>
+    <dir name="backup" tag="edits_dir"/>
     <dir name="comp"/>
     <dir name="desk"/>
     <dir name="flip"/>
@@ -16,5 +16,5 @@
     <dir name="sim"/>
     <dir name="tex"/>
     <dir name="video" tag="playblast_dir"/>
-  <dir/>
+  </dir>
 </data>

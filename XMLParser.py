@@ -2,6 +2,7 @@
 
 import xml.etree.ElementTree
 
+from pathlib import Path
 from os import makedirs
 
 class XMLParser:
@@ -18,7 +19,8 @@ class XMLParser:
 
 	def recursiveParser(self, root, root_folder):
 		if root.tag == "dir":
-			makedirs(root_folder)
+			if not Path(root_folder).is_dir():
+				makedirs(root_folder)
 
 		for child in root:
 			self.recursiveParser(child, root_folder + "/" + child.attrib["name"])
