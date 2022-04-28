@@ -36,10 +36,10 @@ from ManageBackupsDialog import *
 class SuperPipe(QMainWindow):
 # Class: Main class of Superpipe, containing mostly UI
 	def __init__(self, app):
+		super(SuperPipe, self).__init__()
+
 		self.settings = Settings("assets/settings.spi")
 		self.settings.loadGeneralSettings()
-
-		super(SuperPipe, self).__init__()
 
 		self.app = app
 
@@ -240,7 +240,7 @@ class SuperPipe(QMainWindow):
 		self.asset_filter_textfield.textChanged.connect(self.updateAssetListView)
 		self.asset_list = QTreeWidget()
 		self.asset_list.setHeaderHidden(True)
-		self.asset_list.itemSelectionChanged.connect(self.assetListCommand)
+		self.asset_list.currentItemChanged.connect(self.assetListCommand)
 		self.categories = {"character": QTreeWidgetItem(["CHARACTER"]), "fx": QTreeWidgetItem(["FX"]), "props": QTreeWidgetItem(["PROPS"]), "set": QTreeWidgetItem(["SET"])}
 		for cat in self.categories:
 			self.asset_list.addTopLevelItem(self.categories[cat])
@@ -256,7 +256,7 @@ class SuperPipe(QMainWindow):
 
 		shot_label = QLabel("Shots", alignment=Qt.AlignHCenter)
 		self.shot_list = QListWidget()
-		self.shot_list.itemSelectionChanged.connect(self.shotListCommand)
+		self.shot_list.currentItemChanged.connect(self.shotListCommand)
 
 		sidebar_shots_layout.addWidget(shot_label, alignment=Qt.AlignHCenter)
 		sidebar_shots_layout.addWidget(self.shot_list)
