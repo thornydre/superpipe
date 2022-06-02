@@ -8,11 +8,9 @@ class Resources:
 		if line == -1:
 			with open(file, "a") as f:
 				f.write(text)
-			f.close()
 		else:
 			with open(file, "r") as f:
 				lines = f.readlines()
-			f.close()
 
 			if len(lines) < line:
 				for i in range(line - len(lines)):
@@ -22,8 +20,6 @@ class Resources:
 
 			with open(file, "w") as f:
 				for l in lines:
-					f.write(l)
-			f.close()
 
 
 	def normString(data):
