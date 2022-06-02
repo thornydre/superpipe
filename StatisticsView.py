@@ -27,7 +27,6 @@ class StatisticsView(Frame):
 
 			with open(self.project_stats_path, "r") as f:
 				str_stats = f.read()
-			f.close()
 
 			stats_label = Label(self, text = "STATISTICS", bg = self.theme.main_color, fg = self.theme.text_color, height = 1, justify = CENTER, font = "Helvetica 11 bold")
 			stats_label.pack(expand = True, fill = BOTH, pady = 10)
