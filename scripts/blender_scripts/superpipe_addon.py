@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Superpipe Tools",
     "author": "Lucas BOUTROT",
-    "version": (1, 5),
+    "version": (2, 0),
     "blender": (2, 90, 0),
     "location": "View3D > Tools > Superpipe",
     "description": "Pipeline tools to work with Superpipe",
@@ -114,8 +114,8 @@ def superpipe_save():
     elif ori_height > ori_width:
         new_width = round(new_height / ori_height * ori_width)
 
-    bpy.context.scene.render.resolution_x = new_width
-    bpy.context.scene.render.resolution_y = new_height
+    bpy.context.scene.render.resolution_x = int(new_width)
+    bpy.context.scene.render.resolution_y = int(new_height)
     bpy.context.scene.render.resolution_percentage = 100
 
     bpy.context.scene.render.image_settings.file_format = "JPEG"
@@ -139,14 +139,15 @@ def superpipe_save():
     bpy.ops.wm.save_mainfile()
     
     ## CREATE REFERENCE ##
-    if "edits" in directory:
-        if path.isfile(directory + "../reference_" + file_name + ".blend"):
-            remove(directory + "../reference_" + file_name + ".blend")
-        copyfile(directory + file_name + ".blend", directory + "../reference_" + path.splitext(file_name)[0][:-4] + ".blend")
-    else:
-        if path.isfile(directory + "reference_" + file_name + ".blend"):
-            remove(directory + "reference_" + file_name + ".blend")
-        copyfile(directory + file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
+    if "04_asset" in directory:
+        if "edits" in directory:
+            if path.isfile(directory + "../reference_" + file_name + ".blend"):
+                remove(directory + "../reference_" + file_name + ".blend")
+            copyfile(directory + file_name + ".blend", directory + "../reference_" + path.splitext(file_name)[0][:-4] + ".blend")
+        else:
+            if path.isfile(directory + "reference_" + file_name + ".blend"):
+                remove(directory + "reference_" + file_name + ".blend")
+            copyfile(directory + file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
 
 def superpipe_incremental_save(comment):
     directory = bpy.path.abspath("//")
@@ -185,7 +186,6 @@ def superpipe_incremental_save(comment):
 
     with open(versions_file, "r") as f:
         all_comments = f.read()
-    f.close()
 
     comments_list = all_comments.split("\n---\n")
     i = 0
@@ -206,7 +206,6 @@ def superpipe_incremental_save(comment):
 
     with open(versions_file, "w") as f:
         f.write(final_comment)
-    f.close()
         
     ## CHANGES PROPERTIES VALUES ##
     new_width = 512.0
@@ -217,8 +216,8 @@ def superpipe_incremental_save(comment):
     elif ori_height > ori_width:
         new_width = round(new_height / ori_height * ori_width)
 
-    bpy.context.scene.render.resolution_x = new_width
-    bpy.context.scene.render.resolution_y = new_height
+    bpy.context.scene.render.resolution_x = int(new_width)
+    bpy.context.scene.render.resolution_y = int(new_height)
     bpy.context.scene.render.resolution_percentage = 100
     bpy.context.scene.render.image_settings.file_format = "JPEG"
     
@@ -250,14 +249,15 @@ def superpipe_incremental_save(comment):
         remove(current_file_ext)
     
     ## CREATE REFERENCE ##
-    if "edits" in directory:
-        if path.isfile(directory + "../reference_" + file_name + ".blend"):
-            remove(directory + "../reference_" + file_name + ".blend")
-        copyfile(directory + "../" + new_file_name + ".blend", directory + "../reference_" + path.splitext(file_name)[0][:-4] + ".blend")
-    else:
-        if path.isfile(directory + "reference_" + file_name + ".blend"):
-            remove(directory + "reference_" + file_name + ".blend")
-        copyfile(directory + new_file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
+    if "04_asset" in directory:
+        if "edits" in directory:
+            if path.isfile(directory + "../reference_" + file_name + ".blend"):
+                remove(directory + "../reference_" + file_name + ".blend")
+            copyfile(directory + "../" + new_file_name + ".blend", directory + "../reference_" + path.splitext(file_name)[0][:-4] + ".blend")
+        else:
+            if path.isfile(directory + "reference_" + file_name + ".blend"):
+                remove(directory + "reference_" + file_name + ".blend")
+            copyfile(directory + new_file_name + ".blend", directory + "reference_" + path.splitext(file_name)[0][:-4] + ".blend")
 
 
 def superpipe_import_asset():

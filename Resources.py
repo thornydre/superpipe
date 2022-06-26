@@ -20,6 +20,7 @@ class Resources:
 
 			with open(file, "w") as f:
 				for l in lines:
+					f.write(l)
 
 
 	def normString(data):

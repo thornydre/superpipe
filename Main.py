@@ -3,10 +3,6 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt, QFile, QTextStream
 from PySide6.QtGui import *
-from Settings import *
-from Project import *
-from Resources import *
-from ListsObserver import *
 from os import path, mkdir, listdir
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -20,6 +16,9 @@ import subprocess
 import webbrowser
 import threading
 
+from Settings import *
+from Project import *
+from Resources import *
 from CustomSlider import *
 from CustomVideoPlayer import *
 # from StatisticsView import *
@@ -43,7 +42,7 @@ class SuperPipe(QMainWindow):
 
 		self.app = app
 
-		file = QFile("./assets/themes/" + self.settings.getSetting("theme") + ".css")
+		file = QFile(f"./assets/themes/{self.settings.getSetting('theme')}.css")
 		file.open(QFile.ReadOnly|QFile.Text)
 		stream = QTextStream(file)
 		self.app.setStyleSheet(stream.readAll())
@@ -641,11 +640,17 @@ class SuperPipe(QMainWindow):
 		self.main_preview_layout = QVBoxLayout()
 		preview_scroll_area = QScrollArea()
 		preview_scroll_area.setWidgetResizable(True)
+		preview_scroll_area.verticalScrollBar().setSingleStep(8)
+		buffer_widget = QWidget()
+		buffer_layout = QVBoxLayout()
 		self.preview_scroll_widget = QWidget()
 		self.preview_scroll_layout = QGridLayout()
 
 		self.main_preview_layout.addWidget(preview_scroll_area)
-		preview_scroll_area.setWidget(self.preview_scroll_widget)
+		buffer_widget.setLayout(buffer_layout)
+		buffer_layout.addWidget(self.preview_scroll_widget)
+		buffer_layout.addStretch(1)
+		preview_scroll_area.setWidget(buffer_widget)
 		self.preview_scroll_widget.setLayout(self.preview_scroll_layout)
 
 		## Finalize preview layout ##
@@ -737,7 +742,7 @@ class SuperPipe(QMainWindow):
 		sidebar_right_bottom_layout = QVBoxLayout()
 
 		self.version_list = QListWidget()
-		self.version_list.itemSelectionChanged.connect(self.versionlistCommand)
+		self.version_list.currentItemChanged.connect(self.versionlistCommand)
 		sidebar_right_bottom_layout.addWidget(self.version_list)
 
 		sidebar_right_layout.addLayout(sidebar_right_bottom_layout)
@@ -996,7 +1001,9 @@ class SuperPipe(QMainWindow):
 
 
 	def assetListCommand(self):
-		self.shot_list.clearSelection()
+		print("toto")
+		#self.shot_list.clearSelection()
+		self.shot_list.setCurrentItem(None)
 		if self.current_project:
 			selected_asset = self.asset_list.currentItem()
 
@@ -1117,7 +1124,8 @@ class SuperPipe(QMainWindow):
 
 
 	def shotListCommand(self):
-		self.asset_list.clearSelection()
+		#self.asset_list.clearSelection()
+		self.asset_list.setCurrentItem(None)
 		if self.shot_list.currentItem():
 			if self.shot_list.count() != 0:
 				self.main_home_page_widget.setVisible(False)
@@ -1547,7 +1555,7 @@ class SuperPipe(QMainWindow):
 					item.setBackground(QBrush(QColor(229, 82, 82)))
 
 			else:
-				self.dialog("ERROR", "W", "The shot " + shot.getShotName() + " has a problem !")
+				self.dialog("ERROR", "W", f"The shot {shot.getShotName()} has a problem !")
 
 
 	def updateVersionListView(self, shot = None, asset = None):
@@ -1733,27 +1741,32 @@ class SuperPipe(QMainWindow):
 		all_shots_preview = []
 
 		i = 0
-		for shot in self.current_project.getShotList().values():
+		for i, shot in enumerate(self.current_project.getShotList().values()):
 			all_picts_path = shot.getPictsPath()
 
 			all_picts_path_array = []
 
 			for f in listdir(all_picts_path):
 				if path.splitext(f)[1] == ".jpg" or path.splitext(f)[1] == ".gif":
-					all_picts_path_array.append(all_picts_path + f)
+					all_picts_path_array.append(f"{all_picts_path}\\{f}")
 
 			img = "assets/img/img_not_available.jpg"
 			if all_picts_path_array:
 				img = max(all_picts_path_array, key=path.getmtime)
 
-			shot_name_widget = QLabel(shot.getShotName(), alignment=Qt.AlignHCenter)
-			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter)
+			shot_name_widget = QLabel(shot.getShotName(), alignment=Qt.AlignHCenter|Qt.AlignTop)
+			shot_preview_widget = QLabel(alignment=Qt.AlignHCenter|Qt.AlignTop)
 			preview_pixmap = QPixmap(img)
 			shot_preview_widget.setPixmap(preview_pixmap.scaledToWidth(230))
 
-			self.preview_scroll_layout.addWidget(shot_name_widget, int(i/5) * 2, i % 5)
-			self.preview_scroll_layout.addWidget(shot_preview_widget, int(i/5) * 2, i % 5)
-			i += 1
+			preview_layout = QVBoxLayout()
+			preview_layout.addWidget(shot_name_widget)
+			preview_layout.addWidget(shot_preview_widget)
+			preview_layout.addStretch(1)
+
+			self.preview_scroll_layout.setRowMinimumHeight(int(i/5) * 2, 170)
+
+			self.preview_scroll_layout.addLayout(preview_layout, int(i/5) * 2, i % 5)
 
 		self.app.restoreOverrideCursor()
 
@@ -1921,7 +1934,7 @@ class SuperPipe(QMainWindow):
 			self.settings.setSetting("theme", preferences["theme"])
 			self.settings.saveSettings()
 
-			file = QFile("./assets/themes/" + preferences["theme"] + ".css")
+			file = QFile(f"./assets/themes/{preferences['theme']}.css")
 			file.open(QFile.ReadOnly|QFile.Text)
 			stream = QTextStream(file)
 			self.app.setStyleSheet(stream.readAll())
@@ -1972,24 +1985,25 @@ class SuperPipe(QMainWindow):
 
 
 	def runObserver(self):
-		self.current_project.getDirectory()
+		return
+		# self.current_project.getDirectory()
 
-		my_event_handler = FileSystemEventHandler()
-		my_event_handler.on_created = self.refresh
-		my_event_handler.on_deleted = self.refresh
-		my_event_handler.on_moved = self.refresh
+		# my_event_handler = FileSystemEventHandler()
+		# my_event_handler.on_created = self.refresh
+		# my_event_handler.on_deleted = self.refresh
+		# my_event_handler.on_moved = self.refresh
 
-		self.project_observer = Observer()
-		self.project_observer.schedule(my_event_handler, self.current_project.getDirectory(), recursive=True)
+		# self.project_observer = Observer()
+		# self.project_observer.schedule(my_event_handler, self.current_project.getDirectory(), recursive=True)
 
-		self.project_observer.start()
+		# self.project_observer.start()
 
-		try:
-			while True:
-				time.sleep(1)
-		except KeyboardInterrupt:
-			self.project_observer.stop()
-			self.project_observer.join()
+		# try:
+		# 	while True:
+		# 		time.sleep(1)
+		# except KeyboardInterrupt:
+		# 	self.project_observer.stop()
+		# 	self.project_observer.join()
 
 
 	def dialog(self, title, purpose, message):

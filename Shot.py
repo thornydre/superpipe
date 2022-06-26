@@ -48,8 +48,15 @@ class Shot:
 		self.percentage = self.shot_settings.getSetting("percentage")
 		self.frame_range = self.shot_settings.getSetting("frame_range")
 		self.description = self.shot_settings.getSetting("description")
-		if not self.software:
+		if self.software:
+			self.shot_settings.setSetting("software", self.software)
+			self.shot_settings.saveSettings()
+		else:
 			self.software = self.shot_settings.getSetting("software")
+
+		extensions = {"maya":".ma", "blender":".blend", "houdini":".hip"}
+
+		self.extension = extensions[self.software]
 
 		self.setTaggedPaths()
 
@@ -271,19 +278,19 @@ class Shot:
 				self.shot_dir.rename(new_dir)
 
 				for f in Path(f"{new_dir}/scenes/").iterdir():
-					if self.shot_name in f.parts:
+					if self.shot_name in f.parts[-1]:
 						f.rename(str(f).replace(self.shot_name, new_name))
 
 				for f in Path(f"{new_dir}/scenes/edits/").iterdir():
-					if self.shot_name in f.parts:
+					if self.shot_name in f.parts[-1]:
 						f.rename(str(f).replace(self.shot_name, new_name))
 
 				for f in Path(f"{new_dir}/scenes/backup/").iterdir():
-					if self.shot_name in f.parts:
+					if self.shot_name in f.parts[-1]:
 						f.rename(str(f).replace(self.shot_name, new_name))
 
 				for f in Path(f"{new_dir}/images/screenshots/").iterdir():
-					if self.shot_name in f.parts:
+					if self.shot_name in f.parts[-1]:
 						f.rename(str(f).replace(self.shot_name, new_name))
 			except Exception as e:
 				print(e)

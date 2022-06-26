@@ -2,12 +2,12 @@ import maya.cmds as cmds
 from os import path, listdir, mkdir, remove
 from shutil import copyfile
 
-cmds.menu(l = "SuperPipe", p = "MayaWindow")
-cmds.menuItem(l = "Save", c = "override_save()")
-cmds.menuItem(l = "Increment and Save", c = "incremental_save()")
+cmds.menu(l="SuperPipe", p="MayaWindow")
+cmds.menuItem(l="Save", c="override_save()")
+cmds.menuItem(l="Increment and Save", c="incremental_save()")
 
 def override_save():
-    current_file_ext = cmds.file(query = True, sceneName = True)
+    current_file_ext = cmds.file(query=True, sceneName=True)
     current_file = current_file_ext.strip(".ma")
     directory = path.dirname(current_file_ext)
     file_name = path.basename(current_file)
@@ -18,19 +18,19 @@ def override_save():
     if "edits" in directory:
         if not path.isdir(directory + "/../../images/screenshots"):
             mkdir(directory + "/../../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../../images/screenshots/" + file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False)
+        cmds.playblast(frame=1, format="image", cf=directory + "/../../images/screenshots/" + file_name + ".gif", v=False, wh=(498, 270), p=100, orn=False)
     else:
         if not path.isdir(directory + "/../images/screenshots"):
             mkdir(directory + "/../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../images/screenshots/" + file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False)
+        cmds.playblast(frame=1, format="image", cf=directory + "/../images/screenshots/" + file_name + ".gif", v=False, wh=(498, 270), p=100, orn=False)
     
     cmds.setAttr("defaultRenderGlobals.imageFormat", frm)
     
     ## SAVE ##
-    cmds.file(save = True, type = "mayaAscii")
+    cmds.file(save=True, type="mayaAscii")
     
 def incremental_save():
-    current_file_ext = cmds.file(query = True, sceneName = True)
+    current_file_ext = cmds.file(query=True, sceneName=True)
     current_file = current_file_ext.strip(".ma")
     directory = path.dirname(current_file_ext)
     file_name = path.basename(current_file)
@@ -55,22 +55,22 @@ def incremental_save():
     if "edits" in directory:
         if not path.isdir(directory + "/../../images/screenshots"):
             mkdir(directory + "/../../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False)
+        cmds.playblast(frame=1, format="image", cf=directory + "/../../images/screenshots/" + new_file_name + ".gif", v=False, wh=(498, 270), p=100, orn=False)
     else:
         if not path.isdir(directory + "/../images/screenshots"):
             mkdir(directory + "/../images/screenshots")
-        cmds.playblast(frame = 1, format = "image", cf = directory + "/../images/screenshots/" + new_file_name + ".gif", v = False, wh = (498, 270), p = 100, orn = False)
+        cmds.playblast(frame=1, format="image", cf=directory + "/../images/screenshots/" + new_file_name + ".gif", v=False, wh=(498, 270), p=100, orn=False)
     
     cmds.setAttr("defaultRenderGlobals.imageFormat", frm)
     
     ## SAVE ##
     if "edits" in directory:
-        cmds.file(rename = directory + "/../" + new_file_name + ".ma")
-        cmds.file(save = True, type = "mayaAscii")
+        cmds.file(rename=directory + "/../" + new_file_name + ".ma")
+        cmds.file(save=True, type="mayaAscii")
         copyfile(directory + "/../" + current_file_ext, directory + "/" + current_file_ext)
         remove(directory + "/../" + current_file_ext)
     else:
-        cmds.file(rename = directory + "/" + new_file_name + ".ma")
-        cmds.file(save = True, type = "mayaAscii")
+        cmds.file(rename=directory + "/" + new_file_name + ".ma")
+        cmds.file(save=True, type="mayaAscii")
         copyfile(current_file_ext, directory + "/edits/" + file_name + ".ma")
         remove(current_file_ext)

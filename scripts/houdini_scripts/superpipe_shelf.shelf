@@ -119,13 +119,11 @@ class SuperpipeSave(QWidget):
 
         with open(versions_file, "r") as f:
             all_comments = json.load(f)
-        f.close()
 
         all_comments[new_file_name + file_extension] = comment
 
         with open(versions_file, "w") as f:
             json.dump(all_comments, f)
-        f.close()
 
         ## SCREENSHOT ##
         viewer = toolutils.sceneViewer()
