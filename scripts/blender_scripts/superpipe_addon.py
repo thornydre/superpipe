@@ -102,6 +102,7 @@ def superpipe_save():
     ori_width = bpy.context.scene.render.resolution_x
     ori_height = bpy.context.scene.render.resolution_y
     temp_percentage = bpy.context.scene.render.resolution_percentage
+    temp_transparency = bpy.context.scene.render.film_transparent
 
     temp_type = bpy.context.scene.render.image_settings.file_format
     temp_path = bpy.data.scenes["Scene"].render.filepath
@@ -118,8 +119,9 @@ def superpipe_save():
     bpy.context.scene.render.resolution_x = int(new_width)
     bpy.context.scene.render.resolution_y = int(new_height)
     bpy.context.scene.render.resolution_percentage = 100
-
+    bpy.context.scene.render.film_transparent = False
     bpy.context.scene.render.image_settings.file_format = "JPEG"
+
     if "edits" in directory:
         bpy.data.scenes["Scene"].render.filepath = directory + "../../images/screenshots/" + file_name + ".jpg"
     else:
@@ -132,6 +134,7 @@ def superpipe_save():
     bpy.context.scene.render.resolution_x = ori_width
     bpy.context.scene.render.resolution_y = ori_height
     bpy.context.scene.render.resolution_percentage = temp_percentage
+    bpy.context.scene.render.film_transparent = temp_transparency
     
     bpy.data.scenes["Scene"].render.filepath = temp_path
     bpy.context.scene.render.image_settings.file_format = temp_type
@@ -160,6 +163,7 @@ def superpipe_incremental_save(comment):
     ori_width = bpy.context.scene.render.resolution_x
     ori_height = bpy.context.scene.render.resolution_y
     temp_percentage = bpy.context.scene.render.resolution_percentage
+    temp_transparency = bpy.context.scene.render.film_transparent
 
     temp_type = bpy.context.scene.render.image_settings.file_format
     temp_path = bpy.data.scenes["Scene"].render.filepath
@@ -204,6 +208,7 @@ def superpipe_incremental_save(comment):
     bpy.context.scene.render.resolution_x = int(new_width)
     bpy.context.scene.render.resolution_y = int(new_height)
     bpy.context.scene.render.resolution_percentage = 100
+    bpy.context.scene.render.film_transparent = False
     bpy.context.scene.render.image_settings.file_format = "JPEG"
     
     if "edits" in directory:
@@ -218,6 +223,7 @@ def superpipe_incremental_save(comment):
     bpy.context.scene.render.resolution_x = ori_width
     bpy.context.scene.render.resolution_y = ori_height
     bpy.context.scene.render.resolution_percentage = temp_percentage
+    bpy.context.scene.render.film_transparent = temp_transparency
     
     bpy.data.scenes["Scene"].render.filepath = temp_path
     bpy.context.scene.render.image_settings.file_format = temp_type
