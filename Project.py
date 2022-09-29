@@ -184,6 +184,10 @@ class Project:
 
 			shot.renameShot(swap_shot_name_backup)
 			self.shot_list[swap_shot_name_backup] = self.shot_list.pop("s00p000")
+
+			shot.setTaggedPaths()
+			swap_shot.setTaggedPaths()
+
 		except:
 			print("ERROR : Could not rename the shots")
 
@@ -204,6 +208,10 @@ class Project:
 
 			shot.renameShot(swap_shot_name_backup)
 			self.shot_list[swap_shot_name_backup] = self.shot_list.pop("s00p000")
+
+			shot.setTaggedPaths()
+			swap_shot.setTaggedPaths()
+
 		except:
 			print("ERROR : Could not rename the shots")
 

@@ -1643,10 +1643,10 @@ class SuperPipe(QMainWindow):
 
 	def toggleLastVersions(self):
 		if self.current_project.getSelectionType() == "shot":
-			self.updateVersionListView(shot = self.current_project.getSelection())
+			self.updateVersionListView(shot=self.current_project.getSelection())
 		elif self.current_project.getSelectionType() == "asset":
 			if self.asset_list.currentItem().text(0) not in ["CHARACTER", "FX", "PROPS", "SET"]:
-				self.updateVersionListView(asset = self.current_project.getSelection())
+				self.updateVersionListView(asset=self.current_project.getSelection())
 
 
 	def toggleShotDone(self):

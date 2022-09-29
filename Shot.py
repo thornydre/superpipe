@@ -277,21 +277,14 @@ class Shot:
 			try:
 				self.shot_dir.rename(new_dir)
 
-				for f in Path(f"{new_dir}/scenes/").iterdir():
-					if self.shot_name in f.parts[-1]:
-						f.rename(str(f).replace(self.shot_name, new_name))
+				subfolders_list = ["/scenes/", "/scenes/edits/", "/scenes/backup/", "/images/screenshots/"]
 
-				for f in Path(f"{new_dir}/scenes/edits/").iterdir():
-					if self.shot_name in f.parts[-1]:
-						f.rename(str(f).replace(self.shot_name, new_name))
+				for subfolder in subfolders_list:
+					for f in Path(f"{new_dir}{subfolder}").iterdir():
+						if self.shot_name in f.parts[-1]:
+							f.rename(str(f).replace(self.shot_name, new_name))
+							print(f"RENAME : {str(f)} TO {str(f).replace(self.shot_name, new_name)}")
 
-				for f in Path(f"{new_dir}/scenes/backup/").iterdir():
-					if self.shot_name in f.parts[-1]:
-						f.rename(str(f).replace(self.shot_name, new_name))
-
-				for f in Path(f"{new_dir}/images/screenshots/").iterdir():
-					if self.shot_name in f.parts[-1]:
-						f.rename(str(f).replace(self.shot_name, new_name))
 			except Exception as e:
 				print(e)
 				return False
@@ -299,6 +292,8 @@ class Shot:
 		self.shot_name = new_name
 		self.shot_nb, self.sequence = Resources.makeShotNbs(new_name)
 		self.shot_dir = new_dir
+
+		print("#####################")
 
 		return True
 

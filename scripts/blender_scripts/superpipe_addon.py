@@ -11,6 +11,7 @@ bl_info = {
     }
 
 import bpy
+import json
 from os import path, remove, listdir, rename
 from shutil import copyfile
  
@@ -33,7 +34,7 @@ class SUPERPIPE_OT_CommentPopup(bpy.types.Operator):
     bl_idname = "superpipe.comment_popup"
     bl_label = "Superpipe"
 
-    comment = bpy.props.StringProperty(name="Comment")
+    comment: bpy.props.StringProperty(name="Comment")
 
     def execute(self, context):
         superpipe_incremental_save(self.comment)
@@ -173,39 +174,23 @@ def superpipe_incremental_save(comment):
                 current_file = path.splitext(current_file_ext)[0]
                 version = int(current_file[-2:]) + 1
 
-    if version < 10:
-        new_file_name = file_name[:-2] + "0" + str(version)
-    else:
-        new_file_name = file_name[:-2] + str(version)
+    new_file_name = file_name[:-2] + str(version).zfill(2)
     
     ## COMMENT ##
     if "edits" in directory:
         versions_file = directory + "../../superpipe/versions_data.spi"
     else:
         versions_file = directory + "../superpipe/versions_data.spi"
-
+    
     with open(versions_file, "r") as f:
-        all_comments = f.read()
-
-    comments_list = all_comments.split("\n---\n")
-    i = 0
-    comments_dict = {}
-    for version_name in comments_list[:-1:2]:
-        print(version_name)
-        print(comments_list[i + 1])
-        comments_dict[version_name] = comments_list[i + 1]
-        i += 2
-
-    comments_dict[new_file_name + ".blend"] = comment
-
-    print(comments_dict)
-
-    final_comment = ""
-    for version_name, version_comment in comments_dict.items():
-        final_comment += version_name + "\n---\n" + version_comment + "\n---\n"
+        all_comments = json.load(f)
+    f.close()
+        
+    all_comments[new_file_name + ".blend"] = comment
 
     with open(versions_file, "w") as f:
-        f.write(final_comment)
+        json.dump(all_comments, f)
+    f.close()
         
     ## CHANGES PROPERTIES VALUES ##
     new_width = 512.0
