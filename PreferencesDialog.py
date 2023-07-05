@@ -2,7 +2,6 @@
 
 from PySide6.QtWidgets import *
 from PySide6.QtCore import Qt
-from Resources import *
 from os import listdir, path
 from Settings import *
 
